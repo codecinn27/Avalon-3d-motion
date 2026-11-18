@@ -416,11 +416,19 @@ async function traceSummary(file) {
   const at = (ts) => { let lo = 0, hi = marks.length - 1; if (ts < marks[0][0]) return marks[0][1]; while (lo < hi) { const m = (lo + hi + 1) >> 1; marks[m][0] <= ts ? (lo = m) : (hi = m - 1); } return marks[lo][1]; };
   const tenth = (p) => Math.min(9, Math.floor(p / 10));
   const T = Array.from({ length: 10 }, () => ({ frames: 0, passes: 0, maxPasses: 0, gpu: 0, from: Infinity, to: 0, freezes: 0 }));
+  // by 1% of the page: the peak passes in one frame is steady between traces, where an average is not (spec 013, CP-7: a long freeze
+  // lands all its frames on one percent, because the page writes the markers and stops while frozen, and pulls a tenth's average up)
+  const C = Array.from({ length: 101 }, () => ({ frames: 0, max: 0, from: Infinity, to: 0 }));
   let j = 0;
   for (const [ts, dur] of draws) {
     let n = 0;
     while (j < passes.length && passes[j] < ts) j++;
     for (let k = j; k < passes.length && passes[k] <= ts + dur; k++) n++;
+    const c = C[Math.max(0, Math.min(100, at(ts)))];
+    c.frames++;
+    c.max = Math.max(c.max, n);
+    c.from = Math.min(c.from, ts);
+    c.to = Math.max(c.to, ts);
     const t = T[tenth(at(ts))];
     t.frames++;
     t.passes += n;
@@ -447,6 +455,18 @@ async function traceSummary(file) {
     if (!t.frames) return console.log(`      ${i + 1}: no frames`);
     console.log(`      ${i + 1}: ${secs ? (t.frames / secs).toFixed(0) : '?'} frames/s, ${(t.passes / t.frames).toFixed(1)} passes per frame (most ${t.maxPasses}), GPU drawing ${secs ? Math.round((100 * t.gpu) / 1e6 / secs) : '?'}% of the time, ${t.freezes} freeze(s)`);
   });
+  console.log('\n    by 1% of the page: the most passes in one frame (- = no marker at that percent; compare variants by these, not by the averages)');
+  for (let d = 0; d < 100; d += 10) console.log(`      ${String(d).padStart(2)}-${d + 9}%: ${C.slice(d, d + 10).map((c) => (c.frames ? String(c.max) : '-').padStart(3)).join('')}`);
+  // hot spots: runs of percents at 15 passes or more (gaps of a missing percent are bridged), with the time the page stayed on them
+  const spots = [];
+  for (let p = 0; p <= 100; p++) {
+    const c = C[p];
+    if (!c.frames || c.max < 15) continue;
+    const last = spots[spots.length - 1];
+    if (last && p - last.to <= 2) (last.to = p), (last.max = Math.max(last.max, c.max)), (last.secs += (c.to - c.from) / 1e6);
+    else spots.push({ from: p, to: p, max: c.max, secs: (c.to - c.from) / 1e6 });
+  }
+  console.log(`    hot spots (15 passes or more): ${spots.length ? spots.map((s) => `${s.from}${s.to > s.from ? `-${s.to}` : ''}% peak ${s.max}, ${s.secs.toFixed(1)} s`).join('; ') : 'none'}`);
   console.log(`\n    main-thread freezes over 200 ms (${freezes.length}), longest first:`);
   for (const [ts, gap, p] of freezes.sort((a, b) => b[1] - a[1]).slice(0, 12)) {
     const c = pageCommits.filter(([cs, cd]) => cs < ts + gap && cs + cd > ts).reduce((m, [, cd]) => Math.max(m, cd), 0);

@@ -1,0 +1,11 @@
+[
+  { "label": "cp7-control", "dir": "perf/builds/cp6" },
+  { "label": "cp7-no-glow", "dir": "perf/builds/cp6", "css": ".ring.is-night .slot{box-shadow:none!important}" },
+  { "label": "cp7-no-veil", "dir": "perf/builds/cp6", "css": ".ring.is-night .slot::after{content:none!important}" },
+  { "label": "cp7-ghost-no-blend", "dir": "perf/builds/cp6", "css": ".bl-ghost{mix-blend-mode:normal!important}" },
+  { "label": "cp7-no-badge-shadow", "dir": "perf/builds/cp6", "css": ".card .card-front .in::after{filter:none!important}" },
+  { "label": "cp7-no-flash", "dir": "perf/builds/cp6", "css": ".bl-flash{display:none!important}" },
+  { "label": "cp7-dagger-plain", "dir": "perf/builds/cp6", "css": ".bl-dag g{filter:none!important}.bd-gl{clip-path:none!important;display:none!important}" },
+  { "label": "cp7-slot-opacity-1", "dir": "perf/builds/cp6", "css": ".slot{opacity:1!important}" },
+  { "label": "cp7-all-off", "dir": "perf/builds/cp6", "css": ".ring.is-night .slot{box-shadow:none!important}.ring.is-night .slot::after{content:none!important}.bl-ghost{mix-blend-mode:normal!important}.card .card-front .in::after{filter:none!important}.bl-flash{display:none!important}.bl-dag g{filter:none!important}.bd-gl{display:none!important}" }
+]

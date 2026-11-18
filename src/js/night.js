@@ -106,9 +106,28 @@ export function createNight(o) {
     if (k === 't') el.style.transform = v;
     else if (k === 'o') el.style.opacity = v;
     else if (k === 'v') el.style.visibility = v;
+    else if (k === 'face') v ? (el.dataset.face = v) : delete el.dataset.face;
     else el.style.setProperty(k, v);
   };
   api.put = put;
+  // turn a vote, quest or climb card (its .pc-3d) to e: 0 = face down, 1 = face up. Phones (spec 013, CP-9): a card that is not
+  // turning is flat and shows only the face that is up (data-face, see main.css), as the seat cards in cards.js (CP-6).
+  // A 3D context per card made the GPU draw every such card off screen first.
+  // CP-10 (owner's choice: option C, plain): on phones the turn is flat too, a 2D squash. scaleX goes 1 → 0 with the face that
+  // is down, the face swaps at the edge (e = 0.5), then 0 → 1 with the face that is up. Ten vote cards turning together in 3D made
+  // 19 passes per frame and a 2.9 s freeze. Desktops keep the real 3D turn.
+  const lite = document.documentElement.classList.contains('lite');
+  api.turn = (el, e) => {
+    if (lite) {
+      put(el, 'face', e > 0.5 ? 'front' : 'back');
+      if (e <= 0 || e >= 1) return put(el, 't', '');
+      const sx = Math.max(0.01, Math.abs(Math.cos(Math.PI * (1 - e))));
+      put(el, 't', `scaleX(${sx.toFixed(3)})`);
+    } else {
+      put(el, 'face', '');
+      put(el, 't', `rotateY(${(180 * (1 - e)).toFixed(2)}deg)`);
+    }
+  };
 
   // ---------- measuring (called by hero() whenever the table is measured) ----------
   function measure(vw, vh, ringTop, baseW) {

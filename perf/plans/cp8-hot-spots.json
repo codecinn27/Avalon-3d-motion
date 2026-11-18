@@ -1,0 +1,9 @@
+[
+  { "label": "cp8-control", "dir": "perf/builds/cp6" },
+  { "label": "cp8-flat-cards", "dir": "perf/builds/cp6", "css": ".card-3d{transform-style:flat!important}" },
+  { "label": "cp8-no-cards", "dir": "perf/builds/cp6", "css": ".slot,.slot *{visibility:hidden!important}" },
+  { "label": "cp8-flat-chapter-cards", "dir": "perf/builds/cp6", "css": ".pc,.pc-3d,.pc *{transform-style:flat!important}" },
+  { "label": "cp8-no-chapter-cards", "dir": "perf/builds/cp6", "css": ".pc,.pc *{visibility:hidden!important}" },
+  { "label": "cp8-no-silk", "dir": "perf/builds/cp6", "css": "#silk{display:none!important}" },
+  { "label": "cp8-no-tints", "dir": "perf/builds/cp6", "css": ".tint{display:none!important}" }
+]

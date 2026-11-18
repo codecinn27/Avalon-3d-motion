@@ -127,7 +127,7 @@ export function createClimb({ gsap, sec, ring, night, vote, quest, lady, desktop
         c.failOn = isFail;
         c.el.classList.toggle('is-fail', isFail);
       }
-      put(c.flip, 't', `rotateY(${(180 * (1 - smooth(clamp(flip)))).toFixed(2)}deg)`);
+      night.turn(c.flip, smooth(clamp(flip)));
       put(c.glow, 'o', clamp(c.gl).toFixed(3));
     });
     // red light that spreads over the table from the Fails (the second is wider), the Percival and Morgana shine

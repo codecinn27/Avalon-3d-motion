@@ -1,6 +1,6 @@
 # 013 Mobile performance (scroll lag on real phones)
 
-**Status**: in progress, worked one checkpoint at a time (see "Checkpoints" below). CP-1 and CP-2 measured: fewer layers (351 → 210), steadier frames (p95 108 → 58 ms), but the average is still about 21 to 25 fps because of freezes of up to about 3 s. CP-3 traced them: inside the pinned story the GPU draws 13 to 38 off-screen surfaces per frame (filters, 3D contexts, clip-paths, blends), against 1 after it, and that backs up the main thread. CP-4 hid the undrawn threads: layers 211 → 146, but the surfaces per frame did not fall, so the threads were not drawing them. CP-5 traced switch-offs: **the ten story cards make most of the surfaces and the freezes**, and only removing both their 3D context and their rounded clip cuts them (freezes over 500 ms 11 → 1). CP-6 did that for real: average fps 21.9 → 40.1 (run ranges apart), worst frame 3.2 s → 0.55 s, wall surfaces 41 → 15.5 per frame. Next: CP-7, tenth 8 (the 1.5 s freeze left at 70%), then the chapters' own effects. **Not ready to ship**: the goal is the ship rule in "What counts as smooth".
+**Status**: in progress, worked one checkpoint at a time (see "Checkpoints" below). CP-1 and CP-2 measured: fewer layers (351 → 210), steadier frames (p95 108 → 58 ms), but the average is still about 21 to 25 fps because of freezes of up to about 3 s. CP-3 traced them: inside the pinned story the GPU draws 13 to 38 off-screen surfaces per frame (filters, 3D contexts, clip-paths, blends), against 1 after it, and that backs up the main thread. CP-4 hid the undrawn threads: layers 211 → 146, but the surfaces per frame did not fall, so the threads were not drawing them. CP-5 traced switch-offs: **the ten story cards make most of the surfaces and the freezes**, and only removing both their 3D context and their rounded clip cuts them (freezes over 500 ms 11 → 1). CP-6 did that for real: average fps 21.9 → 40.1 (run ranges apart), worst frame 3.2 s → 0.55 s, wall surfaces 41 → 15.5 per frame. CP-7 traced seven suspects in tenth 8 and ruled them all out: the heavy places are two narrow hot spots, 40 to 43% and 70 to 71%, at 18 to 19 surfaces per frame whatever is switched off. CP-8 proved the cause: the chapters' own small cards (`.pc`, the vote, quest and climb cards) stay 3D contexts even at rest. Flattened, both spots go (peaks 19 → 10 and 17 → 13), and freezes over 500 ms fall 4 → 1. CP-9 did that on phones (resting chapter cards flat, 3D only while they turn): fps 39 → 42 against cp6 (run ranges apart), the 70% spot gone, at no visible change. The vote's ten-cards-at-once turn (43 to 44%) is still a hot spot. CP-10 made every chapter card's turn a flat 2D squash on phones (owner's choice C, desktops keep the 3D turn): the vote's peak 19 → 9, worst frame 1371 → 532 ms, no freeze over 500 ms left on the page, average 40.7 fps. Next: CP-11 and on: the wall, then the chapters' own effects. **Not ready to ship**: the goal is the ship rule in "What counts as smooth".
 **Reported by**: owner ([own.md](../own.md) item 6). Scrolling is very laggy on a real phone. Desktop is smooth, and desktop Chrome in mobile view (DevTools device mode) is smooth too. It happens on Cloudflare and on cPanel alike.
 **Test phone**: Honor X9b (ALI-NX1), 1200x2652, 3.25 device pixels per CSS pixel, screen at 60 Hz during the tests, Chrome 157.
 **Code involved**: `src/templates/layout.mjs` (the `lite` class), `src/styles/main.css`, `src/js/shader.js`, `src/js/main.js`, `src/js/cards.js`, the chapter files. Measuring: `scripts/perf-phone.mjs`, `perf/`.
@@ -53,6 +53,9 @@ The numbers are medians of the runs ("range" = slowest to fastest run). The wors
 | 4 | All: hide the night's and the quest's threads while undrawn | 27.3 (19.8 to 30.1) | 7.5 fps | 83.1 ms | 19.9% | 60 | 2.8 s | 146 | keep: layers 211 → 146 at no visual cost. Fps **unclear** (runs overlap), surfaces per frame unchanged, freezes remain |
 | 5 | No change: traces with one thing switched off at a time | same as CP-4 | | | | | | | diagnosis: the cards' surfaces come from two causes at once, the `preserve-3d` card and the rounded `overflow: hidden` clip. Each alone changes nothing. Both off: surfaces about halved, freezes 21 → 12, over 500 ms 11 → 1 |
 | 6 | All: no rounded clip on the card insides. Phone-only: a card at rest is flat, 3D only while it turns | 40.1 (35.4 to 42.6) | 18.8 fps | 74.8 ms | 17% | 119 | 549 ms | 109 | **keep**: fps against cp4 21.9 (21.4 to 29.7) in the same session, ranges apart. No visual change (phone screenshots) |
+| 7 | No change: switch-off traces for tenth 8 | same as CP-6 | | | | | | | diagnosis: none of the seven suspects (slot glow, grey veil, ghost blend, badge shadow, flash, dagger, slot opacity) is the cause. Two narrow hot spots, 40 to 43% and 70 to 71%, peak at 18 to 19 passes per frame with all of them off. The tenth average there tracks freeze length, not what is drawn |
+| 8 | No change to the site: the two hot spots. Script: a 1% breakdown in `--trace` | same as CP-6 | | | | | | | diagnosis: **the chapter cards' (`.pc`) `preserve-3d`** makes both spots. Flat: peaks 19 → 10 and 17 → 13, freezes over 500 ms 4 → 1. Seat cards, silk and tints change nothing there |
+| 9 | Phone-only: vote, quest and climb cards flat at rest, 3D only while they turn (`night.turn`) | 42 (41.2 to 43.5) | 18.4 fps | 58.2 ms | 17.1% | 98 | 1072 ms | 112 | **keep**: against cp6 39 (37.5 to 39) in the same session, ranges apart. 70% spot gone (peak 17 → 14). The vote's ten-at-once turn (43 to 44%, peak 19) remains. No visible change (phone screenshots, pixel diff) |
 | Ship rule | | 55 or more (45 acceptable) | 45 (30 acceptable) | 20 ms (33) | under 5% (15%) | 0 to 2 (10) | under 100 ms (200) | under 50 (100) | |
 
 ### [x] CP-0 Baseline (2026-11-18)
@@ -344,11 +347,221 @@ This matches CP-5's "flat cards + square card insides" row. 23 freezes over 200 
 
 (Freezes over 50 ms went up because the long freezes broke into many shorter frames, see above. The worst frame, 549 ms, is the measure that shows the freezes going.)
 
-### [ ] CP-7 and on: tenth 8, then the chapters' own effects
+### [x] CP-7 Find what draws tenth 8 (no code change, 2026-11-18)
+
+**Do:** `node scripts/perf-phone.mjs --label cp6 --dir perf/builds/cp6 --layers --port 4880` for what is drawn at 70 to 80%, then one trace per switch-off, all in one session, with a control (cp6, nothing switched off): `node scripts/perf-phone.mjs --plan perf/plans/cp7-switch-offs.json --trace --port 4880`. The CSS is injected after the intro, as in CP-5.
+
+**What the layer scan shows at 70 to 80%** (besides the 1 px `*-static` and `.vh` clip blocks CP-5 ruled out):
+- the 10 `button.slot` layers grow from 5.3 to **8.8 Mpx**: the glow `box-shadow` (`.ring.is-night .slot`) makes every card's layer bigger, even at alpha 0;
+- 5 to 6 `img.bl-ghost` (`mix-blend-mode: screen`, also while at opacity 0);
+- a full-screen white `div.bl-flash` (3.3 Mpx);
+- the dagger's SVG `g` (`filter: drop-shadow`) and its glint `rect.bd-gl` (`clip-path`);
+- at 80%, all 10 slots as opacity groups (the chapter's end fade);
+- not in the scan, because it skips pseudo-elements: each card front's good/evil badge (`.card .card-front .in::after`, `filter: drop-shadow`), face up at the blade.
+
+Surfaces (render passes) per frame, by tenth of the page, plus the peak at 70 to 71% (the most passes in one frame there):
+
+| Switched off (CSS) | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | Peak at 70–71% | Freezes > 200 ms | of them > 500 ms | Longest | Freeze at 69–71% |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| **nothing (control)** | 12.4 | 15.8 | 5.9 | 7.7 | 15.7 | 8.6 | 10.0 | 6.4 | 1.3 | 1.5 | 18 | 20 | 4 | 1.3 s at 40% | 0.36 s |
+| glow `.ring.is-night .slot{box-shadow:none}` | 12.8 | 15.5 | 8.0 | 7.8 | 14.2 | 8.7 | 10.8 | 17.8 | 2.1 | 1.7 | 18 | 12 | 4 | 2.7 s at 70% | 2.69 s |
+| grey veil `.ring.is-night .slot::after{content:none}` | 12.6 | 15.3 | 5.9 | 6.7 | 18.5 | 12.6 | 10.4 | 8.9 | 1.3 | 1.8 | 19 | 19 | 5 | 2.2 s at 44% | 0.75 s |
+| ghost blend `.bl-ghost{mix-blend-mode:normal}` | 12.6 | 15.2 | 6.6 | 7.6 | 15.1 | 10.0 | 10.9 | 8.0 | 1.2 | 1.7 | 19 | 22 | 3 | 1.5 s at 40% | 0.51 s |
+| badge shadow `.card .card-front .in::after{filter:none}` | 13.1 | 15.6 | 7.6 | 10.5 | 14.6 | 8.1 | 10.4 | 17.1 | 1.5 | 1.8 | 19 | 18 | 6 | 1.5 s at 70% | 1.55 s |
+| white flash `.bl-flash{display:none}` | 12.8 | 16.0 | 6.9 | 10.2 | 15.0 | 8.7 | 10.5 | 11.5 | 1.3 | 1.6 | 19 | 15 | 6 | 1.4 s at 39% | 0.87 s |
+| plain dagger `.bl-dag g{filter:none}.bd-gl{display:none}` | 12.6 | 15.0 | 7.7 | 6.7 | 18.9 | 10.0 | 11.1 | 15.0 | 1.2 | 1.6 | 18 | 18 | 5 | 2.0 s at 70% | 1.98 s |
+| slot at `opacity: 1` | 15.5 | 14.7 | 8.0 | 6.6 | 18.1 | 9.9 | 10.7 | 17.1 | 1.2 | 1.7 | 18 | 17 | 4 | 2.3 s at 69% | 2.29 s |
+| **all of the above but opacity** | 12.4 | 15.4 | 8.3 | 6.0 | 18.7 | 9.6 | 10.3 | 17.6 | 1.4 | 1.7 | **18** | 15 | 3 | 2.7 s at 43% | **2.50 s** |
+
+**Result: no suspect is proven. All seven are ruled out for tenth 8.** With every one of them off at once, the page still reaches the same state at 70 to 71%: **18 passes per frame, the GPU drawing them 73% of the time, and a 2.5 s freeze** (248 frames at exactly 18 passes).
+
+- **The tenth-8 average measures how long the page stayed on that state, not what is drawn.** Ranked by tenth-8 passes, the variants fall in exactly the order of their freeze at 69 to 71%: control 6.4 / 0.36 s, ghost 8.0 / 0.51 s, veil 8.9 / 0.75 s, flash 11.5 / 0.87 s, dagger 15.0 / 1.98 s, badge 17.1 / 1.55 s, opacity 17.1 / 2.29 s, all off 17.6 / 2.50 s, glow 17.8 / 2.69 s. While the main thread is frozen the scroll markers stop (the page writes them), so the compositor's frames during a freeze all land on one percent, at the heavy state. A long freeze there pulls the whole tenth's average up. CP-6's "14 surfaces in tenth 8" was the same state with a 1.5 s freeze in it. The CP-6 trace, read by 1%, shows 18 to 19 passes at 70% too.
+- **The same state gives freezes from 0.36 to 2.7 s** between traces of the same build. So the freeze length at one spot cannot rank variants from one trace each. The peak passes at that spot can: it is 18 to 19 in all nine traces.
+- **There are two hot spots, not one.** Read by 1% of the page (a scratch reader over the saved traces), the story is mostly 5 to 15 passes per frame, but two narrow spots peak at **19 at 40 to 43%** and **18 to 19 at 70 to 71%**. In this session the longest freeze was at 39 to 44% in 5 of the 9 traces (up to 2.7 s, once stuck in Commit for 2.6 s), not at 70%. Below and above them the counts fall quickly: 69% 12 to 16, 77 to 81% exactly 1.
+- **Why the layer scan does not show it:** the scan is taken at ten fixed stops (0%, 10%, … 90%), with the page at rest. Both hot spots are 3 to 4% wide and fall between the stops. (A first guess here, that 70% is the blade's opening, was wrong: CP-8's probe shows the blade starts at about 73 to 74%.)
+
+**What this changes in the method:** for a narrow hot spot, the average by tenth misleads, and the peak passes per frame at 1% resolution is the steady measure. `perf-phone.mjs` now prints it (owner's choice, see CP-8).
+
+**Proposal for CP-8.** No fix is justified yet, because no suspect is proven. Next, another diagnosis aimed at the two hot spots: trace cp6 with switch-offs and compare them by the peak at 40 to 43% and 70 to 71%, and read on the phone what is mid-animation at those points. Then CP-9 is the fix for whichever cause is proven.
+
+Results: `perf/results/2026-11-18-14-51-cp6-layers.json`, `2026-11-18-14-52-cp7-*-trace.json` (9 traces, 293 to 326 MB each). Plan: `perf/plans/cp7-switch-offs.json`. The scroll took 39 s in every trace (10 batches), so the variants scrolled alike.
+
+| Measure | Smooth (ship) | Acceptable | Laggy | Baseline | CP1 | CP2 | CP3 | CP4 | CP5 | CP6 | **CP7** |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Average fps while scrolling | ≥ 55 | 45–55 | < 45 | 15.3 | 25.5 | 21.3 | 21.3 (no change) | 27.3 | 27.3 (no change) | 40.1 | **40.1 (no change)** |
+| Worst tenth of the page | ≥ 45 fps | 30–45 | < 30 | 0.4 | 1.3 | 0.7 | 0.7 (no change) | 7.5 | 7.5 (no change) | 18.8 | **18.8 (no change)** |
+| p95 frame time | ≤ 20 ms | ≤ 33 ms | > 33 ms | 241 ms | 74.9 ms | 58.2 ms | 58.2 ms (no change) | 83.1 ms | 83.1 ms (no change) | 74.8 ms | **74.8 ms (no change)** |
+| Dropped frames | < 5% | 5–15% | > 15% | 31% | 20.9% | 16.6% | 16.6% (no change) | 19.9% | 19.9% (no change) | 17% | **17% (no change)** |
+| Freezes over 50 ms | 0–2 | ≤ 10 | > 10 | 37 | 55 | 38 | 38 (no change) | 60 | 60 (no change) | 119 | **119 (no change)** |
+| GPU layers | < 50 | 50–100 | > 200 | 339 | 210 | 210 | 210 (no change) | 146 | 146 (no change) | 109 | **109 (no change)** |
+| GPU memory | < 50% of max | < 75% | near max | 76 MB | 75 MB | 62 MB | 62 MB (no change) | 68 MB | 68 MB (no change) | 88 MB | **88 MB (no change)** |
+
+### [x] CP-8 Find what draws the two hot spots (no code change to the site, 2026-11-18)
+
+Owner's choice (2026-11-18): diagnose both spots, and add the 1% breakdown to the measuring script.
+
+**Script** (`scripts/perf-phone.mjs`, the measuring tool only): `--trace` and `--read-trace` now also print the most passes in one frame for every 1% of the page (a 10 x 10 grid), plus the hot spots: runs of 15 passes or more, with the time the page stayed on each.
+
+**Probe** (a scratch script, cp6 opened with `?debug`, scrolled to set points, the page read at rest): what is on screen at the two spots.
+- **Neither spot is the blade.** At 70 to 73% the blade's timeline is still at 0 (`t 0`, `dark 0`). It starts at about 73 to 74% (`dark 1` at 74%, the evil cards up at 76%).
+- **At both spots the chapters' small cards are face down in 3D.** `.pc` is `preserve-3d` and its `.pc-3d` is turned 180° (`matrix3d(-1, …)`) until the card turns up. At 43%: **10 vote cards** (`.pc.pc-vote`), all in 3D, turned up and flat by 44%. At 69%: **5 of the climb's quest cards** (`.pc.xq.kq`) in 3D, turned up by 70%. Elsewhere at most 2 or 3 are on screen.
+- The seat cards are flat there (none turning). Two slots are at opacity 0.55 to 0.8 from 66 to 73%. No tint is showing.
+
+This is CP-5's 3D cause again, on cards CP-6 did not touch. The traces had to prove it.
+
+**Traces** (`node scripts/perf-phone.mjs --plan perf/plans/cp8-hot-spots.json --trace --port 4880`, cp6, one session). Surfaces per frame by tenth, then the peak (most passes in one frame) at each hot spot, from the new 1% grid:
+
+| Switched off (CSS) | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | Peak 39–46% | Peak 69–72% | Freezes > 200 ms | of them > 500 ms | Longest |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| **nothing (control)** | 12.9 | 15.0 | 6.6 | 6.6 | 15.3 | 8.9 | 8.7 | 15.2 | 1.2 | 1.8 | 19 | 17 | 18 | 4 | 1.1 s at 72% |
+| seat cards flat while turning `.card-3d{transform-style:flat}` | 11.9 | 14.9 | 5.9 | 5.8 | 14.9 | 9.2 | 11.3 | 17.6 | 1.4 | 1.3 | 19 | 18 | 15 | 2 | 2.6 s at 70% |
+| no seat cards `.slot,.slot *{visibility:hidden}` | 1.2 | 1.2 | 3.8 | 5.6 | 17.7 | 9.2 | 10.9 | 10.9 | 1.2 | 1.6 | 19 | 18 | 7 | 3 | 1.7 s at 70% |
+| **chapter cards flat** `.pc,.pc-3d,.pc *{transform-style:flat}` | 12.5 | 15.1 | 7.4 | 5.7 | **8.8** | 9.3 | 10.2 | **4.8** | 1.1 | 1.6 | **10** | **13** | **11** | **1** | **0.51 s at 9%** |
+| no chapter cards `.pc,.pc *{visibility:hidden}` | 12.4 | 14.9 | 9.8 | 9.1 | 8.7 | 7.6 | 9.1 | 4.8 | 1.3 | 1.7 | 9 | 13 | 14 | 2 | 1.0 s at 28% |
+| no silk canvas `#silk{display:none}` | 12.7 | 15.3 | 10.4 | 6.6 | 13.1 | 10.6 | 10.3 | 18.2 | 1.2 | 1.7 | 19 | 19 | 16 | 4 | 2.7 s at 69% |
+| no tints `.tint{display:none}` | 12.8 | 15.1 | 7.4 | 6.3 | 12.8 | 8.9 | 11.1 | 18.0 | 1.2 | 1.8 | 19 | 18 | 11 | 4 | 2.5 s at 69% |
+
+**Result: proven. The chapter cards' 3D makes both hot spots.**
+
+- **Flattening the chapter cards (`.pc`) takes both spots away**: the peak at 39 to 46% falls 19 → 10, and at 69 to 72% 17 → 13. Tenth 5 drops 15.3 → 8.8 surfaces per frame, tenth 8 15.2 → 4.8. That trace has the fewest freezes over 500 ms (1, at the wall, 9%), and none over 500 ms at either spot (the longest there is 480 ms at 72%).
+- **Flat equals gone.** Hiding the chapter cards entirely gives the same peaks (9 and 13). So the cards cost nothing as flat pictures. Only their `preserve-3d` costs.
+- **Everything else changes nothing at the spots** (19 / 18 to 19): the seat cards (flat while turning, or hidden), the silk canvas and the tints.
+- **What is in the code:** `.pc-3d` is `preserve-3d` with `rotateY(180deg)` (`main.css:341`), and `vote.js:128`, `quest.js:237` and `climb.js:130` turn it with `rotateY(180 × (1 − flip))` on every frame. A card resting face down, or face up, is still a 3D context. It is the same pattern CP-6 fixed on the seat cards. There, both the 3D and a rounded clip had to go (CP-5). Here the 3D alone is enough, although `.pc-in` also has a rounded `overflow: hidden`.
+- **What is left after it**, by the 1% grid with chapter cards flat: the wall at 9 to 17% (peak 21, the seat cards: gone with no seat cards), 27 to 32% (peak 17, with or without seat cards: the night's own effects), 3 to 4% and 65% (peak 16).
+
+**Proposal for CP-9 (the fix):** do for the chapter cards what CP-6 did for the seat cards. While a chapter card rests (flip exactly 0 or 1), it is flat with only its up face shown (`data-face`), and it gets its 3D back only while it turns. The turn looks the same as now. A resting card draws the same picture, because the face that is down is hidden anyway (`backface-visibility: hidden`). One shared helper used by `vote.js`, `quest.js` and `climb.js`, plus the CSS. Phones only (`html.lite`) as in CP-6, or all devices. Expected: the two hot spots go, as in the "chapter cards flat" row.
+
+Results: `perf/results/2026-11-18-15-22-cp8-*-trace.json` (7 traces, 299 to 329 MB each). Plan: `perf/plans/cp8-hot-spots.json`. The probe and the CP-7 1% reader were scratch scripts, not kept.
+
+| Measure | Smooth (ship) | Acceptable | Laggy | Baseline | CP1 | CP2 | CP3 | CP4 | CP5 | CP6 | CP7 | **CP8** |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Average fps while scrolling | ≥ 55 | 45–55 | < 45 | 15.3 | 25.5 | 21.3 | 21.3 (no change) | 27.3 | 27.3 (no change) | 40.1 | 40.1 (no change) | **40.1 (no change)** |
+| Worst tenth of the page | ≥ 45 fps | 30–45 | < 30 | 0.4 | 1.3 | 0.7 | 0.7 (no change) | 7.5 | 7.5 (no change) | 18.8 | 18.8 (no change) | **18.8 (no change)** |
+| p95 frame time | ≤ 20 ms | ≤ 33 ms | > 33 ms | 241 ms | 74.9 ms | 58.2 ms | 58.2 ms (no change) | 83.1 ms | 83.1 ms (no change) | 74.8 ms | 74.8 ms (no change) | **74.8 ms (no change)** |
+| Dropped frames | < 5% | 5–15% | > 15% | 31% | 20.9% | 16.6% | 16.6% (no change) | 19.9% | 19.9% (no change) | 17% | 17% (no change) | **17% (no change)** |
+| Freezes over 50 ms | 0–2 | ≤ 10 | > 10 | 37 | 55 | 38 | 38 (no change) | 60 | 60 (no change) | 119 | 119 (no change) | **119 (no change)** |
+| GPU layers | < 50 | 50–100 | > 200 | 339 | 210 | 210 | 210 (no change) | 146 | 146 (no change) | 109 | 109 (no change) | **109 (no change)** |
+| GPU memory | < 50% of max | < 75% | near max | 76 MB | 75 MB | 62 MB | 62 MB (no change) | 68 MB | 68 MB (no change) | 88 MB | 88 MB (no change) | **88 MB (no change)** |
+
+### [x] CP-9 The chapter cards flat at rest (2026-11-18)
+
+**Change** (phones only, under `html.lite`, owner's choice; desktop unchanged):
+- `night.js`: a new `night.turn(el, e)` beside `put`. It turns a chapter card's `.pc-3d` to `e` (0 = face down, 1 = face up). On phones, while `e` is exactly 0 or 1, it sets `data-face="back"` or `"front"` and no transform. While the card turns, it removes `data-face` and writes the `rotateY` as before. `put` gained a `face` key for the data attribute, so it is cached like the rest.
+- `vote.js`, `quest.js`, `climb.js`: the three `put(c.flip, 't', rotateY(…))` lines call `night.turn` instead.
+- `main.css` (after `.pc-in img`): with `data-face`, `.pc-3d` is `transform-style: flat` with no transform, both sides have no transform and no `backface-visibility`, and the face that is down is `visibility: hidden` (the same three rules as CP-6). The chapter cards that never turn (the Assassin's hand `.xh`, the Lady's card `.lc`, the quest's rule cards `.q-rule`) are flat always: one front, no transform.
+
+**Why:** CP-8. Each chapter card stayed a `preserve-3d` context at rest, and that made the two hot spots.
+
+**Visual check** (owner's choice: phone screenshots): cp6 and cp9 screenshotted on the phone at 32 points from 39% to 72% (the vote, the quest, the climb, before, during and after the turns), and diffed by pixel. **No visible change.** Two screenshots of cp6 itself differ by up to 3.3% of pixels, because the silk backdrop and the spinning crown vary between page loads. cp6 against cp9 differs by 0.04 to 0.72%: the same crown, plus anti-aliasing on the edges of the cards' "SUCCESS" and "FAIL" labels, invisible at full resolution. On cp9 every resting chapter card is flat (`data-face` set), and the 3D shows only in cards caught mid-turn (at 40%, 43.5%, 47%, 53% and 69.5%, the same moments where cp6 turns them).
+
+**Measured** (`--before perf/builds/cp6 --after dist --runs 3 --port 4880`):
+
+| | Avg fps (range) | p95 | Dropped | Hitches | Worst frame | Blocking | Layers | GPU MB |
+|---|---|---|---|---|---|---|---|---|
+| before (cp6) | 39 (37.5 to 39) | 66.4 ms | 15.5% | 94 | 1272 ms | 89 ms | 119 | 92 |
+| after (cp9) | 42 (41.2 to 43.5) | 58.2 ms | 17.1% | 98 | 1072 ms | 59 ms | 112 | 83 |
+
+Each run, before / after: 39 / 41.2, 37.5 / 43.5, 39 / 42 fps.
+By tenth of the page, before: 52.5 / 49.4 / 35 / 15.4 / 15.1 / 28.5 / 17.2 / 17.1 / 49.3 / 72.9. After: 53.1 / 47.8 / 36.4 / **26.1** / **19.1** / 26.8 / 19.1 / **18.4** / 50.4 / 74.6.
+
+**Trace** (`--label cp9 --dir dist --trace`), peaks against CP-8's control (cp6):
+
+| | Peak 39–42% | Peak 43–46% | Peak 69–72% | Freezes > 200 ms | of them > 500 ms | Longest |
+|---|---|---|---|---|---|---|
+| cp6 (CP-8 control) | 19 | 19 | 17 | 18 | 4 | 1.1 s at 72% |
+| **cp9** | 19 | 19 | **14** | **13** | **1** | 2.9 s at 44% |
+
+- **The 70% spot is gone.** The climb's five cards rest flat: peak 17 → 14, no freeze over 500 ms there (the longest 401 ms at 73%). Tenth 8 averages 6.2 surfaces per frame.
+- **The 43 to 44% spot is not.** There all ten vote cards turn at the same moment (twice: about 40% and 43.5%), and a turning card gets its 3D back by design. Ten 3D contexts for that 1% of the page is 19 passes again, and the trace's one long freeze (2.9 s) held the page on it. CP-8's switch-off flattened the cards even mid-turn, which is why it cleared this spot too. Only a flat turn would fix it (see below).
+
+**Verdict: keep.** The runs do not overlap (37.5 to 39 against 41.2 to 43.5 fps), and p95, the worst frame, blocking time, layers and GPU memory are all better, at no visible change. Dropped frames are about the same (15.5 → 17.1%), and so are hitches (94 → 98). Not yet at the ship rule: the average is 42 (laggy is under 45), and tenths 4, 5, 7 and 8 are 18 to 26 fps.
+
+`npm test`: 33 pass, 0 fail. Frozen as `perf/builds/cp9/`. Results: `perf/results/2026-11-18-15-47-*` (runs), `2026-11-18-15-52-cp9-trace.json`.
+
+| Measure | Smooth (ship) | Acceptable | Laggy | Baseline | CP1 | CP2 | CP3 | CP4 | CP5 | CP6 | CP7 | CP8 | **CP9** |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Average fps while scrolling | ≥ 55 | 45–55 | < 45 | 15.3 | 25.5 | 21.3 | 21.3 (no change) | 27.3 | 27.3 (no change) | 40.1 | 40.1 (no change) | 40.1 (no change) | **42** |
+| Worst tenth of the page | ≥ 45 fps | 30–45 | < 30 | 0.4 | 1.3 | 0.7 | 0.7 (no change) | 7.5 | 7.5 (no change) | 18.8 | 18.8 (no change) | 18.8 (no change) | **18.4** |
+| p95 frame time | ≤ 20 ms | ≤ 33 ms | > 33 ms | 241 ms | 74.9 ms | 58.2 ms | 58.2 ms (no change) | 83.1 ms | 83.1 ms (no change) | 74.8 ms | 74.8 ms (no change) | 74.8 ms (no change) | **58.2 ms** |
+| Dropped frames | < 5% | 5–15% | > 15% | 31% | 20.9% | 16.6% | 16.6% (no change) | 19.9% | 19.9% (no change) | 17% | 17% (no change) | 17% (no change) | **17.1%** |
+| Freezes over 50 ms | 0–2 | ≤ 10 | > 10 | 37 | 55 | 38 | 38 (no change) | 60 | 60 (no change) | 119 | 119 (no change) | 119 (no change) | **98** |
+| GPU layers | < 50 | 50–100 | > 200 | 339 | 210 | 210 | 210 (no change) | 146 | 146 (no change) | 109 | 109 (no change) | 109 (no change) | **112** |
+| GPU memory | < 50% of max | < 75% | near max | 76 MB | 75 MB | 62 MB | 62 MB (no change) | 68 MB | 68 MB (no change) | 88 MB | 88 MB (no change) | 88 MB (no change) | **83 MB** |
+
+(Worst tenth 18.8 → 18.4 and layers 109 → 112 are within run-to-run spread: against cp6 measured in the same session, the worst tenth went 17.1 → 18.4 and layers 119 → 112. See the first table.)
+
+### [x] CP-10 The vote's turn: a flat squash on phones (2026-11-19)
+
+**The problem** (CP-9's trace): at 40% and 43.5% all ten vote cards turn over at the same moment (`vote.js`, timeline steps 4 and 7: one `V.flip` drives every card, so the votes are revealed together, as in the game). A card gets its 3D back while it turns (CP-9), so for that moment ten `preserve-3d` contexts are on screen: **19 passes per frame**, and CP-9's one long freeze, **2.9 s at 44%**. CP-8's switch-off, which kept the cards flat even mid-turn, brought the peak there to 9 to 10, so a flat turn is proven to fix it.
+
+**The options** (each phones only under `html.lite`, desktop unchanged, unless the owner says otherwise):
+
+| | Option | What the visitor sees on a phone | Expected cost at 40–44% | Risk |
+|---|---|---|---|---|
+| A | Keep the real 3D turn (no change) | as now | peak 19, freezes stay | none: accept the hot spot |
+| B | **2D squash turn for the vote cards**: `scaleX` from 1 to 0, the face swapped at the edge, back to 1. No `preserve-3d` at any time | the card narrows to a line and opens with the other face. No perspective: the near edge does not grow | about 9 to 10 (CP-8's flat row) | a flatter look than the seat cards' turn. The cards are small (half size on the table), so it may not show |
+| C | 2D squash for **all** chapter cards (vote, quest, climb), so every small card turns the same way | as B, also for the quest and climb turns | as B, plus the 47%, 53% and 69.5% turns | more of the page changes its look |
+| D | Stagger the ten turns, so only 2 or 3 are mid-turn at once, keeping the real 3D | the votes flip one after another instead of together | lower, not measured | **changes the story**: in Avalon the votes are revealed together. Not recommended |
+
+**Decision steps:**
+1. **Comparison first** (owner's standing preference for look and motion choices): a playable artifact with the vote's ten cards turning both ways side by side, A (real 3D) and B (2D squash), at the phone's card size, scrubbed by a slider like the scroll. Optional: C, or B with a slight lift and shadow during the turn, to get back some of the depth.
+2. **Owner picks** A, B, C or D (or a variant from the comparison).
+3. If A: tick CP-10 as "no change, accepted" and go to the wall.
+4. Otherwise build **one** change: in `night.turn` (the one place the chapter cards turn), a squash path on phones for the chosen cards. A resting card stays as CP-9 made it.
+5. `npm run build`, `npm test`.
+6. **Visual check**: phone screenshots of cp9 and cp10 at the vote (39 to 46%, in steps of 0.5%) and pixel diff, plus the same points mid-turn. Here a change mid-turn is expected and is what the owner chose. At rest there must be none.
+7. **Measure**: `node scripts/perf-phone.mjs --before perf/builds/cp9 --after dist --runs 3 --port 4880`, then `--label cp10 --dir dist --trace`. Compare by the **peak at 39 to 46%** (target: about 10, from 19) and the freezes there, not by the tenth average.
+8. Verdict (keep, revert, unclear), comparison table with the CP10 column, freeze `perf/builds/cp10/` if kept.
+
+**Owner's choice** (after the comparison artifact "CP-10 Vote Turn", with A, B, C and D side by side and three squash styles): **C, plain squash, on phones only. Desktops keep the real 3D turn.**
+
+**Change:**
+- `night.js`, `night.turn`: on phones (`html.lite`) a chapter card never gets a 3D context. `data-face` is always set, `"front"` once `e > 0.5`. At rest there is no transform (as CP-9). While it turns, the `.pc-3d` gets `scaleX(|cos(180° × (1 − e))|)` (at least 0.01): it narrows to a line with the face that is down, swaps face at the edge, and opens with the face that is up. Desktops take the `rotateY` path, unchanged. Since every vote, quest and climb card turns through `night.turn`, this covers all of them (option C).
+- `main.css`: only the comment. The CP-9 rules already flatten every card with `data-face`, and the inline `scaleX` wins over their `transform: none` while the card turns.
+
+**Visual check** (phone screenshots of cp9 and cp10, 2 loads of cp9, 24 points: 39 to 46% in steps of 0.5%, and the quest and climb turns at 46.5 to 47.5%, 52.5 to 53.5%, 69 to 70%). **No `.pc-3d` is `preserve-3d` at any point on cp10.** cp9 had 10 at 40% and at 43.5%, 3 at 47%, 2 at 53%, 1 at 53.5% and 69.5%. The pixel diff could not decide this time: two loads of cp9 differ by 6 to 25% (the silk, the crown, and timing), more than cp9 against cp10 (1.4 to 16.6%). Looked at side by side instead (40, 43, 43.5, 44, 45, 47, 53, 69.5%): the same at rest. The squash itself shows only during the short turn, as chosen.
+
+**Measured** (`--before perf/builds/cp9 --after dist --runs 3 --port 4880`):
+
+| | Avg fps (range) | p95 | Dropped | Hitches | Worst frame | Blocking | Layers | GPU MB |
+|---|---|---|---|---|---|---|---|---|
+| before (cp9) | 39.9 (32.7 to 41.6) | 66.5 ms | 18.1% | 94 | 1371 ms | 73 ms | 108 | 80 |
+| after (cp10) | 40.7 (40.2 to 41.8) | 74.7 ms | 18.9% | 110 | **532 ms** | 78 ms | 105 | 76 |
+
+By tenth, before: 54.2 / 51.7 / 28.5 / 16.5 / 20 / 29.2 / 19.2 / 22.9 / 48.4 / 71.7. After: 53 / 48.8 / 31.4 / **22.6** / **29.6** / 28.4 / 18.2 / 24.7 / 47.6 / 73.5.
+
+**Trace** (`--label cp10 --dir dist --trace`), peaks against cp9's trace (CP-9):
+
+| | Peak 39–46% | Peak 69–72% | Freezes > 200 ms | of them > 500 ms | Longest |
+|---|---|---|---|---|---|
+| cp9 | 19 | 14 | 13 | 1 | 2.9 s at 44% |
+| **cp10** | **9** | 14 | 18 | **0** | **499 ms at 9%** (the wall) |
+
+- **The vote's hot spot is gone.** Every 1% from 40 to 49% peaks at 8 to 11 (target about 10), and there is no freeze over 200 ms anywhere from 40 to 68%. Tenth 5 is 8.6 passes per frame.
+- No freeze over 500 ms on the whole page for the first time. The longest are now the wall (9 to 10%), the night (27 to 30%) and the climb's end (69 to 75%).
+- Hot spots left (15 passes or more): 3 to 4% (16), **9 to 17% (21, 3.2 s on it)**, 27 to 32% (17), 64 to 65% (16).
+
+**Verdict: keep.** The target is met (peak 19 → 9 at the vote), the worst frame falls 1371 → 532 ms, tenths 4 and 5 gain 6 and 10 fps, and the look at rest is unchanged. The averages are within run spread (cp9's runs 32.7 to 41.6). p95 (66.5 → 74.7 ms) and hitches (94 → 110) are worse in this session. Neither was the target here, and both moved the other way between sessions before (CP-9: 58.2 ms, 98). Watch them in CP-11. Still not at the ship rule: average 40.7, worst tenth 18.2.
+
+`npm test`: 33 pass, 0 fail. Frozen as `perf/builds/cp10/`. Results: `perf/results/2026-11-18-16-15-*` (runs), `2026-11-18-16-21-cp10-trace.json` (stamped by the PC's clock). The screenshot script was a scratch script, not kept.
+
+| Measure | Smooth (ship) | Acceptable | Laggy | Baseline | CP1 | CP2 | CP3 | CP4 | CP5 | CP6 | CP7 | CP8 | CP9 | **CP10** |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Average fps while scrolling | ≥ 55 | 45–55 | < 45 | 15.3 | 25.5 | 21.3 | 21.3 (no change) | 27.3 | 27.3 (no change) | 40.1 | 40.1 (no change) | 40.1 (no change) | 42 | **40.7** |
+| Worst tenth of the page | ≥ 45 fps | 30–45 | < 30 | 0.4 | 1.3 | 0.7 | 0.7 (no change) | 7.5 | 7.5 (no change) | 18.8 | 18.8 (no change) | 18.8 (no change) | 18.4 | **18.2** |
+| p95 frame time | ≤ 20 ms | ≤ 33 ms | > 33 ms | 241 ms | 74.9 ms | 58.2 ms | 58.2 ms (no change) | 83.1 ms | 83.1 ms (no change) | 74.8 ms | 74.8 ms (no change) | 74.8 ms (no change) | 58.2 ms | **74.7 ms** |
+| Dropped frames | < 5% | 5–15% | > 15% | 31% | 20.9% | 16.6% | 16.6% (no change) | 19.9% | 19.9% (no change) | 17% | 17% (no change) | 17% (no change) | 17.1% | **18.9%** |
+| Freezes over 50 ms | 0–2 | ≤ 10 | > 10 | 37 | 55 | 38 | 38 (no change) | 60 | 60 (no change) | 119 | 119 (no change) | 119 (no change) | 98 | **110** |
+| GPU layers | < 50 | 50–100 | > 200 | 339 | 210 | 210 | 210 (no change) | 146 | 146 (no change) | 109 | 109 (no change) | 109 (no change) | 112 | **105** |
+| GPU memory | < 50% of max | < 75% | near max | 76 MB | 75 MB | 62 MB | 62 MB (no change) | 68 MB | 68 MB (no change) | 88 MB | 88 MB (no change) | 88 MB (no change) | 83 MB | **76 MB** |
+
+(Against cp9 measured in the same session: average 39.9 → 40.7, worst tenth 16.5 → 18.2. The CP9 column came from an earlier session; see the first table.)
+
+### [ ] CP-11 and on: the wall, then the chapters' own effects
 
 Cheapest first:
-- **Tenth 8 (70 to 80%) is now the worst place**: the two longest freezes (1.5 s, 0.6 s) are at 70%, 14 surfaces per frame and the GPU drawing them 53% of the time. CP-5 showed it keeps 20 surfaces with both card causes off against 5 with no cards, so something else on the cards costs there. Run `--layers` at 70 to 80% on cp6 and trace the `button.slot` glow shadows (`.ring.is-night .slot` `box-shadow`, `main.css`) and its `::after` grey veil switched off.
-- **The chapters' own effects** (tenths 5 and 7, 10 to 15 surfaces with no cards). Prove each by a switch-off trace first, as here: the thread shadows' `blur` while drawn (`.thr .sh`, `main.css:288`, a soft gradient on phones), `i.seam` `drop-shadow`, the `.gf`/`.cf`/`.eye-in` `clip-path` (clear it once the reveal is done), `img.bl-ghost` `mix-blend-mode`.
+- **The wall, 9 to 17%** (peak 21 to 24 in every trace, the seat cards and the 20 extras: gone with no seat cards in CP-8). Diagnose first, as in CP-8: what is in 3D or mid-animation there at 1% resolution (the probe), then switch-off traces.
+- **The chapters' own effects** (tenths 5 and 7, 10 to 15 surfaces with no cards). Prove each by a switch-off trace first, as here: the thread shadows' `blur` while drawn (`.thr .sh`, `main.css:288`, a soft gradient on phones), `i.seam` `drop-shadow`, the `.gf`/`.cf`/`.eye-in` `clip-path` (clear it once the reveal is done). (`img.bl-ghost` `mix-blend-mode` was ruled out in CP-7.)
 - Small main-thread items: cache the scroll position once per tick (`cards.js:161`), no layout reads inside frame loops (`night.js:101`, `seats.js`).
 - `ScrollTrigger.normalizeScroll(true)` on touch devices, if the pins jitter once the freezes are gone (P5).
 
@@ -440,7 +653,7 @@ The GPU memory the script reports (`dumpsys meminfo`, the Chrome GPU process "Gr
 `scripts/perf-phone.mjs` scrolls the page on the phone by itself and records every frame, so before and after are measured the same way.
 
 - It serves a built folder from the PC to the phone through the USB cable (`adb reverse`, port 4870 and up, because Windows often reserves 8080), opens it in Chrome with an Android intent, waits for the intro, records 3 s standing still (gives the screen's refresh rate), then scrolls top to bottom with real finger swipes (`adb shell input swipe`, 6 per batch). Every animation frame's time and scroll position is recorded in the page. GPU memory and the layer count are read between batches, not while recording.
-- `--trace`: while Chrome on the phone is tracing, nothing answers DevTools (not even `scrollY`), so the trace scrolls a fixed number of swipe batches (page height / 1800 + 3) and the page writes its scroll position into the trace four times a second (`console.timeStamp`). The trace is streamed to disk (about 400 MB for one scroll, too big for one Node string) and read back event by event. The summary gives, per tenth of the page, frames drawn, off-screen surfaces (render passes) per frame and the GPU's share of time drawing them, then the main-thread freezes (over 200 ms with no animation frame) and the long commits. A gap in *drawn* frames is not counted as a freeze: a page standing still draws nothing.
+- `--trace`: while Chrome on the phone is tracing, nothing answers DevTools (not even `scrollY`), so the trace scrolls a fixed number of swipe batches (page height / 1800 + 3) and the page writes its scroll position into the trace four times a second (`console.timeStamp`). The trace is streamed to disk (about 400 MB for one scroll, too big for one Node string) and read back event by event. The summary gives, per tenth of the page, frames drawn, off-screen surfaces (render passes) per frame and the GPU's share of time drawing them, then the most passes in one frame for every 1% of the page and the hot spots (15 passes or more, with the time spent on each), then the main-thread freezes (over 200 ms with no animation frame) and the long commits. Compare variants by the 1% peaks: a tenth's average swings with how long a freeze happened to last (CP-7). A gap in *drawn* frames is not counted as a freeze: a page standing still draws nothing.
 - Builds: `perf/builds/baseline/` (= cp0), then `perf/builds/cp<N>/` per kept checkpoint. Not in git. Results go to `perf/results/` (one JSON per run and a `-summary.md` per session, named by the UTC time).
 
 ```
@@ -458,5 +671,5 @@ node scripts/perf-phone.mjs --label live --url https://your-site/ --runs 3    # 
 - [ ] Reach the ship rule on the Honor X9b (tracker above)
 - [ ] Owner's look on a phone: no grain, a solid nav pill instead of frosted glass, a still silk backdrop, tighter card shadows (all phone-only, desktop unchanged)
 - [ ] Check on an iPhone (needs a Mac, or test by feel)
-- [x] `npm test` after CP-1 and CP-2 (2026-11-18: 33 pass, 0 fail), after CP-4 (2026-11-18: 33 pass, 0 fail), and after CP-6 (2026-11-18: 33 pass, 0 fail)
+- [x] `npm test` after CP-1 and CP-2 (2026-11-18: 33 pass, 0 fail), after CP-4 (2026-11-18: 33 pass, 0 fail), after CP-6 (2026-11-18: 33 pass, 0 fail), and after CP-9 (2026-11-18: 33 pass, 0 fail)
 - [ ] This also covers AC-14 in spec 0001 (frame rate on a mid range phone) and the phone frame rate checks left open in chapters 2 to 8

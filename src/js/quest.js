@@ -234,7 +234,7 @@ export function createQuest({ gsap, sec, ring, night, vote, desktop, data }) {
       put(c.el, 'v', 'visible');
       put(c.el, '--o', clamp(c.vis * 1.8).toFixed(3));
       put(c.el, 't', `translate3d(${lerp(fx, mx, e).toFixed(1)}px,${(lerp(fy, 0, e) + dir * c.ar * 26 * u).toFixed(1)}px,${z.toFixed(1)}px) rotate(${(wrap(sp.rot) * (1 - e)).toFixed(2)}deg) scale3d(0.5,0.5,0.5)`);
-      put(c.flip, 't', `rotateY(${(180 * (1 - smooth(clamp(flip)))).toFixed(2)}deg)`);
+      night.turn(c.flip, smooth(clamp(flip)));
       put(c.glow, 'o', clamp(c.gl).toFixed(3));
     });
     // the hand: the Assassin's two cards, Success and Fail, standing

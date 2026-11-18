@@ -343,6 +343,13 @@ html.lite .card-3d[data-face=front] .card-back,html.lite .card-3d[data-face=back
 .pc-back{transform:rotateY(180deg)}
 .pc-in{position:absolute;inset:calc(var(--w)*.035);border-radius:calc(var(--w)*.06);overflow:hidden;box-shadow:inset 0 1px 1px rgba(255,255,255,.18);background:#151a2a}
 .pc-in img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+/* phones (spec 013, CP-9, CP-10): a vote, quest or climb card is flat at all times and shows only one face. night.turn() sets
+   data-face, and while the card turns writes an inline scaleX (a 2D squash) that wins over the transform:none here. The cards that never turn (the hand, the Lady's card, the rule) are
+   flat always: one front, no transform, so they look the same. A 3D context per card made the GPU draw it off screen first */
+html.lite .pc-3d[data-face],html.lite .xh .pc-3d,html.lite .lc .pc-3d,html.lite .q-rule .pc,html.lite .q-rule .pc-3d{transform-style:flat}
+html.lite .pc-3d[data-face]{transform:none}
+html.lite .pc-3d[data-face] .pc-side{transform:none;-webkit-backface-visibility:visible;backface-visibility:visible}
+html.lite .pc-3d[data-face=front] .pc-back,html.lite .pc-3d[data-face=back] .pc-front{visibility:hidden}
 .pc-back .pc-in{inset:calc(var(--w)*.035);background:linear-gradient(160deg,#1c2338,#0e1220)}
 .pc-t{position:absolute;left:0;right:0;top:calc(var(--w)*.07);text-align:center;font-family:var(--display);font-size:calc(var(--w)*.15);line-height:1.1;letter-spacing:.06em;text-transform:uppercase;color:#f3dba0;text-shadow:0 1px 0 rgba(0,0,0,.5),0 0 calc(var(--w)*.06) rgba(0,0,0,.7)}
 .pc-approve .pc-t,.pc-reject .pc-t{color:#33240f;text-shadow:0 1px 0 rgba(255,244,214,.55)}

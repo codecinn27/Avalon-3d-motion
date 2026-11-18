@@ -125,7 +125,7 @@ export function createVote({ gsap, sec, ring, night, desktop, data }) {
       put(c.el, '--o', clamp(p * 1.8).toFixed(3));
       put(c.el, '--rj', String(V.face[i]));
       put(c.el, 't', `translate3d(${(s.x * 0.55).toFixed(1)}px,${(s.y * 0.55).toFixed(1)}px,${((1 - p) * 60 * u + 1.2 * u + lift).toFixed(1)}px) rotate(${s.rot}deg) scale3d(0.5,0.5,0.5)`);
-      put(c.flip, 't', `rotateY(${(180 * (1 - flipE)).toFixed(2)}deg)`);
+      night.turn(c.flip, flipE);
     });
     counts.forEach((el, k) => {
       const c = clamp(V.c[k]);
