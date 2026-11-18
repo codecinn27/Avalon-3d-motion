@@ -1,0 +1,281 @@
+<title>Night Shape Options</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Geist:wght@400;500;600&display=swap">
+<style>
+/* Layout: four close-up tiles you can drag, then one table with every shape on it and switches to turn each on or off. Single dark look, because the subject is the night. */
+:root{
+  --bg:#070b16; --panel:#0e1629; --line:rgba(236,229,211,.14);
+  --fg:#ece5d3; --mute:#9aa4bb; --gold:#e0ad4f; --red:#e8707a; --ice:#a8c8ff;
+  --display:"Fraunces",Georgia,"Times New Roman",serif;
+  --body:"Geist",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color-scheme:dark;
+}
+html,body{background:var(--bg)}
+body{margin:0;color:var(--fg);font:400 16px/1.5 var(--body);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 64px;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--bg)}
+.wrap{max-width:1320px;margin:0 auto}
+.top{padding:36px 0 22px;display:grid;gap:10px}
+.kicker{margin:0;font:500 12px/1 var(--body);letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+h1{margin:0;font:600 clamp(30px,5vw,54px)/1.04 var(--display);letter-spacing:-.02em;text-wrap:balance}
+h2{margin:0;font:600 clamp(22px,3vw,30px)/1.15 var(--display);letter-spacing:-.01em}
+.lede{margin:0;max-width:64ch;color:var(--mute);font-size:17px;text-wrap:pretty}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:22px;margin-top:6px}
+.tile{display:grid;gap:10px;align-content:start;min-width:0}
+.tile h3{margin:0;font:600 20px/1.15 var(--display)}
+.tile p{margin:0;font-size:14.5px;color:var(--mute);text-wrap:pretty}
+.tile p b{color:var(--fg);font-weight:600}
+.together{margin-top:48px;display:grid;gap:14px}
+.ctl{display:grid;gap:10px;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row>span{min-width:5.5em;font:500 12px var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.chip{min-height:36px;padding:0 14px;border-radius:99px;border:1px solid var(--line);background:transparent;color:var(--fg);font:500 14px var(--body);cursor:pointer}
+.chip:hover{border-color:var(--gold)}
+.chip[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:#17120a}
+.chip:focus-visible,.stage:focus-visible,.mini:focus-visible{outline:2px solid var(--ice);outline-offset:3px}
+.tip{margin:0;font-size:14px;color:var(--mute)}
+.verdict{margin:34px 0 0;padding:16px 18px;border:1px solid var(--line);border-radius:14px;background:var(--panel);color:var(--mute);max-width:78ch}
+.verdict b{color:var(--fg)}
+@media (prefers-reduced-motion:reduce){.star b,.flame b{animation:none}}
+/*ENGINE_CSS*/
+</style>
+
+<main class="wrap">
+  <header class="top">
+    <p class="kicker">Avalon · Chapter 2 · Night Falls</p>
+    <h1>Four 3D shapes for the night</h1>
+    <p class="lede">The eyes on the cards are already in the plan. These are the extra shapes you could add. Drag any tile to spin it. Then switch them on and off on the table below to see them together.</p>
+  </header>
+
+  <section class="tiles" aria-label="The four shapes">
+    <article class="tile">
+      <div class="mini" id="m-lantern" tabindex="0" aria-label="Narrator's lantern. Drag to turn it."></div>
+      <h3>Narrator's lantern</h3>
+      <p><b>Its job:</b> the only light of the night, hovering over the middle of the table. Its glow turns red when evil wakes, white when Merlin wakes and gold for Percival, and it lifts away at dawn.</p>
+      <p><b>Cost:</b> six glass panes, two caps, three flames. About 30 elements. Phone: keep.</p>
+    </article>
+    <article class="tile">
+      <div class="mini" id="m-gem" tabindex="0" aria-label="Crystals. Drag to turn them."></div>
+      <h3>Crystals</h3>
+      <p><b>Its job:</b> marks who is lit. Red over the traitors, gold over the two cards Percival cannot tell apart. Slow spin and a gentle bob.</p>
+      <p><b>Cost:</b> eight facets each, and four crystals are reused from seat to seat. Phone: keep, spin slower.</p>
+    </article>
+    <article class="tile">
+      <div class="mini" id="m-sky" tabindex="0" aria-label="Moon and stars. Drag to turn the sky."></div>
+      <h3>Moon and drifting stars</h3>
+      <p><b>Its job:</b> says "it is night" without a word. The moon rises behind the table and sets at dawn. The gold motes sit at different depths, so they slide past each other when the camera orbits.</p>
+      <p><b>Cost:</b> one sphere and about 24 dots. Phone: 8 dots.</p>
+    </article>
+    <article class="tile">
+      <div class="mini" id="m-ring" tabindex="0" aria-label="Focus rings. Drag to turn them."></div>
+      <h3>Spinning focus rings</h3>
+      <p><b>Its job:</b> shows whose view you are in. When a seat is tapped, three gold rings spin round that card while the camera flies in.</p>
+      <p><b>Cost:</b> three bordered circles and a small orb. Phone: keep.</p>
+    </article>
+  </section>
+
+  <section class="together" aria-label="All together">
+    <h2>All together on the table</h2>
+    <div class="ctl">
+      <div class="row" role="group" aria-label="Shapes"><span>Shapes</span>
+        <button class="chip tg" type="button" data-k="lamp" aria-pressed="true">Lantern</button>
+        <button class="chip tg" type="button" data-k="gems" aria-pressed="true">Crystals</button>
+        <button class="chip tg" type="button" data-k="sky" aria-pressed="true">Moon and stars</button>
+        <button class="chip tg" type="button" data-k="rings" aria-pressed="true">Focus rings</button>
+      </div>
+      <div class="row" role="group" aria-label="Moment in the night"><span>Moment</span>
+        <button class="chip mo" type="button" data-m="night" aria-pressed="false">Night falls</button>
+        <button class="chip mo" type="button" data-m="evil" aria-pressed="true">Evil wakes</button>
+        <button class="chip mo" type="button" data-m="merlin" aria-pressed="false">Merlin wakes</button>
+        <button class="chip mo" type="button" data-m="percival" aria-pressed="false">Percival wakes</button>
+        <button class="chip mo" type="button" data-m="dawn" aria-pressed="false">Dawn</button>
+      </div>
+      <p class="tip">Drag left or right to turn the table. Tap a seat to fly in and see what that player knows. <button class="chip" id="reset" type="button">Turn back</button></p>
+    </div>
+    <div id="big" tabindex="0" aria-label="The table with every shape. Drag to turn it. Tap a seat to fly in."></div>
+  </section>
+
+  <p class="verdict"><b>Which to keep?</b> Tell me which of the four you want. My pick is the lantern, the crystals and the moon with stars, and the focus rings only if you like seeing them on the table. All four together cost about 160 extra elements and no new images.</p>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+/*IMG*/
+/*ENGINE_JS*/
+
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const $ = (q, r = document) => r.querySelector(q);
+const $$ = (q, r = document) => [...r.querySelectorAll(q)];
+
+/* ---------- builders for the four shapes ---------- */
+const lanternHTML = () => `<div class="lan"><i class="pool p-gold"></i><i class="pool p-red"></i><i class="pool p-ice"></i><i class="bloom b-gold"></i><i class="bloom b-red"></i><i class="bloom b-ice"></i><div class="lan-obj"><div class="lan-spin">${[0, 1, 2, 3, 4, 5].map((k) => `<i class="pane" style="--k:${k}"></i>`).join('')}<i class="cap top"></i><i class="cap bot"></i><i class="handle"></i>${['gold', 'red', 'ice'].map((c) => `<span class="fl ${c}"><i class="flame"><b></b></i><i class="flame x"><b></b></i></span>`).join('')}</div></div></div>`;
+const gemHTML = (hue) => `<div class="gem" style="--hue:${hue}"><div class="gem-spin">${[0, 1, 2, 3].map((k) => `<i class="gf t" style="--k:${k};--l:${[58, 44, 34, 50][k]};--ang:${150 + k * 40}deg"></i>`).join('')}${[0, 1, 2, 3].map((k) => `<i class="gf b" style="--k:${k};--l:${[38, 28, 22, 32][k]};--ang:${200 + k * 30}deg"></i>`).join('')}</div></div>`;
+const armHTML = () => `<div class="arm"><div class="arm-s"><i class="rg r1"></i><i class="rg r2"></i><i class="rg r3"></i><i class="orb"></i></div></div>`;
+let seed = 7;
+const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+const skyHTML = (n) => `<i class="moon"></i>${Array.from({ length: n }, () => `<i class="star" style="transform:translate3d(calc(var(--u)*${(rnd() * 1500 - 750).toFixed(0)}px),calc(var(--u)*${(rnd() * 560 - 330).toFixed(0)}px),calc(var(--u)*${(rnd() * 1100 - 900).toFixed(0)}px))"><b style="animation-delay:${(rnd() * 2.8).toFixed(2)}s"></b></i>`).join('')}`;
+const spin = (el, props, dur) => { if (!RM) gsap.to(el, { ...props, duration: dur, repeat: -1, ease: 'none' }); };
+const live = (root) => {
+  $$('.lan-spin', root).forEach((e) => spin(e, { rotationY: 360 }, 16));
+  $$('.gem-spin', root).forEach((e, i) => spin(e, { rotationY: 360 }, 7 + i));
+  $$('.arm-s', root).forEach((e) => { spin(e, { rotationY: 360 }, 9); if (!RM) gsap.to(e, { rotationX: 28, duration: 3.2, yoyo: true, repeat: -1, ease: 'sine.inOut' }); });
+};
+
+/* ---------- the four close-up tiles ---------- */
+function mini(id, { html, world = 'flat', label, dots }) {
+  const host = $(id);
+  host.innerHTML = `<div class="mworld">${html}</div><div class="mlabel">${label}</div>${dots ? '<div class="dots"></div>' : ''}`;
+  const w = $('.mworld', host);
+  const m = { rz: 0, drag: false };
+  const set = () => (w.style.transform = world === 'flat' ? `rotateX(62deg) rotateZ(${m.rz}deg)` : `rotateX(-8deg) rotateY(${m.rz}deg)`);
+  const fit = () => host.style.setProperty('--u', (host.clientWidth / 300).toFixed(3));
+  new ResizeObserver(fit).observe(host); fit(); set();
+  let last = 0;
+  host.addEventListener('pointerdown', (e) => { m.drag = true; last = e.clientX; host.setPointerCapture(e.pointerId); });
+  host.addEventListener('pointermove', (e) => { if (!m.drag) return; if (Math.abs(e.clientX - last) > 1) { m.rz += (e.clientX - last) * 0.5; set(); } last = e.clientX; });
+  const end = () => (m.drag = false);
+  host.addEventListener('pointerup', end); host.addEventListener('pointercancel', end);
+  host.addEventListener('keydown', (e) => { if (e.key === 'ArrowLeft') { m.rz -= 15; set(); } if (e.key === 'ArrowRight') { m.rz += 15; set(); } });
+  if (!RM) gsap.ticker.add((t, dt) => { if (!m.drag) { m.rz += dt * 0.012; set(); } });
+  live(host);
+  return { host, w, m };
+}
+
+// 1 lantern: cycles through the three light colours; the dots pick one
+const L = mini('#m-lantern', { html: `<i class="table"></i>${lanternHTML()}`, label: 'Evil · Merlin · Percival', dots: true });
+{
+  const obj = $('.lan-obj', L.host);
+  obj.style.transform = `translate3d(0,0,calc(var(--u)*40px)) rotateX(-90deg)`;
+  $$('.bloom', L.host).forEach((b) => (b.style.transform = 'translateZ(calc(var(--u)*78px))'));
+  const set = (c) => {
+    ['gold', 'red', 'ice'].forEach((k) => {
+      gsap.to($(`.pool.p-${k}`, L.host), { opacity: k === c ? 0.95 : 0, duration: 0.6 });
+      gsap.to($(`.bloom.b-${k}`, L.host), { opacity: k === c ? 0.9 : 0, duration: 0.6 });
+      gsap.to($(`.fl.${k}`, L.host), { opacity: k === c ? 1 : 0, duration: 0.6 });
+    });
+    $$('.dots button', L.host).forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.c === c)));
+    $('.mlabel', L.host).textContent = { red: 'Evil wakes', ice: 'Merlin wakes', gold: 'Percival wakes' }[c];
+  };
+  const dots = $('.dots', L.host);
+  [['red', '#ff5a6a'], ['ice', '#a8c8ff'], ['gold', '#ffcf72']].forEach(([c, col]) => {
+    const b = document.createElement('button'); b.type = 'button'; b.dataset.c = c; b.style.background = col; b.setAttribute('aria-label', `Light colour: ${c}`);
+    b.addEventListener('click', () => { clearInterval(auto); set(c); }); dots.append(b);
+  });
+  let n = 0; const order = ['red', 'ice', 'gold'];
+  set('red');
+  const auto = RM ? 0 : setInterval(() => set(order[++n % 3]), 3200);
+}
+
+// 2 crystals: one red over a card, one gold over another
+const G = mini('#m-gem', {
+  html: `<i class="table"></i><i class="mcard" style="transform:translate3d(calc(var(--u)*-70px),0,calc(var(--u)*2px));background-image:url(${IMG.back})"></i><i class="mcard" style="transform:translate3d(calc(var(--u)*70px),0,calc(var(--u)*2px));background-image:url(${IMG.back})"></i>
+    <div style="transform:translate3d(calc(var(--u)*-70px),0,calc(var(--u)*80px)) rotateX(-90deg)">${gemHTML(350)}</div>
+    <div style="transform:translate3d(calc(var(--u)*70px),0,calc(var(--u)*80px)) rotateX(-90deg)">${gemHTML(42)}</div>`,
+  label: 'Red for evil · gold for the two Merlins',
+});
+
+// 3 moon and stars: a small sky, drag to turn, button to set and rise
+const Sk = mini('#m-sky', { html: skyHTML(34).replace('<i class="moon"></i>', ''), world: 'sky', label: 'Drag to turn the sky' });
+{
+  Sk.w.style.top = '50%';
+  const mo = document.createElement('i'); mo.className = 'moon'; mo.style.cssText = 'transform:translate3d(calc(var(--u)*70px),calc(var(--u)*-30px),calc(var(--u)*-160px))'; Sk.host.insertBefore(mo, Sk.w);
+}
+
+// 4 rings around a face up card
+const R = mini('#m-ring', {
+  html: `<i class="table"></i><i class="mcard" style="transform:translate3d(0,0,calc(var(--u)*2px));background-image:url(${IMG.merlin})"></i><div style="transform:translate3d(0,0,calc(var(--u)*72px)) rotateX(-90deg)">${armHTML()}</div>`,
+  label: 'Whose view you are in',
+});
+
+/* ---------- all together ---------- */
+const big = createScene($('#big'), { orbit: true, drag: true, sky: true, close: { tilt: 44 }, tag: 'Drag to turn · tap a seat' });
+const ZERO = zeros;
+const sh = { lamp: 0, lampGold: 0, lampRed: 0, lampIce: 0, moon: 0, rise: 0, gem: ZERO(), hue: { 0: 350, 1: 350, 2: 350, 3: 350, 4: 350, 5: 350, 6: 350, 7: 350, 8: 350, 9: 350 }, ring: 0, ringX: 0, ringY: 0 };
+const on = { lamp: 1, gems: 1, sky: 1, rings: 1 };            // the four switches
+const wrap = (html, tf) => `<div class="ex" style="position:absolute;left:0;top:0;transform-style:preserve-3d">${html}</div>`;
+const extras = big.extras;
+extras.insertAdjacentHTML('beforeend', lanternHTML());
+const lan = $('.lan', extras), lanObj = $('.lan-obj', lan);
+const GEMSEATS = [0, 1, 3, 6, 8];
+const gems = GEMSEATS.map((i) => { const d = document.createElement('div'); d.className = 'gem-wrap'; d.style.cssText = 'position:absolute;left:0;top:0;transform-style:preserve-3d;opacity:0'; d.innerHTML = gemHTML(350); extras.append(d); return { i, el: d, gem: $('.gem', d) }; });
+const ringWrap = document.createElement('div'); ringWrap.style.cssText = 'position:absolute;left:0;top:0;transform-style:preserve-3d;opacity:0'; ringWrap.innerHTML = armHTML(); extras.append(ringWrap);
+big.sky.insertAdjacentHTML('beforeend', skyHTML(matchMedia('(max-width:640px)').matches ? 10 : 26));
+const moonEl = $('.moon', big.sky);
+live(big.stage);
+
+const els = { pG: $('.pool.p-gold', lan), pR: $('.pool.p-red', lan), pI: $('.pool.p-ice', lan), bG: $('.bloom.b-gold', lan), bR: $('.bloom.b-red', lan), bI: $('.bloom.b-ice', lan), fG: $('.fl.gold', lan), fR: $('.fl.red', lan), fI: $('.fl.ice', lan) };
+const cacheStyle = new WeakMap();
+const setS = (el, k, v) => { let c = cacheStyle.get(el); if (!c) cacheStyle.set(el, (c = {})); if (c[k] === v) return; c[k] = v; el.style[k] = v; };
+big.hooks.push((cam, yaw) => {
+  const u = big.u, t = performance.now() / 1000;
+  const lampV = sh.lamp * on.lamp;
+  setS(lan, 'opacity', (lampV > 0.01 ? 1 : 0) + '');
+  setS(lanObj, 'transform', `translate3d(0,0,${((44 + sh.rise * 150) * u).toFixed(2)}px) rotateX(-90deg)`);
+  const bt = `translateZ(${((84 + sh.rise * 150) * u).toFixed(2)}px)`;
+  [els.bG, els.bR, els.bI].forEach((b) => setS(b, 'transform', bt));
+  setS(els.bG, 'opacity', (sh.lampGold * lampV * 0.9).toFixed(3)); setS(els.bR, 'opacity', (sh.lampRed * lampV * 0.9).toFixed(3)); setS(els.bI, 'opacity', (sh.lampIce * lampV * 0.9).toFixed(3));
+  setS(els.pG, 'opacity', (sh.lampGold * lampV * 0.95).toFixed(3)); setS(els.pR, 'opacity', (sh.lampRed * lampV * 0.95).toFixed(3)); setS(els.pI, 'opacity', (sh.lampIce * lampV * 0.95).toFixed(3));
+  setS(els.fG, 'opacity', (sh.lampGold * lampV).toFixed(3)); setS(els.fR, 'opacity', (sh.lampRed * lampV).toFixed(3)); setS(els.fI, 'opacity', (sh.lampIce * lampV).toFixed(3));
+  gems.forEach((g) => {
+    const s = sh.gem[g.i] * on.gems, seat = big.seats[g.i];
+    setS(g.el, 'opacity', clamp(s * 1.4).toFixed(3));
+    setS(g.el, 'transform', `translate3d(${(seat.x * u).toFixed(2)}px,${(seat.y * u).toFixed(2)}px,${((84 + Math.sin(t * 1.8 + g.i) * 5) * u).toFixed(2)}px) rotateX(-90deg) scale(${(0.15 + 0.85 * s).toFixed(3)})`);
+    g.gem.style.setProperty('--hue', sh.hue[g.i].toFixed(0));
+  });
+  const rs = sh.ring * on.rings;
+  setS(ringWrap, 'opacity', clamp(rs * 1.4).toFixed(3));
+  setS(ringWrap, 'transform', `translate3d(${(sh.ringX * u).toFixed(2)}px,${(sh.ringY * u).toFixed(2)}px,${(70 * u).toFixed(2)}px) rotateX(-90deg) scale(${(0.3 + 0.7 * rs).toFixed(3)})`);
+  // sky: parallax from the camera, the moon rises and sets
+  const sk = sh.moon * on.sky;
+  setS(big.sky, 'opacity', sk.toFixed(3));
+  setS(big.sky, 'transform', `rotateX(${((cam.tilt - 28) * -0.35).toFixed(2)}deg) rotateY(${(Math.sin(yaw * DEG) * 7).toFixed(2)}deg)`);
+  setS(moonEl, 'transform', `translate3d(${(380 * u).toFixed(1)}px,${((-215 + (1 - sh.moon) * 300) * u).toFixed(1)}px,${(-420 * u).toFixed(1)}px)`);
+});
+
+/* moments in the night: each one is a set of targets that everything glides to */
+let moment = 'evil';
+const ringSeatFor = { night: null, evil: 1, merlin: 0, percival: 4, dawn: null };
+function aim() {          // the focus rings go to the tapped seat, else the seat that is awake
+  const seat = big.sel >= 0 ? big.sel : ringSeatFor[moment];
+  const s = seat == null ? null : big.seats[seat];
+  if (s) { gsap.to(sh, { ringX: s.x, ringY: s.y, ring: 1, duration: 0.9, ease: 'power2.inOut', overwrite: 'auto' }); }
+  else gsap.to(sh, { ring: 0, duration: 0.6, overwrite: 'auto' });
+}
+function target(name) {
+  const z = () => ({ ...ZERO() });
+  const T = { night: 1, eyeVis: 1, eye: z(), lift: z(), red: z(), gold: z(), thr: z(), gem: z(), hue: {}, sh: { lamp: 1, lampGold: 0, lampRed: 0, lampIce: 0, moon: 1, rise: 0 } };
+  if (name === 'night') T.sh.lampGold = 0.65;
+  if (name === 'evil') { [1, 3, 6].forEach((i) => { T.eye[i] = 1; T.lift[i] = 1; T.red[i] = 1; T.gem[i] = 1; T.hue[i] = 350; }); [0, 1, 2].forEach((k) => (T.thr[k] = 1)); T.sh.lampRed = 1; }
+  if (name === 'merlin') { T.eye[0] = 1; T.lift[0] = 1; [1, 3, 8].forEach((i) => { T.red[i] = 1; T.gem[i] = 1; T.hue[i] = 350; }); [3, 4, 5].forEach((k) => (T.thr[k] = 1)); T.sh.lampIce = 1; }
+  if (name === 'percival') { T.eye[4] = 1; T.lift[4] = 1; [0, 3].forEach((i) => { T.gold[i] = 1; T.gem[i] = 1; T.hue[i] = 42; }); [6, 7].forEach((k) => (T.thr[k] = 1)); T.sh.lampGold = 1; }
+  if (name === 'dawn') { T.night = 0; for (let i = 0; i < 10; i++) T.eye[i] = 1; T.sh.lamp = 0; T.sh.moon = 0; T.sh.rise = 1; T.sh.lampGold = 0.6; }
+  return T;
+}
+function go(name, fast) {
+  moment = name;
+  const T = target(name), d = fast ? 0.01 : 1.2, st = big.st;
+  const o = { duration: d, ease: 'power2.inOut', overwrite: 'auto' };
+  gsap.to(st, { night: T.night, eyeVis: T.eyeVis, ...o });
+  ['eye', 'lift', 'red', 'gold', 'thr'].forEach((k) => gsap.to(st[k], { ...T[k], ...o }));
+  gsap.to(sh, { ...T.sh, ...o });
+  gsap.to(sh.gem, { ...T.gem, ...o });
+  gsap.to(sh.hue, { ...T.hue, ...o });
+  $$('.mo').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.m === name)));
+  aim();
+}
+$$('.mo').forEach((b) => b.addEventListener('click', () => { big.close(); go(b.dataset.m); }));
+$$('.tg').forEach((b) => b.addEventListener('click', () => {
+  const k = b.dataset.k, v = b.getAttribute('aria-pressed') !== 'true';
+  b.setAttribute('aria-pressed', String(v)); on[k] = v ? 1 : 0;
+}));
+$('#reset').addEventListener('click', () => big.resetTurn());
+big.on('select', aim);
+big.stage.addEventListener('click', () => setTimeout(aim, 0));
+const q = new URLSearchParams(location.search);
+if (q.has('sel') || q.has('m')) { gsap.ticker.lagSmoothing(0); gsap.globalTimeline.timeScale(40); }
+go(q.get('m') || 'evil', true);
+if (q.has('off')) q.get('off').split(',').forEach((k) => { on[k] = 0; });
+if (q.has('sel')) big.select(+q.get('sel'));
+if (q.has('turn')) big.yawExtra.v = +q.get('turn');
+</script>

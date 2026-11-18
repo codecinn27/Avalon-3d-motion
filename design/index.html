@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Avalon landing page · design prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Geist:wght@300..600&family=Geist+Mono:wght@400;500&family=Noto+Serif+SC:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F3ECDF; --paper-2:#E8DDC9; --ink:#1B1712; --ink-soft:#5B5246; --gold:#A8782A;
+  --night:#0B0D12; --night-2:#141824; --cream:#EFE6D4; --mute:#9A927F; --candle:#D9A441; --crimson:#8E1B26;
+  --ease:cubic-bezier(.32,.72,0,1);
+  --display:"Fraunces","Noto Serif SC",Georgia,serif;
+  --body:"Geist",system-ui,sans-serif;
+  --mono:"Geist Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0}
+body{font-family:var(--body);background:#d9d2c4;color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+
+/* ---------- board chrome (not part of the real page) ---------- */
+.board-note{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#6b6252;padding:28px 24px 12px;max-width:1280px;margin:0 auto;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.board-note b{color:#1B1712;font-weight:500}
+.board-note::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--gold);flex:none}
+.intro{max-width:1280px;margin:0 auto;padding:40px 24px 8px}
+.intro h1{font-family:var(--display);font-weight:400;font-size:clamp(30px,4.4vw,52px);letter-spacing:-.02em;line-height:1.05}
+.intro p{max-width:60ch;margin-top:14px;color:#4d463b}
+.frame{max-width:1280px;margin:0 auto 8px;border-radius:28px;overflow:hidden;position:relative;box-shadow:0 30px 80px -40px rgba(27,23,18,.45)}
+.frame + .board-note{padding-top:44px}
+
+/* ---------- themes ---------- */
+.light{background:var(--paper);color:var(--ink);--fg:var(--ink);--fg-soft:var(--ink-soft);--accent:var(--gold);--line:rgba(27,23,18,.12);--pill:var(--ink);--pill-fg:var(--paper);--glass:rgba(243,236,223,.72)}
+.dark{background:var(--night);color:var(--cream);--fg:var(--cream);--fg-soft:var(--mute);--accent:var(--candle);--line:rgba(239,230,212,.14);--pill:var(--candle);--pill-fg:#17120a;--glass:rgba(11,13,18,.66)}
+.sec{position:relative;padding:clamp(72px,11vw,150px) clamp(20px,5vw,72px);overflow:hidden;isolation:isolate}
+.grain::after{content:"";position:absolute;inset:0;z-index:5;pointer-events:none;opacity:.07;mix-blend-mode:multiply;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+.dark.grain::after{mix-blend-mode:screen;opacity:.05}
+
+/* silk: a still stand in for the live shader backdrop */
+.silk{position:absolute;inset:-20%;z-index:-1;filter:blur(60px);opacity:.9;
+  background:
+   radial-gradient(40% 34% at 62% 38%,rgba(255,250,240,.95),transparent 70%),
+   radial-gradient(34% 44% at 30% 66%,rgba(214,190,146,.55),transparent 70%),
+   radial-gradient(30% 30% at 78% 76%,rgba(168,120,42,.22),transparent 70%)}
+.dark .silk{opacity:1;background:
+   radial-gradient(38% 34% at 64% 36%,rgba(40,52,92,.75),transparent 70%),
+   radial-gradient(34% 40% at 26% 70%,rgba(142,27,38,.42),transparent 70%),
+   radial-gradient(26% 26% at 80% 80%,rgba(217,164,65,.18),transparent 70%)}
+
+/* ---------- type ---------- */
+.eyebrow{width:fit-content;display:inline-flex;align-items:center;gap:8px;font-size:10px;letter-spacing:.2em;text-transform:uppercase;font-weight:500;padding:6px 12px;border-radius:99px;box-shadow:inset 0 0 0 1px var(--line);color:var(--fg-soft)}
+.eyebrow i{width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.h1{font-family:var(--display);font-weight:380;font-size:clamp(44px,8.2vw,124px);line-height:.94;letter-spacing:-.035em;font-variation-settings:"opsz" 144}
+.h1 em{font-style:italic;font-weight:300;color:var(--accent)}
+.h2{font-family:var(--display);font-weight:380;font-size:clamp(34px,5.4vw,76px);line-height:1;letter-spacing:-.03em}
+.h2 em{font-style:italic;font-weight:300;color:var(--accent)}
+.lede{font-size:clamp(16px,1.5vw,19px);color:var(--fg-soft);max-width:46ch}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;gap:14px;min-height:52px;padding:8px 8px 8px 24px;border-radius:99px;background:var(--pill);color:var(--pill-fg);font-weight:500;font-size:15px;transition:transform .7s var(--ease)}
+.btn:active{transform:scale(.98)}
+.btn .dot{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.14);transition:transform .7s var(--ease)}
+.dark .btn .dot{background:rgba(0,0,0,.14)}
+.btn:hover .dot{transform:translate(3px,-1px) scale(1.06)}
+.btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+.btn.lg{min-height:68px;padding:10px 10px 10px 34px;font-size:18px}
+.btn.lg .dot{width:48px;height:48px}
+.link{display:inline-flex;align-items:center;gap:8px;min-height:44px;font-size:15px;color:var(--fg);box-shadow:inset 0 -1px 0 var(--line)}
+.ghost{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:99px;box-shadow:inset 0 0 0 1px var(--line);font-size:14px;color:var(--fg)}
+.ghost svg{width:16px;height:16px;fill:currentColor}
+
+/* ---------- nav ---------- */
+.nav{position:absolute;top:20px;left:50%;transform:translateX(-50%);z-index:10;display:flex;align-items:center;gap:6px;padding:6px 6px 6px 20px;border-radius:99px;background:var(--glass);backdrop-filter:blur(18px);box-shadow:inset 0 0 0 1px var(--line),0 18px 40px -24px rgba(0,0,0,.35);white-space:nowrap}
+.nav .brand{font-family:var(--display);font-size:19px;letter-spacing:-.01em;margin-right:14px}
+.nav .lang{display:flex;gap:2px;font-size:12px;color:var(--fg-soft)}
+.nav .lang span{padding:8px 10px;border-radius:99px}
+.nav .lang .on{color:var(--fg);box-shadow:inset 0 0 0 1px var(--line)}
+.nav .wa{display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border-radius:99px;background:var(--pill);color:var(--pill-fg);font-size:13px;font-weight:500;margin-left:6px}
+
+/* ---------- cards ---------- */
+.card{--w:170px;width:var(--w);aspect-ratio:2/3;flex:none;border-radius:calc(var(--w)*.085);padding:calc(var(--w)*.035);background:linear-gradient(160deg,rgba(168,120,42,.55),rgba(168,120,42,.12) 40%,rgba(168,120,42,.5));box-shadow:0 40px 60px -30px rgba(27,23,18,.5),0 8px 18px -10px rgba(27,23,18,.3);transform:rotate(var(--r,0deg)) rotateY(var(--ry,0deg)) rotateX(var(--rx,0deg));transform-style:preserve-3d;transition:transform .9s var(--ease)}
+.dark .card{background:linear-gradient(160deg,rgba(217,164,65,.7),rgba(217,164,65,.1) 40%,rgba(217,164,65,.55));box-shadow:0 50px 70px -30px #000,0 0 0 1px rgba(0,0,0,.4)}
+.card .in{position:relative;height:100%;border-radius:calc(var(--w)*.06);overflow:hidden;box-shadow:inset 0 1px 1px rgba(255,255,255,.18)}
+.card .in img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2}
+/* placeholder face, shown until real art exists */
+.face{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:calc(var(--w)*.08);color:#f1e7d2;background:linear-gradient(180deg,#27304a 0%,#151a2a 60%,#0d1019 100%)}
+.face.evil{background:linear-gradient(180deg,#4a1820 0%,#220c11 60%,#0f0709 100%)}
+.face .sig{position:absolute;top:14%;left:50%;transform:translateX(-50%);font-family:var(--display);font-style:italic;font-weight:300;font-size:calc(var(--w)*.62);line-height:1;color:rgba(217,164,65,.5)}
+.face .nm{font-family:var(--display);font-size:calc(var(--w)*.125);line-height:1.05;letter-spacing:-.01em;position:relative;z-index:3}
+.face .sd{font-size:calc(var(--w)*.052);letter-spacing:.2em;text-transform:uppercase;color:rgba(241,231,210,.6);margin-top:4px;position:relative;z-index:3}
+.card.has-art .face{background:linear-gradient(180deg,transparent 55%,rgba(8,8,12,.88));z-index:3}
+.card.has-art .face .sig{display:none}
+.back{position:absolute;inset:0;background:
+  radial-gradient(circle at 50% 50%,transparent 0 17%,rgba(217,164,65,.6) 17.5% 18.5%,transparent 19% 27%,rgba(217,164,65,.35) 27.5% 28%,transparent 28.5%),
+  repeating-conic-gradient(from 0deg at 50% 50%,rgba(217,164,65,.14) 0 6deg,transparent 6deg 12deg),
+  linear-gradient(160deg,#1c2338,#0e1220)}
+.back::after{content:"✦";position:absolute;inset:0;display:grid;place-items:center;font-size:calc(var(--w)*.18);color:rgba(217,164,65,.85)}
+.glow{filter:drop-shadow(0 0 34px rgba(217,164,65,.28)) drop-shadow(0 0 70px rgba(142,27,38,.35))}
+
+/* ---------- 1 hero: ten face down cards on an oval around the title ---------- */
+.hero{--rx:min(40vw,500px);--ry:min(31vh,250px);--cw:min(8.6vw,120px);min-height:min(100dvh,820px);display:grid;place-items:center;text-align:center;padding-top:110px;perspective:1400px}
+.hero .copy{position:relative;z-index:3;margin-top:5vh;display:grid;justify-items:center;gap:18px}
+.hero .h1{font-size:min(clamp(56px,10vw,128px),16vh)}
+.hero .tag{font-family:var(--display);font-weight:380;font-size:clamp(18px,2vw,26px);color:var(--fg-soft)}
+.hero .tag em{font-style:italic;color:var(--accent)}
+.hero .cta{display:flex;gap:22px;align-items:center;flex-wrap:wrap;justify-content:center}
+.ring{position:absolute;left:50%;top:54%;width:0;height:0;pointer-events:none}
+.ring .card{position:absolute;left:0;top:0;--w:var(--cw);margin:calc(var(--w)*-.75) 0 0 calc(var(--w)*-.5);--a:calc(var(--i)*36deg - 90deg);
+  transform:translate(calc(cos(var(--a))*var(--rx)),calc(sin(var(--a))*var(--ry))) rotate(calc(cos(var(--a))*10deg)) scale(calc(.88 + sin(var(--a))*.12));
+  opacity:calc(.7 + sin(var(--a))*.3);z-index:1}
+
+/* ---------- flip dialog (the card a visitor clicked in the ring) ---------- */
+.peekframe{position:relative;min-height:min(86vh,620px);display:flex;align-items:center;justify-content:center;gap:clamp(24px,5vw,72px);padding:32px;background:var(--night);color:var(--cream);--fg:var(--cream);--fg-soft:var(--mute);--accent:var(--candle);--line:rgba(239,230,212,.16)}
+.peekframe .card{--w:min(300px,34vw)}
+.peekframe .txt{position:relative;display:grid;gap:16px;justify-items:start;max-width:34ch}
+.peekframe .hint{font-size:12px;color:var(--mute)}
+
+/* ---------- team badge: blue = loyal side, red = evil side, top right of every face up card ---------- */
+.card.good.has-art .in::after,.card.evil.has-art .in::after{content:"";position:absolute;z-index:4;top:calc(var(--w)*.035);right:calc(var(--w)*.035);width:calc(var(--w)*.28);aspect-ratio:1;background:center/contain no-repeat;filter:drop-shadow(0 2px 3px rgba(0,0,0,.55));pointer-events:none}
+.card.good.has-art .in::after{background-image:url(../dist/assets/badges/good-384.webp)}
+.card.evil.has-art .in::after{background-image:url(../dist/assets/badges/evil-384.webp)}
+
+/* ---------- 2 how ---------- */
+.how{display:grid;grid-template-columns:1fr 1.25fr;gap:clamp(32px,6vw,96px);align-items:start}
+.how .steps{display:grid;gap:0}
+.step{display:grid;grid-template-columns:64px 1fr;gap:20px;padding:30px 0;box-shadow:inset 0 1px 0 var(--line)}
+.step:last-child{box-shadow:inset 0 1px 0 var(--line),inset 0 -1px 0 var(--line)}
+.step .n{font-family:var(--display);font-style:italic;font-weight:300;font-size:44px;line-height:1;color:var(--accent)}
+.step h3{font-family:var(--display);font-weight:400;font-size:clamp(22px,2.4vw,32px);letter-spacing:-.02em;line-height:1.1}
+.step p{color:var(--fg-soft);margin-top:8px;max-width:44ch}
+.step.dim{opacity:.32}
+.how .side{display:grid;gap:22px;position:sticky;top:40px}
+
+/* ---------- 3 characters ---------- */
+.chars .head{display:flex;justify-content:space-between;align-items:end;gap:24px;flex-wrap:wrap;margin-bottom:clamp(40px,6vw,80px)}
+.row{display:flex;gap:clamp(10px,1.6vw,22px);justify-content:center;perspective:1600px;flex-wrap:nowrap}
+.row .card{--w:clamp(104px,11.4vw,164px)}
+.row .card:nth-child(odd){--r:-2.5deg;margin-top:14px}
+.row .card:nth-child(even){--r:2deg}
+.row .card.lift{margin-top:-18px;--r:0deg;--w:clamp(120px,13vw,190px)}
+.caption{margin-top:44px;display:grid;justify-items:center;text-align:center;gap:6px}
+.caption .who{font-family:var(--display);font-size:clamp(26px,3vw,40px);letter-spacing:-.02em}
+.caption .side-l{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}
+.caption p{color:var(--fg-soft);max-width:40ch}
+
+/* ---------- 4 draw ---------- */
+.draw{display:grid;grid-template-columns:1fr 1fr;gap:clamp(32px,6vw,90px);align-items:center}
+.deck{position:relative;height:360px;display:grid;place-items:center;perspective:1200px}
+.deck .card{position:absolute;--w:200px}
+.deck .card:nth-child(1){--r:-10deg;transform:rotate(-10deg) translate(-34px,10px)}
+.deck .card:nth-child(2){--r:-4deg;transform:rotate(-4deg) translate(-14px,4px)}
+.deck .card:nth-child(3){transform:rotate(5deg) rotateY(-14deg) translate(26px,-12px)}
+.result{display:grid;gap:22px;justify-items:start}
+.share{display:flex;flex-wrap:wrap;gap:10px}
+.rule{height:1px;width:100%;background:var(--line)}
+
+/* ---------- 5 final + footer ---------- */
+.final{text-align:center;display:grid;justify-items:center;gap:36px;padding-top:clamp(110px,15vw,200px);padding-bottom:clamp(110px,15vw,200px)}
+.final .h1{max-width:12ch}
+.foot{padding:28px clamp(20px,5vw,72px);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--mute);box-shadow:inset 0 1px 0 rgba(239,230,212,.14);background:var(--night)}
+.foot b{font-family:var(--display);font-weight:400;font-size:16px;color:var(--cream)}
+
+/* ---------- tokens board ---------- */
+.tokens{background:#fbf8f2;padding:clamp(24px,4vw,56px);display:grid;gap:40px}
+.sw{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px}
+.sw div{border-radius:16px;padding:54px 12px 12px;font-family:var(--mono);font-size:11px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+.sw small{display:block;opacity:.7}
+.types{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:28px}
+.types h4,.tokens h4{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;color:#6b6252;margin-bottom:12px}
+.langs{display:grid;gap:10px;font-family:var(--display);font-size:clamp(24px,3vw,38px);letter-spacing:-.02em;line-height:1.1}
+.langs small{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:#6b6252;display:block}
+
+/* ---------- art compare ---------- */
+.art{background:var(--night);color:var(--cream);padding:clamp(28px,5vw,72px);display:grid;gap:36px}
+.art .cols{display:grid;grid-template-columns:1fr 1fr;gap:clamp(20px,4vw,64px)}
+.art .pair{display:flex;gap:18px;justify-content:center;flex-wrap:wrap}
+.art .card{--w:clamp(130px,17vw,230px)}
+.art h3{font-family:var(--display);font-weight:400;font-size:28px;text-align:center;margin-bottom:6px}
+.art .sub{text-align:center;color:var(--mute);font-size:14px;margin-bottom:24px}
+.pending{position:absolute;top:10px;left:10px;z-index:4;font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;background:rgba(0,0,0,.55);color:#f1e7d2;padding:4px 8px;border-radius:99px}
+.card.has-art .pending{display:none}
+
+/* ---------- role page ---------- */
+.role{display:grid;grid-template-columns:auto 1fr;gap:clamp(32px,6vw,90px);align-items:center;padding-top:140px}
+.role .card{--w:clamp(200px,24vw,300px);--ry:-12deg;--r:-3deg}
+.role .txt{display:grid;gap:22px;justify-items:start}
+
+/* ---------- phone ---------- */
+@media (max-width:820px){
+  .frame{border-radius:18px;margin-left:10px;margin-right:10px}
+  .nav{padding-left:14px;top:12px}
+  .nav .brand{margin-right:4px;font-size:17px}
+  .nav .lang span{padding:8px 7px}
+  .hero{--rx:36vw;--ry:min(33vh,260px);--cw:min(19vw,80px);padding-top:100px}
+  .peekframe{flex-direction:column;text-align:center}.peekframe .txt{justify-items:center}.peekframe .card{--w:min(60vw,240px)}
+  .how,.draw,.role,.art .cols{grid-template-columns:1fr}
+  .how .side{position:static}
+  .step{grid-template-columns:44px 1fr;gap:14px}
+  .row{overflow-x:auto;justify-content:flex-start;padding:26px 20px 30px;margin:0 -20px;scroll-snap-type:x mandatory}
+  .row .card{--w:150px;scroll-snap-align:center}
+  .row .card.lift{--w:170px}
+  .deck{height:300px}.deck .card{--w:160px}
+  .role{justify-items:center;text-align:center;padding-top:110px}.role .txt{justify-items:center}
+  .btn{width:100%;justify-content:space-between}
+  .hero .cta{flex-direction:column;gap:6px}
+}
+/* ---------- reference board, before and after, badges ---------- */
+.refs{background:#fbf8f2;padding:clamp(24px,4vw,56px);display:grid;gap:28px}
+.refs p.note{max-width:78ch;color:#4d463b;font-size:14px}
+.refgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:18px}
+.refgrid figure{display:grid;gap:8px;align-content:start}
+.refgrid img{width:100%;border-radius:12px;box-shadow:0 10px 24px -14px rgba(0,0,0,.5);background:#e8ddc9}
+.refgrid figcaption,.cmp figcaption{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#6b6252}
+.cmp{background:var(--night);color:var(--cream);padding:clamp(24px,4vw,56px);display:grid;gap:44px}
+.cmp h3{font-family:var(--display);font-weight:400;font-size:26px;letter-spacing:-.01em}
+.cmp .traits{color:var(--mute);font-size:14px;margin:6px 0 16px;max-width:80ch}
+.cmp .trio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(12px,2.4vw,36px)}
+.cmp figure{display:grid;gap:8px;align-content:start}
+.cmp .pic{position:relative;aspect-ratio:2/3;border-radius:14px;overflow:hidden;background:#141824;box-shadow:inset 0 0 0 1px rgba(239,230,212,.14)}
+.cmp .pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cmp .pic.wait::after{content:"Not generated yet";position:absolute;inset:0;display:grid;place-items:center;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.cmp .pic.ref img{object-fit:contain;background:#0b0d12}
+.bdgrow{display:flex;gap:clamp(18px,4vw,56px);flex-wrap:wrap;align-items:center}
+.bdgrow .big{width:clamp(110px,14vw,180px)}
+.bdg{position:relative;width:clamp(150px,18vw,230px);aspect-ratio:2/3;border-radius:14px;overflow:hidden;box-shadow:0 30px 50px -30px #000}
+.bdg>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.bdg>i{position:absolute;top:3.5%;right:3.5%;width:28%;aspect-ratio:1;background:center/contain no-repeat;filter:drop-shadow(0 2px 3px rgba(0,0,0,.55))}
+.bdg.good>i{background-image:url(../dist/assets/badges/good-384.webp)}
+.bdg.evil>i{background-image:url(../dist/assets/badges/evil-384.webp)}
+/* ---------- game cards: vote, quest, Lady of the Lake. Titles and badges are added by the page, sized from the card width ---------- */
+.gcrow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(10px,2vw,28px)}
+.gc{position:relative;aspect-ratio:2/3;border-radius:14px;overflow:hidden;container-type:inline-size;box-shadow:0 30px 50px -30px #000,inset 0 0 0 1px rgba(239,230,212,.14)}
+.gc>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.gc .t{position:absolute;left:0;right:0;top:7%;text-align:center;font-family:var(--display);font-weight:600;font-size:11.5cqw;letter-spacing:.07em;text-transform:uppercase;line-height:1}
+.gc.vote .t{color:#6e5d46;text-shadow:0 .4cqw 0 rgba(255,248,230,.75),0 -.3cqw 0 rgba(60,44,24,.35)}
+.gc.quest .t{color:#e3bf78;text-shadow:0 .5cqw 0 rgba(20,10,0,.75),0 0 3cqw rgba(232,170,60,.35)}
+.gc.quest.bad .t{color:#a38d63;text-shadow:0 .5cqw 0 rgba(10,5,0,.8)}
+.gcsec.zh .gc .t{font-size:14cqw;letter-spacing:.35em;text-indent:.35em}
+.gc i{position:absolute;bottom:18%;width:27cqw;aspect-ratio:1;background:center/contain no-repeat;filter:drop-shadow(0 .6cqw 1.2cqw rgba(0,0,0,.6))}
+.gc i.l{left:4cqw;background-image:url(../dist/assets/badges/good-384.webp)}
+.gc i.r{right:4cqw;background-image:url(../dist/assets/badges/evil-384.webp)}
+.gclang{display:flex;gap:8px;margin:0 0 20px}
+.gclang button{font:500 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;min-height:44px;padding:0 16px;border-radius:99px;border:1px solid rgba(239,230,212,.3);background:transparent;color:var(--cream);cursor:pointer}
+.gclang button[aria-pressed=true]{background:var(--candle);color:#17120a;border-color:var(--candle)}
+@media (max-width:900px){.gcrow{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:560px){.gcrow{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:820px){.cmp .trio{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="intro">
+  <h1>Avalon landing page, design prototype</h1>
+  <p>Updated 2026-11-15 to match the build: ten card hero ring, flip dialog, team badges. Still frames of every section in page order, at real size. Nothing moves here (the live motion is in the built site). The soft colour shapes stand in for the live shader backdrop, and card faces are placeholders until the art is generated. Resize the window to see the phone layout.</p>
+</div>
+
+<!-- ============ TOKENS ============ -->
+<div class="board-note"><b>00</b> Colours, type and languages</div>
+<div class="frame tokens">
+  <div>
+    <h4>Light palette (the loyal side)</h4>
+    <div class="sw">
+      <div style="background:#F3ECDF">Paper<small>#F3ECDF</small></div>
+      <div style="background:#E8DDC9">Paper deep<small>#E8DDC9</small></div>
+      <div style="background:#1B1712;color:#F3ECDF">Ink<small>#1B1712</small></div>
+      <div style="background:#5B5246;color:#F3ECDF">Ink soft<small>#5B5246</small></div>
+      <div style="background:#A8782A;color:#fff">Antique gold<small>#A8782A</small></div>
+    </div>
+  </div>
+  <div>
+    <h4>Dark palette (evil revealed)</h4>
+    <div class="sw">
+      <div style="background:#0B0D12;color:#EFE6D4">Night<small>#0B0D12</small></div>
+      <div style="background:#141824;color:#EFE6D4">Night lift<small>#141824</small></div>
+      <div style="background:#EFE6D4">Cream<small>#EFE6D4</small></div>
+      <div style="background:#9A927F">Mute<small>#9A927F</small></div>
+      <div style="background:#D9A441">Candle gold<small>#D9A441</small></div>
+      <div style="background:#8E1B26;color:#EFE6D4">Crimson<small>#8E1B26</small></div>
+    </div>
+  </div>
+  <div class="types">
+    <div>
+      <h4>Display · Fraunces</h4>
+      <div style="font-family:var(--display);font-size:56px;line-height:.95;letter-spacing:-.03em">Trust <em style="font-weight:300;color:var(--gold)">no one</em></div>
+    </div>
+    <div>
+      <h4>Body · Geist</h4>
+      <p style="color:#4d463b">Avalon is a game of hidden roles, bold lies, and one perfect betrayal. Join an online night and find out which side you are on.</p>
+    </div>
+    <div>
+      <h4>Hero title in three languages</h4>
+      <div class="langs">
+        <div><small>EN</small>Trust no one at the round table.</div>
+        <div><small>中文</small>圆桌之上，谁都不可信。</div>
+        <div><small>BM</small>Jangan percaya sesiapa di meja bulat.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 1 HERO ============ -->
+<div class="board-note"><b>01</b> Hero · cream · ten face down cards turn on an oval around "Avalon" · hover stops the ring · click flips a card (see 01b)</div>
+<div class="frame">
+  <section class="sec light grain hero">
+    <div class="silk"></div>
+    <nav class="nav"><span class="brand">Avalon</span><span class="lang"><span class="on">EN</span><span>中文</span><span>BM</span></span><a class="wa" href="#">WhatsApp</a></nav>
+    <div class="ring">
+      <div class="card" style="--i:0"><div class="in"><div class="back"></div></div></div>
+      <div class="card" style="--i:1"><div class="in"><div class="back"></div></div></div>
+      <div class="card" style="--i:2"><div class="in"><div class="back"></div></div></div>
+      <div class="card" style="--i:3"><div class="in"><div class="back"></div></div></div>
+      <div class="card" style="--i:4"><div class="in"><div class="back"></div></div></div>
+      <div class="card" style="--i:5"><div class="in"><div class="back"></div></div></div>
+      <div class="card" style="--i:6"><div class="in"><div class="back"></div></div></div>
+      <div class="card" style="--i:7"><div class="in"><div class="back"></div></div></div>
+      <div class="card" style="--i:8"><div class="in"><div class="back"></div></div></div>
+      <div class="card" style="--i:9"><div class="in"><div class="back"></div></div></div>
+    </div>
+    <div class="copy">
+      <span class="eyebrow"><i></i>Online game nights</span>
+      <h1 class="h1">Avalon</h1>
+      <p class="tag">Trust <em>no one</em> at the round table.</p>
+      <div class="cta">
+        <a class="btn" href="https://wa.me/60176016227?text=Hi!%20I%20want%20to%20know%20more%20about%20the%20online%20Avalon%20game%20nights." target="_blank" rel="noopener noreferrer">Ask on WhatsApp <span class="dot"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></span></a>
+        <a class="link" href="#draw">Draw your card ↓</a>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ============ 1b FLIP DIALOG ============ -->
+<div class="board-note"><b>01b</b> Click a ring card · it flies to the middle while flipping, a dialog shows the character · click anywhere or Esc puts it back</div>
+<div class="frame">
+  <section class="peekframe">
+    <div class="card" data-art="loyal-servant-3" data-style="painted-v2"><div class="in"><div class="face"><span class="sig">L</span><span class="nm">Loyal Servant</span><span class="sd">Good</span></div></div></div>
+    <div class="txt">
+      <span class="eyebrow"><i></i>Good side</span>
+      <h2 class="h2">Loyal Servant</h2>
+      <p class="lede">No special knowledge. Just sharp eyes and a loyal heart.</p>
+      <span class="ghost">Close</span>
+      <span class="hint">Tap anywhere to put the card back</span>
+    </div>
+  </section>
+</div>
+
+<!-- ============ 2 HOW ============ -->
+<div class="board-note"><b>02</b> How the game works · cream · section pins, steps light up one at a time</div>
+<div class="frame">
+  <section class="sec light grain how">
+    <div class="silk" style="opacity:.55"></div>
+    <div class="side">
+      <span class="eyebrow"><i></i>How it works</span>
+      <h2 class="h2">Three rounds of <em>doubt.</em></h2>
+      <p class="lede">New to Avalon? You will have it in two minutes. The rest is reading faces.</p>
+    </div>
+    <div class="steps">
+      <div class="step"><span class="n">1</span><div><h3>You get a secret role</h3><p>Loyal knight or hidden traitor. Only you know which.</p></div></div>
+      <div class="step dim"><span class="n">2</span><div><h3>The table goes on quests</h3><p>Teams are picked, votes are cast, and every choice says something about you.</p></div></div>
+      <div class="step dim"><span class="n">3</span><div><h3>Find the traitors before they win</h3><p>Three failed quests and evil takes the throne. Talk, accuse, bluff.</p></div></div>
+    </div>
+  </section>
+</div>
+
+<!-- ============ 3a CHARACTERS before ============ -->
+<div class="board-note"><b>03a</b> Meet the characters · before the turn · good roles flip first</div>
+<div class="frame">
+  <section class="sec light grain chars">
+    <div class="silk" style="opacity:.6"></div>
+    <div class="head">
+      <div style="display:grid;gap:18px"><span class="eyebrow"><i></i>The seven roles</span><h2 class="h2">Three you can <em>trust.</em></h2></div>
+      <p class="lede" style="max-width:32ch">Keep scrolling. Four cards have not shown their face yet.</p>
+    </div>
+    <div class="row">
+      <div class="card lift" data-art="merlin"><div class="in"><div class="face"><span class="sig">M</span><span class="nm">Merlin</span><span class="sd">Good</span></div></div></div>
+      <div class="card" data-art="percival"><div class="in"><div class="face"><span class="sig">P</span><span class="nm">Percival</span><span class="sd">Good</span></div></div></div>
+      <div class="card" data-art="loyal-servant"><div class="in"><div class="face"><span class="sig">L</span><span class="nm">Loyal Servant</span><span class="sd">Good</span></div></div></div>
+      <div class="card"><div class="in"><div class="back"></div></div></div>
+      <div class="card"><div class="in"><div class="back"></div></div></div>
+      <div class="card"><div class="in"><div class="back"></div></div></div>
+      <div class="card"><div class="in"><div class="back"></div></div></div>
+    </div>
+    <div class="caption"><span class="side-l">Good side</span><span class="who">Merlin</span><p>Knows who is evil, but must never be found out.</p></div>
+  </section>
+</div>
+
+<!-- ============ 3b CHARACTERS after ============ -->
+<div class="board-note"><b>03b</b> Meet the characters · after the turn · the page goes dark as the Assassin flips</div>
+<div class="frame">
+  <section class="sec dark grain chars">
+    <div class="silk"></div>
+    <div class="head">
+      <div style="display:grid;gap:18px"><span class="eyebrow"><i></i>The seven roles</span><h2 class="h2">Four you <em>cannot.</em></h2></div>
+      <p class="lede" style="max-width:32ch">They sit at the same table, smile the same smile, and vote against you.</p>
+    </div>
+    <div class="row">
+      <div class="card" data-art="merlin" style="opacity:.45"><div class="in"><div class="face"><span class="sig">M</span><span class="nm">Merlin</span><span class="sd">Good</span></div></div></div>
+      <div class="card" data-art="percival" style="opacity:.45"><div class="in"><div class="face"><span class="sig">P</span><span class="nm">Percival</span><span class="sd">Good</span></div></div></div>
+      <div class="card" data-art="loyal-servant" style="opacity:.45"><div class="in"><div class="face"><span class="sig">L</span><span class="nm">Loyal Servant</span><span class="sd">Good</span></div></div></div>
+      <div class="card glow" data-art="assassin"><div class="in"><div class="face evil"><span class="sig">A</span><span class="nm">Assassin</span><span class="sd">Evil</span></div></div></div>
+      <div class="card lift glow" data-art="morgana"><div class="in"><div class="face evil"><span class="sig">M</span><span class="nm">Morgana</span><span class="sd">Evil</span></div></div></div>
+      <div class="card glow" data-art="mordred"><div class="in"><div class="face evil"><span class="sig">M</span><span class="nm">Mordred</span><span class="sd">Evil</span></div></div></div>
+      <div class="card glow" data-art="oberon"><div class="in"><div class="face evil"><span class="sig">O</span><span class="nm">Oberon</span><span class="sd">Evil</span></div></div></div>
+    </div>
+    <div class="caption"><span class="side-l" style="color:#c9545f">Evil side</span><span class="who">Morgana</span><p>Poses as Merlin to mislead Percival.</p></div>
+  </section>
+</div>
+
+<!-- ============ 4 DRAW ============ -->
+<div class="board-note"><b>04</b> Draw your card · dark · shown after a draw, with share and WhatsApp</div>
+<div class="frame" id="draw">
+  <section class="sec dark grain draw">
+    <div class="silk"></div>
+    <div class="deck">
+      <div class="card"><div class="in"><div class="back"></div></div></div>
+      <div class="card"><div class="in"><div class="back"></div></div></div>
+      <div class="card glow" data-art="morgana"><div class="in"><div class="face evil"><span class="sig">M</span><span class="nm">Morgana</span><span class="sd">Evil</span></div></div></div>
+    </div>
+    <div class="result">
+      <span class="eyebrow"><i></i>Fate has dealt</span>
+      <h2 class="h2">You drew <em>Morgana.</em></h2>
+      <p class="lede">You pose as Merlin and send the loyal down the wrong path. Can you keep a straight face?</p>
+      <a class="btn" href="https://wa.me/60176016227?text=Hi!%20I%20drew%20Morgana%20on%20your%20Avalon%20page.%20Tell%20me%20more%20about%20the%20online%20game%20nights." target="_blank" rel="noopener noreferrer">Ask about game nights <span class="dot"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></span></a>
+      <div class="rule"></div>
+      <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--mute)">Share your role</div>
+      <div class="share">
+        <a class="ghost" href="#">WhatsApp</a><a class="ghost" href="#">Facebook</a><a class="ghost" href="#">Threads</a><a class="ghost" href="#">X</a><a class="ghost" href="#">Copy link</a>
+      </div>
+      <a class="link" href="#">Draw again ↻</a>
+    </div>
+  </section>
+</div>
+
+<!-- ============ 5 FINAL ============ -->
+<div class="board-note"><b>05</b> Final call and footer · dark</div>
+<div class="frame">
+  <section class="sec dark grain final">
+    <div class="silk"></div>
+    <span class="eyebrow"><i></i>Online, every game night</span>
+    <h2 class="h1">Your seat is <em>waiting.</em></h2>
+    <p class="lede" style="text-align:center">Message us and we will tell you when the next table opens. Come alone or bring friends.</p>
+    <a class="btn lg" href="https://wa.me/60176016227?text=Hi!%20I%20want%20to%20know%20more%20about%20the%20online%20Avalon%20game%20nights." target="_blank" rel="noopener noreferrer">Message us on WhatsApp <span class="dot"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></span></a>
+  </section>
+  <footer class="foot"><b>Avalon</b><span>EN · 中文 · BM</span><span>Original artwork. Not an official product of any game publisher.</span></footer>
+</div>
+
+<!-- ============ ROLE PAGE ============ -->
+<div class="board-note"><b>06</b> Role share page · what a friend sees after tapping a shared link</div>
+<div class="frame">
+  <section class="sec dark grain role">
+    <div class="silk"></div>
+    <nav class="nav"><span class="brand">Avalon</span><span class="lang"><span class="on">EN</span><span>中文</span><span>BM</span></span><a class="wa" href="#">WhatsApp</a></nav>
+    <div style="perspective:1200px"><div class="card glow" data-art="morgana"><div class="in"><div class="face evil"><span class="sig">M</span><span class="nm">Morgana</span><span class="sd">Evil</span></div></div></div></div>
+    <div class="txt">
+      <span class="eyebrow"><i></i>A friend drew this role</span>
+      <h2 class="h2">Morgana. <em>Which one are you?</em></h2>
+      <p class="lede">Poses as Merlin to mislead Percival. Seven roles, one table, and nobody is who they say they are.</p>
+      <a class="btn" href="#draw">Draw your own <span class="dot"><svg viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></svg></span></a>
+      <a class="link" href="#">Ask on WhatsApp ↗</a>
+    </div>
+  </section>
+</div>
+
+<!-- ============ ART COMPARE ============ -->
+<div class="board-note"><b>07</b> Card art · two styles to choose from (Merlin and Morgana in each)</div>
+<div class="frame art">
+  <div class="cols">
+    <div>
+      <h3>A · Painted dark fantasy</h3>
+      <p class="sub">Oil paint, candle light, art fills the whole card</p>
+      <div class="pair">
+        <div class="card" data-style="painted" data-art="merlin"><div class="in"><span class="pending">Art pending</span><div class="face"><span class="sig">M</span><span class="nm">Merlin</span><span class="sd">Good</span></div></div></div>
+        <div class="card" data-style="painted" data-art="morgana"><div class="in"><span class="pending">Art pending</span><div class="face evil"><span class="sig">M</span><span class="nm">Morgana</span><span class="sd">Evil</span></div></div></div>
+      </div>
+    </div>
+    <div>
+      <h3>B · Tarot card</h3>
+      <p class="sub">Gold line work, ornate arched frame, symbolic poses</p>
+      <div class="pair">
+        <div class="card" data-style="tarot" data-art="merlin"><div class="in"><span class="pending">Art pending</span><div class="face"><span class="sig">M</span><span class="nm">Merlin</span><span class="sd">Good</span></div></div></div>
+        <div class="card" data-style="tarot" data-art="morgana"><div class="in"><span class="pending">Art pending</span><div class="face evil"><span class="sig">M</span><span class="nm">Morgana</span><span class="sd">Evil</span></div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ REFERENCES ============ -->
+<div class="board-note"><b>08</b> Reference board · pictures the owner supplied, used for looks only</div>
+<div class="frame refs">
+  <p class="note">These are reference pictures for future design work. The site never loads them: the build reads only <code>src/assets</code>, and this folder is <code>refeerences/</code>. The new paintings take the traits listed under each role (hair, headband, helmet, moustache and so on) and are painted as original art, not copies.</p>
+  <div class="refgrid">
+    <figure><img src="../refeerences/ref-morgana.png" alt="Morgana reference"><figcaption>Morgana</figcaption></figure>
+    <figure><img src="../refeerences/ref-loyal-servant-male.png" alt="Loyal Servant · male reference"><figcaption>Loyal Servant · male</figcaption></figure>
+    <figure><img src="../refeerences/ref-loyal-servant-female-1.png" alt="Loyal Servant · female 1 reference"><figcaption>Loyal Servant · female 1</figcaption></figure>
+    <figure><img src="../refeerences/ref-loyal-servant-female-2.png" alt="Loyal Servant · female 2 reference"><figcaption>Loyal Servant · female 2</figcaption></figure>
+    <figure><img src="../refeerences/ref-percival.png" alt="Percival reference"><figcaption>Percival</figcaption></figure>
+    <figure><img src="../refeerences/ref-oberon.png" alt="Oberon reference"><figcaption>Oberon</figcaption></figure>
+    <figure><img src="../refeerences/ref-badge-good.png" alt="Good side badge reference"><figcaption>Good badge: blue, top right</figcaption></figure>
+    <figure><img src="../refeerences/ref-badge-evil.png" alt="Evil side badge reference"><figcaption>Evil badge: red, top right</figcaption></figure>
+  </div>
+</div>
+
+<!-- ============ BEFORE AND AFTER ============ -->
+<div class="board-note"><b>09</b> Six repainted characters · current, new, and the reference each one follows</div>
+<div class="frame cmp">
+  <section>
+    <h3>Morgana</h3>
+    <p class="traits">Traits taken: Long copper orange hair, a gold headband with a red ruby at the forehead, a tall ribbed gold collar, a cold sideways stare.</p>
+    <div class="trio">
+      <figure><div class="pic"><img src="../src/assets/cards/painted/morgana.png" alt="Morgana, current painting"></div><figcaption>Current (live on the site)</figcaption></figure>
+      <figure><div class="pic" data-new><img src="../src/assets/cards/painted-v2/morgana.png" alt="Morgana, new painting" onerror="this.parentNode.classList.add('wait');this.remove()"></div><figcaption>New (painted-v2, waiting for your approval)</figcaption></figure>
+      <figure><div class="pic ref"><img src="../refeerences/ref-morgana.png" alt="Morgana, reference picture"></div><figcaption>Reference (looks only, never shipped)</figcaption></figure>
+    </div>
+  </section>
+  <section>
+    <h3>Loyal Servant · male</h3>
+    <p class="traits">Traits taken: Long dark curly hair, steel plate armour, a cut on the cheek.</p>
+    <div class="trio">
+      <figure><div class="pic"><img src="../src/assets/cards/painted/loyal-servant-2.png" alt="Loyal Servant · male, current painting"></div><figcaption>Current (live on the site)</figcaption></figure>
+      <figure><div class="pic" data-new><img src="../src/assets/cards/painted-v2/loyal-servant-2.png" alt="Loyal Servant · male, new painting" onerror="this.parentNode.classList.add('wait');this.remove()"></div><figcaption>New (painted-v2, waiting for your approval)</figcaption></figure>
+      <figure><div class="pic ref"><img src="../refeerences/ref-loyal-servant-male.png" alt="Loyal Servant · male, reference picture"></div><figcaption>Reference (looks only, never shipped)</figcaption></figure>
+    </div>
+  </section>
+  <section>
+    <h3>Loyal Servant · female 1</h3>
+    <p class="traits">Traits taken: Hair swept back under a gold headband, blue gown with pearls, three quarter view.</p>
+    <div class="trio">
+      <figure><div class="pic"><img src="../src/assets/cards/painted/loyal-servant-3.png" alt="Loyal Servant · female 1, current painting"></div><figcaption>Current (live on the site)</figcaption></figure>
+      <figure><div class="pic" data-new><img src="../src/assets/cards/painted-v2/loyal-servant-3.png" alt="Loyal Servant · female 1, new painting" onerror="this.parentNode.classList.add('wait');this.remove()"></div><figcaption>New (painted-v2, waiting for your approval)</figcaption></figure>
+      <figure><div class="pic ref"><img src="../refeerences/ref-loyal-servant-female-1.png" alt="Loyal Servant · female 1, reference picture"></div><figcaption>Reference (looks only, never shipped)</figcaption></figure>
+    </div>
+  </section>
+  <section>
+    <h3>Loyal Servant · female 2</h3>
+    <p class="traits">Traits taken: A closed steel helmet framing the face, plate armour with blue shoulder plates.</p>
+    <div class="trio">
+      <figure><div class="pic"><img src="../src/assets/cards/painted/loyal-servant-4.png" alt="Loyal Servant · female 2, current painting"></div><figcaption>Current (live on the site)</figcaption></figure>
+      <figure><div class="pic" data-new><img src="../src/assets/cards/painted-v2/loyal-servant-4.png" alt="Loyal Servant · female 2, new painting" onerror="this.parentNode.classList.add('wait');this.remove()"></div><figcaption>New (painted-v2, waiting for your approval)</figcaption></figure>
+      <figure><div class="pic ref"><img src="../refeerences/ref-loyal-servant-female-2.png" alt="Loyal Servant · female 2, reference picture"></div><figcaption>Reference (looks only, never shipped)</figcaption></figure>
+    </div>
+  </section>
+  <section>
+    <h3>Percival</h3>
+    <p class="traits">Traits taken: Straw blond bowl cut, short moustache and chin beard, pale eyes, a healing cut, dark armour with a red cloak.</p>
+    <div class="trio">
+      <figure><div class="pic"><img src="../src/assets/cards/painted/percival.png" alt="Percival, current painting"></div><figcaption>Current (live on the site)</figcaption></figure>
+      <figure><div class="pic" data-new><img src="../src/assets/cards/painted-v2/percival.png" alt="Percival, new painting" onerror="this.parentNode.classList.add('wait');this.remove()"></div><figcaption>New (painted-v2, waiting for your approval)</figcaption></figure>
+      <figure><div class="pic ref"><img src="../refeerences/ref-percival.png" alt="Percival, reference picture"></div><figcaption>Reference (looks only, never shipped)</figcaption></figure>
+    </div>
+  </section>
+  <section>
+    <h3>Oberon</h3>
+    <p class="traits">Traits taken: Yellow green horned fey creature, thorn crest, pointed ears, a snarl with sharp fangs.</p>
+    <div class="trio">
+      <figure><div class="pic"><img src="../src/assets/cards/painted/oberon.png" alt="Oberon, current painting"></div><figcaption>Current (live on the site)</figcaption></figure>
+      <figure><div class="pic" data-new><img src="../src/assets/cards/painted-v2/oberon.png" alt="Oberon, new painting" onerror="this.parentNode.classList.add('wait');this.remove()"></div><figcaption>New (painted-v2, waiting for your approval)</figcaption></figure>
+      <figure><div class="pic ref"><img src="../refeerences/ref-oberon.png" alt="Oberon, reference picture"></div><figcaption>Reference (looks only, never shipped)</figcaption></figure>
+    </div>
+  </section>
+</div>
+
+<!-- ============ BADGES ============ -->
+<div class="board-note"><b>10</b> Team badge version 2 · generated with gpt-image-2.6-flare · blue = loyal side, red = evil side, top right of every face up card</div>
+<div class="frame cmp">
+  <section>
+    <h3>Version 2 (new) and version 1 (simple vector, kept as backup)</h3>
+    <p class="traits">Blue: a pegasus holding a spear, gold laurel ring. Red: a two headed bird with both wings and both legs spread wide, steel ring with teeth and filigree. Our own designs, made from the owner's description, not copies of any game's crests. Cut out by npm run build into dist/ (run it before opening this page). Added by the page, never painted into the card art. Face down cards carry no badge.</p>
+    <div class="bdgrow">
+      <img class="big" style="width:clamp(150px,20vw,260px)" src="../dist/assets/badges/good-384.webp" alt="Blue badge, version 2">
+      <img class="big" style="width:clamp(150px,20vw,260px)" src="../dist/assets/badges/evil-384.webp" alt="Red badge, version 2">
+      <img class="big" style="opacity:.8" src="../src/assets/badges/good.svg" alt="Blue badge, version 1">
+      <img class="big" style="opacity:.8" src="../src/assets/badges/evil.svg" alt="Red badge, version 1">
+    </div>
+  </section>
+  <section>
+    <h3>On the cards (real size, with version 2)</h3>
+    <div class="bdgrow">
+      <div class="bdg good"><img src="../src/assets/cards/painted/merlin.png" alt="Merlin with the blue badge"><i></i></div>
+      <div class="bdg good"><img src="../src/assets/cards/painted/percival.png" alt="Percival with the blue badge"><i></i></div>
+      <div class="bdg evil"><img src="../src/assets/cards/painted/assassin.png" alt="Assassin with the red badge"><i></i></div>
+      <div class="bdg evil"><img src="../src/assets/cards/painted/mordred.png" alt="Mordred with the red badge"><i></i></div>
+    </div>
+  </section>
+</div>
+<!-- ============ GAME CARDS ============ -->
+<div class="board-note"><b>11</b> Game cards · vote, quest and Lady of the Lake · gpt-image-2.6-flare · titles and badges added by the page, never painted into the picture</div>
+<div class="frame cmp gcsec" id="gamecards">
+  <section>
+    <h3>Approve, Reject, Success, Fail and the Lady of the Lake</h3>
+    <p class="traits">Original pictures (the owner's four reference pictures were looked at, never copied). The title is live text from the language files, so it shows in three languages. The badges are the cut out blue and red badges, the same files the role cards use: Success carries both, Fail carries only the red one. Switch the language to check the titles.</p>
+    <div class="gclang" role="group" aria-label="Preview language">
+      <button type="button" data-l="en" aria-pressed="true">EN</button>
+      <button type="button" data-l="zh" aria-pressed="false">中文</button>
+      <button type="button" data-l="ms" aria-pressed="false">BM</button>
+    </div>
+    <div class="gcrow">
+      <figure><div class="gc vote"><img src="../src/assets/props/approve.png" alt="Approve vote card: a white marble sphere"><b class="t" data-k="approve">Approve</b></div><figcaption>Approve · vote, chapter 3</figcaption></figure>
+      <figure><div class="gc vote"><img src="../src/assets/props/reject.png" alt="Reject vote card: a black stone sphere"><b class="t" data-k="reject">Reject</b></div><figcaption>Reject · vote, chapter 3</figcaption></figure>
+      <figure><div class="gc quest"><img src="../src/assets/props/success.png" alt="Success quest card: a gleaming golden chalice"><b class="t" data-k="success">Success</b><i class="l"></i><i class="r"></i></div><figcaption>Success · quest, chapter 4 · both badges</figcaption></figure>
+      <figure><div class="gc quest bad"><img src="../src/assets/props/fail.png" alt="Fail quest card: a cracked, tarnished chalice"><b class="t" data-k="fail">Fail</b><i class="r"></i></div><figcaption>Fail · quest, chapter 4 · red badge only</figcaption></figure>
+      <figure><div class="gc"><img src="../src/assets/props/lady_of_the_lake.png" alt="Lady of the Lake: a woman seen from behind in a misty lake, looking over her shoulder"></div><figcaption>Lady of the Lake · chapter 5</figcaption></figure>
+    </div>
+  </section>
+</div>
+<div style="height:80px"></div>
+
+<script>
+// Prototype only: use the generated card back when it exists.
+{
+  const back = new Image();
+  back.onload = () => {
+    const s = document.createElement('style');
+    s.textContent = `.back{background:#0e1220 url("${back.src}") center/cover}.back::after{content:none}`;
+    document.head.append(s);
+  };
+  back.src = '../src/assets/cards/painted/card-back.png';
+}
+// Prototype only: swap in generated art when the files exist.
+// ?style=painted or ?style=tarot picks which set the page frames use.
+// ?style=painted-v2 previews the six repainted characters (the rest fall back to painted).
+const pick = new URLSearchParams(location.search).get('style') || 'painted';
+const SIDE = { merlin: 'good', percival: 'good', 'loyal-servant': 'good', 'loyal-servant-2': 'good', 'loyal-servant-3': 'good', 'loyal-servant-4': 'good', assassin: 'evil', morgana: 'evil', mordred: 'evil', oberon: 'evil' };
+document.querySelectorAll('.card[data-art]').forEach((card) => {
+  const art = card.dataset.art;
+  const tries = [...new Set([card.dataset.style || pick, 'painted'])];
+  if (SIDE[art]) card.classList.add(SIDE[art]); // the team badge shows once the art is on the card
+  const img = new Image();
+  img.alt = card.querySelector('.nm')?.textContent + ' card art';
+  img.onload = () => { card.querySelector('.in').prepend(img); card.classList.add('has-art'); };
+  img.onerror = () => { const next = tries.shift(); if (next) img.src = '../src/assets/cards/' + next + '/' + art + '.png'; };
+  img.onerror();
+});
+// Prototype only: the language switch on the game cards (section 11). The real titles will come from src/i18n/*.json.
+{
+  const sec = document.getElementById('gamecards');
+  const words = {
+    en: { approve: 'Approve', reject: 'Reject', success: 'Success', fail: 'Fail' },
+    zh: { approve: '赞成', reject: '反对', success: '成功', fail: '失败' },
+    ms: { approve: 'Setuju', reject: 'Tolak', success: 'Berjaya', fail: 'Gagal' },
+  };
+  const set = (l) => {
+    sec.classList.toggle('zh', l === 'zh');
+    sec.lang = l === 'zh' ? 'zh-Hans' : l;
+    sec.querySelectorAll('.t').forEach((el) => { el.textContent = words[l][el.dataset.k]; });
+    sec.querySelectorAll('.gclang button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.l === l)));
+  };
+  sec.querySelectorAll('.gclang button').forEach((b) => b.addEventListener('click', () => set(b.dataset.l)));
+  const first = new URLSearchParams(location.search).get('gl');
+  if (words[first]) set(first); // ?gl=zh or ?gl=ms opens the page in that language
+}
+</script>
+</body>
+</html>

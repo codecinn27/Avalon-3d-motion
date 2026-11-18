@@ -1,0 +1,317 @@
+{
+  "meta": {
+    "title": "Malam permainan Avalon dalam talian · Jangan percaya sesiapa di meja bulat",
+    "description": "Avalon ialah permainan peranan rahsia, pembohongan berani, dan satu pengkhianatan sempurna. Cabut kad peranan anda, kongsi dengan kawan, dan tanya kami di WhatsApp tentang malam permainan seterusnya."
+  },
+  "a11y": {
+    "skip": "Terus ke kandungan",
+    "nav": "Utama",
+    "language": "Bahasa",
+    "newTab": "dibuka dalam tab baharu",
+    "cardAlt": "Kad {role}, lukisan asli",
+    "deckAlt": "Sekeping kad Avalon yang tertutup",
+    "turnCard": "Buka kad {n} daripada {total}",
+    "musicOff": "Matikan muzik latar",
+    "musicOn": "Hidupkan muzik latar"
+  },
+  "nav": {
+    "whatsapp": "WhatsApp"
+  },
+  "hero": {
+    "eyebrow": "Malam permainan",
+    "title": "Jangan percaya *sesiapa* di meja bulat.",
+    "cta": "Tanya di WhatsApp",
+    "drawLink": "Cabut kad anda"
+  },
+  "how": {
+    "eyebrow": "Cara bermain",
+    "title": "Tiga pusingan *keraguan.*",
+    "lede": "Baru kenal Avalon? Dua minit sahaja untuk faham. Selebihnya, baca air muka.",
+    "step1Title": "Anda dapat peranan rahsia",
+    "step1Body": "Kesatria setia atau pengkhianat tersembunyi. Hanya anda yang tahu.",
+    "step2Title": "Meja bulat menjalankan misi",
+    "step2Body": "Pasukan dipilih, undi dibuang, dan setiap pilihan mendedahkan sesuatu tentang anda.",
+    "step3Title": "Cari pengkhianat sebelum mereka menang",
+    "step3Body": "Tiga misi gagal dan pihak jahat merampas takhta. Berbincang, menuduh, menggertak."
+  },
+  "deal": {
+    "title": "Sepuluh kerusi. Enam setia. Empat sedang *berbohong.*",
+    "lede": "Setiap pemain mendapat satu kad rahsia. Tiada siapa menunjukkannya, kawan baik pun tidak."
+  },
+  "night": {
+    "title": "Malam tiba. Setiap orang tahu perkara yang berbeza.",
+    "fall": "Malam tiba.",
+    "fallSub": "Semua orang, pejamkan mata.",
+    "evil": "Pihak jahat, buka mata anda.",
+    "traitors": "Para pengkhianat saling mengenali.",
+    "oberon": "Oberon bergerak seorang diri.",
+    "merlin": "Merlin, buka mata anda.",
+    "merlinSees": "Merlin nampak para pengkhianat.",
+    "merlinSub": "Kecuali seorang.",
+    "percival": "Percival, buka mata anda.",
+    "percivalSees": "Percival nampak dua Merlin.",
+    "percivalSub": "Hanya seorang yang sebenar.",
+    "others": "Yang lain tidak nampak apa-apa pun.",
+    "open": "Semua orang, buka mata anda.",
+    "know": "Kini setiap orang tahu perkara yang berbeza.",
+    "whoTitle": "Siapa tahu apa",
+    "seat": "Kerusi {n}: {role}",
+    "sees": {
+      "merlin": "Nampak Pembunuh, Morgana dan Oberon sebagai jahat. Tidak nampak Mordred.",
+      "assassin": "Kenal Morgana dan Mordred. Tidak kenal Oberon.",
+      "morgana": "Kenal Pembunuh dan Mordred. Pada pandangan Percival, dia kelihatan seperti Merlin.",
+      "mordred": "Kenal Pembunuh dan Morgana. Merlin tidak dapat melihatnya.",
+      "oberon": "Tidak kenal sesiapa. Oberon bersendirian dalam gelap.",
+      "percival": "Nampak dua kad yang mungkin Merlin: Merlin dan Morgana. Tidak tahu yang mana satu sebenar.",
+      "loyal-servant": "Tidak nampak apa-apa pun."
+    },
+    "seen": {
+      "merlin": "Dilihat oleh Percival, yang menyangka dia mungkin Merlin.",
+      "assassin": "Dilihat oleh Merlin, Morgana dan Mordred.",
+      "morgana": "Dilihat oleh Merlin, Pembunuh, Mordred dan Percival.",
+      "mordred": "Dilihat oleh Pembunuh dan Morgana. Merlin tidak dapat melihatnya.",
+      "oberon": "Dilihat oleh Merlin sahaja.",
+      "percival": "Tiada siapa yang melihatnya.",
+      "loyal-servant": "Tiada siapa yang melihatnya."
+    }
+  },
+  "vote": {
+    "title": "Undian",
+    "leader": "Setiap pusingan, seorang pemain mengetuai.",
+    "team1": "Ketua memilih siapa yang pergi menjalankan misi.",
+    "cards": "Setiap pemain memegang dua kad: Setuju dan Tolak.",
+    "all": "Semua mengundi. Serentak. Secara terbuka.",
+    "rejected": "Ditolak. Mahkota berpindah.",
+    "five": "Lima pasukan ditolak berturut-turut,",
+    "fiveSub": "dan pihak jahat menang tanpa mengangkat pedang.",
+    "team2": "Ketua baharu memilih semula.",
+    "approved": "Tujuh Setuju. Tiga Tolak. Diluluskan.",
+    "approve": "Setuju",
+    "reject": "Tolak",
+    "barQuests": "Misi",
+    "barRejects": "Tolakan",
+    "howTitle": "Cara undian berfungsi",
+    "how1": "Ketua memilih satu pasukan.",
+    "how2": "Setiap pemain meletakkan satu kad undi menghadap bawah.",
+    "how3": "Semua kad dibuka serentak.",
+    "how4": "Lebih separuh mesti Setuju supaya pasukan boleh pergi.",
+    "how5": "Seri bermakna pasukan ditolak.",
+    "how6": "Lima pasukan ditolak berturut-turut dan pihak jahat menang."
+  },
+  "quest": {
+    "title": "Misi",
+    "secret": "Pasukan pergi menjalankan misi. Secara rahsia.",
+    "rule": "Yang setia mesti memainkan Berjaya. Pengkhianat boleh memilih mana-mana.",
+    "q1": "Malah Pembunuh memainkan Berjaya. Buat masa ini.",
+    "q1done": "Misi pertama berjaya.",
+    "team2": "Ketua baharu. Pasukan empat orang. Diluluskan.",
+    "hand": "Hanya anda yang nampak. Pembunuh memilih Gagal.",
+    "shuffle": "Dikocok. Tiada siapa dapat mengikut yang mana satu.",
+    "turn": "Balikkan kad.",
+    "fail": "Satu Gagal sudah cukup. Tiada siapa tahu milik siapa.",
+    "both": "Kerusi 3 ada dalam kedua-dua misi.",
+    "points": "Pengkhianat menuding dahulu.",
+    "cardLabel": "Kad misi {n} daripada 4, menghadap bawah. Balikkan.",
+    "cardSuccess": "Berjaya",
+    "cardFail": "Gagal",
+    "r1": "Misi 1: tiga kad, semuanya Berjaya. Misi berjaya.",
+    "r2": "Misi 2: empat kad, satu Gagal. Misi gagal.",
+    "live1": "Berjaya.",
+    "liveFail": "Gagal. Satu Gagal sudah cukup.",
+    "howTitle": "Cara misi berfungsi",
+    "how1": "Setiap ahli pasukan memainkan satu kad, menghadap bawah.",
+    "how2": "Yang setia mesti memainkan Berjaya. Pengkhianat boleh memainkan mana-mana.",
+    "how3": "Kad dikocok sebelum dibalikkan.",
+    "how4": "Satu Gagal sahaja dan misi gagal (misi 4 pada tujuh pemain atau lebih memerlukan dua).",
+    "how5": "Tiada siapa tahu siapa memainkan apa."
+  },
+  "sides": {
+    "good": "Baik",
+    "evil": "Jahat",
+    "goodLong": "Pihak baik",
+    "evilLong": "Pihak jahat"
+  },
+  "draw": {
+    "eyebrow": "Cabut kad anda",
+    "title": "*Anda* di pihak mana?",
+    "lede": "Tujuh kad, tertutup. Ketik sekali dan takdir memberi anda satu peranan. Kongsi dan lihat apa yang kawan anda dapat.",
+    "button": "Cabut kad anda",
+    "noscript": "Cabutan kad memerlukan JavaScript. Anda masih boleh tanya kami apa sahaja di WhatsApp.",
+    "resultEyebrow": "Takdir telah memilih",
+    "resultTitle": "Anda mendapat *{role}.*",
+    "ask": "Tanya tentang malam permainan",
+    "shareLabel": "Kongsi peranan anda",
+    "copy": "Salin pautan",
+    "copied": "Disalin",
+    "again": "Cabut lagi",
+    "linkField": "Pautan ke peranan ini",
+    "save": "Simpan kad saya"
+  },
+  "share": {
+    "text": "Saya mendapat {role} di meja bulat Avalon. Peranan apa yang anda akan dapat?"
+  },
+  "final": {
+    "eyebrow": "Dalam talian, setiap malam permainan",
+    "title": "Tempat duduk anda *sedang menunggu.*",
+    "lede": "Malam Avalon dalam talian. Datang seorang atau bawa kumpulan anda. Kami penuhkan meja.",
+    "cta": "Simpankan saya tempat duduk"
+  },
+  "footer": {
+    "note": "Karya seni asli. Bukan produk rasmi mana-mana penerbit permainan."
+  },
+  "rolePage": {
+    "eyebrow": "Seorang kawan mendapat peranan ini",
+    "title": "{role}. *Anda yang mana satu?*",
+    "tail": "Tujuh peranan, satu meja, dan tiada siapa seperti yang mereka dakwa.",
+    "cta": "Cabut kad anda",
+    "wa": "Tanya di WhatsApp",
+    "metaTitle": "{role} · Malam permainan Avalon dalam talian",
+    "metaDescription": "Seorang kawan mendapat {role}. {line} Cabut peranan anda sendiri dan sertai malam Avalon dalam talian."
+  },
+  "notFound": {
+    "title": "Tempat duduk ini *kosong.*",
+    "body": "Halaman yang anda cari tiada di meja ini.",
+    "link": "Kembali ke meja bulat"
+  },
+  "waMessage": {
+    "general": "Hai! Saya ingin tahu lebih lanjut tentang malam permainan Avalon dalam talian.",
+    "withRole": "Hai! Saya mendapat {role} di halaman Avalon anda. Ceritakan lagi tentang malam permainan dalam talian.",
+    "seat": "Hai! Tolong simpankan saya tempat duduk pada malam Avalon dalam talian yang seterusnya."
+  },
+  "roles": {
+    "merlin": {
+      "name": "Merlin",
+      "line": "Tahu siapa yang jahat, tetapi tidak boleh sekali-kali terbongkar.",
+      "drawLine": "Anda kenal setiap pengkhianat di meja. Bimbing yang setia tanpa mendedahkan diri."
+    },
+    "percival": {
+      "name": "Percival",
+      "line": "Kenal Merlin, dan mesti melindunginya daripada Pembunuh.",
+      "drawLine": "Anda tahu siapa Merlin, atau anda fikir anda tahu. Lindungi dia hingga ke akhir."
+    },
+    "loyal-servant": {
+      "name": "Hamba Setia",
+      "line": "Tiada maklumat istimewa. Hanya mata yang tajam dan hati yang setia.",
+      "drawLine": "Tiada rahsia, tiada kuasa. Hanya akal anda untuk membezakan kawan dan pengkhianat."
+    },
+    "assassin": {
+      "name": "Pembunuh",
+      "line": "Jika pihak baik menang misi, satu serangan ke atas Merlin masih boleh merampas kemenangan.",
+      "drawLine": "Kalah misi pun anda masih ada satu serangan. Namakan Merlin dan pihak jahat menang semuanya."
+    },
+    "morgana": {
+      "name": "Morgana",
+      "line": "Menyamar sebagai Merlin untuk mengelirukan Percival.",
+      "drawLine": "Anda menyamar sebagai Merlin dan menyesatkan yang setia. Bolehkah anda kekal tenang?"
+    },
+    "mordred": {
+      "name": "Mordred",
+      "line": "Satu-satunya pengkhianat yang Merlin sendiri tidak nampak.",
+      "drawLine": "Merlin pun tidak nampak anda. Bersembunyi di depan mata dan kawal segalanya."
+    },
+    "oberon": {
+      "name": "Oberon",
+      "line": "Jahat, tetapi bersendirian. Pengkhianat lain tidak mengenalinya.",
+      "drawLine": "Anda jahat dan tiada siapa tahu, termasuk pihak anda sendiri. Cetuskan huru-hara seorang diri."
+    }
+  },
+  "peek": {
+    "close": "Tutup",
+    "hint": "Ketik di mana-mana untuk meletakkan kad semula"
+  },
+  "lady": {
+    "title": "Puteri Tasik",
+    "name": "Puteri Tasik",
+    "wakes": "Selepas misi kedua, Puteri Tasik terjaga.",
+    "holds": "Mordred memegangnya.",
+    "looks": "Dia memandang kerusi 3, orang yang dipersalahkan meja.",
+    "still": "Meja bertukar menjadi air yang tenang.",
+    "touch": "Sentuh air itu.",
+    "shows": "Dia menunjukkan kepada pemegangnya pihak sebenar seorang pemain.",
+    "blue": "Biru. Kerusi 3 setia.",
+    "evil": "Jahat.",
+    "never": "Puteri tidak pernah berbohong.",
+    "might": "Tetapi yang memegangnya mungkin.",
+    "merlin": "Merlin pun tidak dapat melihat pembohongan ini.",
+    "merlinWhy": "Merlin nampak tiga pengkhianat. Mordred bukan salah seorang daripadanya.",
+    "moves": "Dia berpindah tangan.",
+    "again": "Dia terjaga lagi selepas misi 3 dan 4.",
+    "poolLabel": "Air Puteri. Sentuh untuk melihat pihak sebenar kerusi 3.",
+    "result": "Mordred nampak kerusi 3 setia, lalu memberitahu meja kerusi 3 jahat.",
+    "howTitle": "Cara Puteri berfungsi",
+    "how1": "Selepas misi 2, 3 dan 4, pemegang Puteri memilih seorang pemain.",
+    "how2": "Mereka melihat secara rahsia pihak pemain itu, setia atau jahat, tetapi bukan peranannya.",
+    "how3": "Mereka boleh memberitahu meja perkara yang benar atau berbohong.",
+    "how4": "Kemudian mereka menyerahkan Puteri kepada pemain itu.",
+    "how5": "Orang yang pernah memegang Puteri tidak boleh dipilih.",
+    "seatTag": "{n} · {role}"
+  },
+  "climb": {
+    "title": "Pendakian",
+    "q3lead": "Misi 3. Morgana mengetuai.",
+    "approved": "Diluluskan.",
+    "q3cards": "Morgana pun mainkan Berjaya. Dia perlukan kepercayaan mereka.",
+    "ladyAgain": "Puteri terjaga lagi. Kerusi 3 memandang Pembunuh.",
+    "red": "Merah.",
+    "truth": "Kali ini, yang benar.",
+    "q4lead": "Percival mengetuai. Dia percaya Merlin yang salah.",
+    "q4rule": "Untuk sepuluh pemain, misi empat perlukan dua kad Gagal.",
+    "twoAll": "Dua sama. Tinggal satu misi.",
+    "ladyOnce": "Dia terjaga sekali lagi. Pembunuh memandang Percival, dan tidak berkata apa-apa.",
+    "q5lead": "Kerusi 6 mengetuai. Percival menamakan pasukan.",
+    "bluff": "Percival berlakon sebagai Merlin. Dengan sengaja.",
+    "q5done": "Lima Berjaya.",
+    "won": "Pihak setia menang.",
+    "liveRed": "Merah. Pembunuh jahat, dan kerusi 3 bercakap benar.",
+    "liveScore": "Setia {good}, jahat {evil}.",
+    "r3": "Misi 3 berjaya: empat kad, semuanya Berjaya.",
+    "rLady": "Kerusi 3 memandang Pembunuh, nampak merah, dan bercakap benar.",
+    "r4": "Misi 4 gagal dengan dua kad Gagal, daripada Morgana dan Mordred.",
+    "r5": "Misi 5 berjaya: lima kad, semuanya Berjaya. Pihak setia menang tiga misi kepada dua.",
+    "howTitle": "Cara permainan dimenangi",
+    "how1": "Pihak pertama yang menang tiga misi memenangi permainan.",
+    "how2": "Ketua berpindah satu kerusi ke kiri selepas setiap pasukan, lulus atau tidak.",
+    "how3": "Untuk tujuh pemain atau lebih, misi 4 perlukan dua kad Gagal untuk gagal.",
+    "how4": "Puteri Tasik terjaga selepas misi 2, 3 dan 4."
+  },
+  "seat": {
+    "hidden": "Bolehkah anda menyembunyikan Merlin?",
+    "found": "Bolehkah anda menemui Merlin?",
+    "friend": "Sekarang bayangkan pembohong itu ialah kawan baik anda.",
+    "turn": "Giliran anda. Cabut kad anda.",
+    "cardLabel": "Cabut kad anda"
+  },
+  "blade": {
+    "title": "Pisau terakhir",
+    "remains": "Tetapi satu pisau masih tinggal.",
+    "evilWin": "Pihak jahat boleh kalah setiap misi dan masih menang.",
+    "name": "Sebut nama Merlin, dan segalanya jatuh ke tangan pihak jahat.",
+    "slows": "Ia menjadi perlahan di antara dua orang.",
+    "percival": "Sepanjang permainan, Percival berlakon sebagai Merlin untuk menarik pisau itu pergi.",
+    "saw": "Anda melihat segalanya malam ini. Pembunuh tidak nampak apa-apa.",
+    "where": "Di mana pisau akan jatuh?",
+    "hintMouse": "Halakan pada satu kad, kemudian klik.",
+    "hintTouch": "Ketik untuk menghalakan. Ketik lagi untuk menikam.",
+    "strike": "Tikam tempat {n}",
+    "cardLabel": "Tempat {n}, {name}. Halakan pisau ke sini.",
+    "chooses": "Pembunuh memilih.",
+    "merlin": "Merlin.",
+    "taken": "Kemenangan itu diambil semula.",
+    "lost": "Tiga misi dimenangi. Satu nama menghilangkan segalanya.",
+    "notMerlin": "Bukan Merlin.",
+    "hidden": "Merlin kekal tersembunyi.",
+    "saved": "Pisau itu tersasar. Kerajaan selamat.",
+    "other": "Lihat pengakhiran yang lain",
+    "liveA": "Pisau itu menemui Merlin. Pihak jahat menang.",
+    "liveB": "Pisau itu tersasar. {name} ialah pihak setia, bukan Merlin. Kerajaan selamat.",
+    "orScroll": "Atau terus tatal, dan Pembunuh yang memilih.",
+    "seatBtn": "Tempat {n}, {name}",
+    "plainA": "Pembunuh menyebut nama Merlin. Pihak jahat menang.",
+    "howTitle": "Tikaman terakhir",
+    "how1": "Jika pihak setia menang tiga misi, permainan belum tamat.",
+    "how2": "Pembunuh mendapat satu tekaan: dia menyebut pemain yang disangkanya Merlin.",
+    "how3": "Jika betul, pihak jahat memenangi seluruh permainan. Jika salah, pihak setia menang.",
+    "winEvil": "Pihak jahat menang",
+    "winGood": "Pihak setia menang"
+  }
+}

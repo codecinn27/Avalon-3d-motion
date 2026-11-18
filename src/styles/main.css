@@ -1,0 +1,698 @@
+/* Avalon landing page. Ported from design/index.html (the approved look). */
+
+@font-face{font-family:"Fraunces";font-style:normal;font-weight:100 900;font-display:swap;src:url("/fonts/fraunces-latin-opsz-normal.woff2") format("woff2-variations")}
+@font-face{font-family:"Fraunces";font-style:italic;font-weight:100 900;font-display:swap;src:url("/fonts/fraunces-latin-opsz-italic.woff2") format("woff2-variations")}
+@font-face{font-family:"Geist";font-style:normal;font-weight:100 900;font-display:swap;src:url("/fonts/geist-latin-wght-normal.woff2") format("woff2-variations")}
+
+:root{
+  --paper:#F3ECDF; --paper-2:#E8DDC9; --ink:#1B1712; --ink-soft:#5B5246; --gold:#A8782A;
+  --night:#0B0D12; --night-2:#141824; --cream:#EFE6D4; --mute:#9A927F; --candle:#D9A441; --crimson:#8E1B26;
+  --ease:cubic-bezier(.32,.72,0,1);
+  --display:"Fraunces","Songti SC","Noto Serif SC","STSong","SimSun",Georgia,serif;
+  --body:"Geist","PingFang SC","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif;
+  /* light theme (the loyal side) */
+  --bg:var(--paper); --fg:var(--ink); --fg-soft:var(--ink-soft); --accent:var(--gold); --accent-text:#7A5516;
+  --evil:#8E1B26; --line:rgba(27,23,18,.14); --pill:var(--ink); --pill-fg:var(--paper); --glass:rgba(243,236,223,.72); --glass-solid:rgba(243,236,223,.94);
+  --card-edge:linear-gradient(160deg,rgba(168,120,42,.75),rgba(168,120,42,.2) 40%,rgba(168,120,42,.65));
+  --card-shadow:0 40px 60px -30px rgba(27,23,18,.5),0 8px 18px -10px rgba(27,23,18,.3);
+  color-scheme:light;
+}
+/* dark theme (evil revealed). Also used by the late sections when no script is steering the theme. */
+html.dark, html:not(.themed):not(.dark) .late, .peek{
+  --bg:var(--night); --fg:var(--cream); --fg-soft:var(--mute); --accent:var(--candle); --accent-text:var(--candle);
+  --evil:#D0616B; --line:rgba(239,230,212,.16); --pill:var(--candle); --pill-fg:#17120a; --glass:rgba(11,13,18,.66); --glass-solid:rgba(16,19,27,.92);
+  --card-edge:linear-gradient(160deg,rgba(217,164,65,.8),rgba(217,164,65,.14) 40%,rgba(217,164,65,.6));
+  --card-shadow:0 50px 70px -30px #000,0 0 0 1px rgba(0,0,0,.4);
+}
+html.dark{color-scheme:dark}
+/* chapter 2: night is a third state, bluer than dark. It sits on top of the dark variables (theme.js sets both classes) and passes at dawn. */
+html.night{--bg:#070B18;--glass-solid:rgba(10,15,32,.92)}
+html:not(.themed):not(.dark) .late{background:var(--night)}
+
+*,*::before,*::after{box-sizing:border-box}
+*{margin:0}
+html{-webkit-text-size-adjust:100%;overflow-x:clip}
+body{font-family:var(--body);background:var(--bg);color:var(--fg);line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:clip;min-height:100svh}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+ul,ol{list-style:none;padding:0}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+.vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.skip{position:fixed;top:8px;left:8px;z-index:100;padding:12px 18px;border-radius:99px;background:var(--pill);color:var(--pill-fg);transform:translateY(-200%)}
+.skip:focus{transform:none}
+
+/* Lenis */
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+.lenis.lenis-stopped{overflow:hidden}
+
+/* the light to dark turn: colours ease for a moment while the class is on */
+/* the light, dark and night turns: the backdrop follows the scroll (theme.js), so nothing fades the whole page on a timer.
+   When a turn passes its middle the text colours swap; these few elements ease that swap. */
+html.themed body{background:transparent}
+.nav,.nav a,.night-say,.night-say span,.deal .h2,.deal .lede,.h2 em,.side-l{transition:color .6s var(--ease),background-color .6s var(--ease),box-shadow .6s var(--ease)}
+
+/* ---------- backdrop ---------- */
+.backdrop{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:var(--paper)}
+.silk{position:absolute;inset:-20%;filter:blur(60px);will-change:opacity}
+.silk-light{opacity:.9;background:
+   radial-gradient(40% 34% at 62% 38%,rgba(255,250,240,.95),transparent 70%),
+   radial-gradient(34% 44% at 30% 66%,rgba(214,190,146,.55),transparent 70%),
+   radial-gradient(30% 30% at 78% 76%,rgba(168,120,42,.22),transparent 70%)}
+.silk-dark{opacity:0;background:
+   radial-gradient(38% 34% at 64% 36%,rgba(40,52,92,.75),transparent 70%),
+   radial-gradient(34% 40% at 26% 70%,rgba(142,27,38,.42),transparent 70%),
+   radial-gradient(26% 26% at 80% 80%,rgba(217,164,65,.18),transparent 70%),
+   var(--night)}
+.silk-night{opacity:0;background:
+   radial-gradient(38% 34% at 64% 36%,rgba(34,52,106,.8),transparent 70%),
+   radial-gradient(34% 40% at 26% 70%,rgba(26,44,104,.5),transparent 70%),
+   radial-gradient(26% 26% at 80% 80%,rgba(217,164,65,.1),transparent 70%),
+   #070B18}
+html:not(.themed).dark .silk-dark{opacity:1}
+#silk{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity 1.2s var(--ease)}
+.backdrop.gl #silk{opacity:1}
+.backdrop.gl .silk{display:none}
+.grain{position:fixed;inset:0;z-index:40;pointer-events:none;opacity:.075;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+/* phones and tablets (html.lite, set by the boot script, spec 013): no grain over the page, and no frosted glass blur.
+   Both are redrawn over the whole moving page on every scroll frame, which a phone's GPU cannot keep up with */
+html.lite .grain{display:none}
+html.lite .nav,html.lite .music{-webkit-backdrop-filter:none;backdrop-filter:none;background:var(--glass-solid)}
+
+/* ---------- type ---------- */
+.eyebrow{width:fit-content;display:inline-flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:500;padding:6px 12px;border-radius:99px;box-shadow:inset 0 0 0 1px var(--line);color:var(--fg-soft)}
+.eyebrow i{width:5px;height:5px;border-radius:50%;background:var(--accent);flex:none}
+.h1{font-family:var(--display);font-weight:380;font-size:clamp(44px,8.2vw,124px);line-height:.94;letter-spacing:-.035em;font-variation-settings:"opsz" 144;text-wrap:balance}
+.h2{font-family:var(--display);font-weight:380;font-size:clamp(34px,5.4vw,76px);line-height:1;letter-spacing:-.03em;font-variation-settings:"opsz" 144;text-wrap:balance}
+.h1 em,.h2 em{font-style:italic;font-weight:300;color:var(--accent)}
+.lede{font-size:clamp(16px,1.5vw,19px);color:var(--fg-soft);max-width:46ch;text-wrap:pretty}
+.side-l{font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:500;color:var(--accent-text)}
+.evil > .side-l,.evil .cap .side-l,.cap-s.evil .side-l,.role.evil .side-l{color:var(--evil)}
+:lang(zh) .h1,:lang(zh) .h2{letter-spacing:0;line-height:1.12;font-weight:500}
+:lang(zh) em{font-style:normal!important}
+:lang(zh) .eyebrow,:lang(zh) .side-l{letter-spacing:.12em;font-size:12px}
+/* split text lines: room for descenders inside the reveal mask */
+.ln{padding-bottom:.14em}
+.ln-mask{margin-bottom:-.14em}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;gap:14px;min-height:52px;padding:8px 8px 8px 24px;border-radius:99px;background:var(--pill);color:var(--pill-fg);font-weight:500;font-size:15px;transition:transform .7s var(--ease);will-change:transform}
+.btn:active{transform:scale(.98)}
+.btn .dot{width:36px;height:36px;flex:none;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.14);transition:transform .7s var(--ease)}
+html.dark .btn .dot,html:not(.themed) .late .btn .dot{background:rgba(0,0,0,.14)}
+.btn:hover .dot{transform:translate(3px,-1px) scale(1.06)}
+.btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+.btn.lg{min-height:68px;padding:10px 10px 10px 34px;font-size:18px}
+.btn.lg .dot{width:48px;height:48px}
+.link{display:inline-flex;align-items:center;gap:8px;min-height:44px;font-size:15px;color:var(--fg);box-shadow:inset 0 -1px 0 var(--line)}
+.link:hover{box-shadow:inset 0 -1px 0 var(--accent)}
+.ghost{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:99px;box-shadow:inset 0 0 0 1px var(--line);font-size:14px;color:var(--fg);transition:box-shadow .4s var(--ease)}
+.ghost:hover{box-shadow:inset 0 0 0 1px var(--accent)}
+
+/* ---------- nav ---------- */
+.nav-wrap{position:fixed;top:16px;left:0;right:0;z-index:60;display:flex;justify-content:center;padding:0 8px;pointer-events:none}
+.nav{pointer-events:auto;display:flex;align-items:center;gap:6px;padding:6px 6px 6px 20px;border-radius:99px;background:var(--glass);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);box-shadow:inset 0 0 0 1px var(--line),0 18px 40px -24px rgba(0,0,0,.35);white-space:nowrap;color:var(--fg)}
+.nav .brand{font-family:var(--display);font-size:19px;letter-spacing:-.01em;margin-right:14px;min-height:44px;display:inline-flex;align-items:center}
+.nav .lang{display:flex;gap:2px;font-size:12px;color:var(--fg-soft)}
+.nav .lang a{min-width:44px;min-height:44px;padding:0 10px;border-radius:99px;display:inline-flex;align-items:center;justify-content:center;position:relative}
+.nav .lang a:hover{color:var(--fg)}
+.nav .lang .on{color:var(--fg);box-shadow:inset 0 0 0 1px var(--line)}
+.nav .lang .offer::after{content:"";position:absolute;top:9px;right:7px;width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.nav .wa{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:99px;background:var(--pill);color:var(--pill-fg);font-size:13px;font-weight:500;margin-left:6px}
+.music{pointer-events:auto;position:fixed;top:22px;right:16px;z-index:61;width:44px;height:44px;padding:0;border:0;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--fg);background:var(--glass);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);box-shadow:inset 0 0 0 1px var(--line),0 18px 40px -24px rgba(0,0,0,.35);transition:color .6s var(--ease),background-color .6s var(--ease),box-shadow .6s var(--ease)}
+.music[hidden]{display:none}
+.music:hover{box-shadow:inset 0 0 0 1px var(--accent),0 18px 40px -24px rgba(0,0,0,.35)}
+.music:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.music .mx{display:none}
+.music[aria-pressed="false"] .mw{display:none}
+.music[aria-pressed="false"] .mx{display:inline}
+.music[aria-pressed="false"]{color:var(--fg-soft)}
+
+/* ---------- cards: real 3D objects with a front and a back ---------- */
+.card{--w:170px;position:relative;width:var(--w);aspect-ratio:2/3;flex:none;perspective:1200px;transform:perspective(1200px) rotate(var(--r,0deg)) rotateY(var(--ry,0deg)) rotateX(var(--rx,0deg))}
+.card-3d{position:absolute;inset:0;z-index:1;transform-style:preserve-3d}
+.card.is-down .card-3d{transform:rotateY(180deg)}
+.card-side{position:absolute;inset:0;border-radius:calc(var(--w)*.085);padding:calc(var(--w)*.035);background:var(--card-edge),#1a1610;box-shadow:var(--card-shadow);-webkit-backface-visibility:hidden;backface-visibility:hidden}
+.card-back{transform:rotateY(180deg)}
+/* no overflow clip on .in: the parts that fill it round themselves (border-radius: inherit). A rounded clip around the
+   name strip's own GPU layer needs a mask surface per card face, which the phone GPU could not keep up with (spec 013, CP-6) */
+.card .in{position:relative;height:100%;border-radius:calc(var(--w)*.06);box-shadow:inset 0 1px 1px rgba(255,255,255,.18);background:linear-gradient(180deg,#27304a 0%,#151a2a 60%,#0d1019 100%)}
+.card.evil .in{background:linear-gradient(180deg,#4a1820 0%,#220c11 60%,#0f0709 100%)}
+.card .in img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit}
+.card-back .in{background:
+  radial-gradient(circle at 50% 50%,transparent 0 17%,rgba(217,164,65,.6) 17.5% 18.5%,transparent 19% 27%,rgba(217,164,65,.35) 27.5% 28%,transparent 28.5%),
+  repeating-conic-gradient(from 0deg at 50% 50%,rgba(217,164,65,.14) 0 6deg,transparent 6deg 12deg),
+  linear-gradient(160deg,#1c2338,#0e1220)}
+.face{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;justify-content:flex-end;padding:calc(var(--w)*.08);color:#f1e7d2;background:linear-gradient(180deg,transparent 55%,rgba(8,8,12,.88));border-radius:inherit}
+.face .nm{font-family:var(--display);font-size:calc(var(--w)*.125);line-height:1.05;letter-spacing:-.01em}
+.face .sd{font-size:max(9px,calc(var(--w)*.052));letter-spacing:.2em;text-transform:uppercase;color:rgba(241,231,210,.72);margin-top:4px}
+:lang(zh) .face .nm{letter-spacing:0}
+/* team badge, top right of every face up card: blue for the loyal side, red for evil */
+.card.good .card-front .in::after,.card.evil .card-front .in::after{content:"";position:absolute;z-index:3;top:calc(var(--w)*.035);right:calc(var(--w)*.035);width:calc(var(--w)*.28);aspect-ratio:1;background:center/contain no-repeat;filter:drop-shadow(0 2px 3px rgba(0,0,0,.55));pointer-events:none}
+.card.good .card-front .in::after{background-image:url(/assets/badges/good.svg);background-image:image-set(url(/assets/badges/good-96.webp) 1x,url(/assets/badges/good-192.webp) 2x,url(/assets/badges/good-384.webp) 4x)}
+.card.evil .card-front .in::after{background-image:url(/assets/badges/evil.svg);background-image:image-set(url(/assets/badges/evil-96.webp) 1x,url(/assets/badges/evil-192.webp) 2x,url(/assets/badges/evil-384.webp) 4x)}
+.halo{position:absolute;inset:-12% -34%;z-index:0;border-radius:50%;pointer-events:none;opacity:0;background:radial-gradient(closest-side,rgba(217,164,65,.5),rgba(160,32,44,.42) 52%,transparent 80%)}
+html.dark .evil .halo{opacity:1}
+
+/* ---------- sections ---------- */
+.sec{position:relative;padding:clamp(72px,11vw,150px) clamp(20px,5vw,72px)}
+.late{color:var(--fg)}
+
+/* 1 hero: ten face down cards turn on an oval around the title */
+.hero{--rx:min(41vw,640px);--ry:31svh;--w:min(9vw,132px,13.5svh);height:100svh;min-height:600px;display:grid;place-items:center;text-align:center;padding:0 20px;overflow:hidden}
+.hero .copy{position:relative;z-index:3;margin-top:8svh;max-width:calc(var(--rx)*2 - var(--w)*1.5);display:grid;justify-items:center;gap:clamp(12px,2.2svh,22px)}
+.hero .h1{font-size:min(clamp(56px,10vw,132px),17svh)}
+/* title runners (runner.js): a canvas over the title, placed and sized by script */
+.hero .copy .runner{position:absolute;z-index:1;pointer-events:none}
+.hero .tag{font-family:var(--display);font-weight:380;font-size:clamp(18px,2vw,27px);line-height:1.15;letter-spacing:-.01em;color:var(--fg-soft);max-width:24ch;text-wrap:balance}
+.hero .tag em{font-style:italic;color:var(--accent)}
+.hero .cta{display:flex;gap:22px;align-items:center;flex-wrap:wrap;justify-content:center;margin-top:6px}
+/* the box is only a ruler: its size tells the script the two radii */
+.ring{position:absolute;left:50%;top:54%;width:var(--rx);height:var(--ry);pointer-events:none;perspective:1600px;perspective-origin:0 0;transform-style:preserve-3d}
+.ring.is-gathering .slot{pointer-events:none}
+.slot.is-extra{display:none;pointer-events:none}
+html.motion .slot.is-extra{display:block}
+.slot{--w2:calc(var(--w)*2);position:absolute;left:0;top:0;width:var(--w2);margin:calc(var(--w2)*-.75) 0 0 calc(var(--w2)*-.5);z-index:1;pointer-events:auto;--a:calc(var(--i)*36deg - 90deg);transform:translate(calc(cos(var(--a))*var(--rx)),calc(sin(var(--a))*var(--ry))) rotate(calc(cos(var(--a))*10deg)) scale(calc((.88 + sin(var(--a))*.12)/2));will-change:transform,opacity}
+/* every card of the hero is built twice its size and scaled by one half (SS in cards.js), so it stays sharp when the night zooms in */
+.slot .card{--w:var(--w2);transform:none}
+.slot .face .sd{font-size:max(18px,calc(var(--w)*.052))}
+button.slot{display:block;cursor:pointer;border-radius:calc(var(--w2)*.085)}
+.slot.is-out .card{visibility:hidden}
+/* phones (spec 013): a tighter shadow. The wide soft one more than doubled the area the GPU paints for every card face */
+html.lite .slot .card-side{box-shadow:0 16px 22px -12px rgba(27,23,18,.5)}
+html.lite.dark .slot .card-side{box-shadow:0 18px 24px -12px #000,0 0 0 1px rgba(0,0,0,.4)}
+/* phones (spec 013, CP-6): a story card that is not turning is flat and shows only the face that is up. cards.js sets
+   data-face while it rests and clears it for the turn. A 3D context per card made the GPU draw every card off screen first.
+   The slot already flattens the card into its own plane, so a resting card looks the same either way */
+html.lite .card .card-3d[data-face]{transform-style:flat;transform:none}
+html.lite .card-3d[data-face] .card-side{transform:none;-webkit-backface-visibility:visible;backface-visibility:visible}
+html.lite .card-3d[data-face=front] .card-back,html.lite .card-3d[data-face=back] .card-front{visibility:hidden}
+
+/* the card a visitor turned over, shown large in a dialog */
+.peek{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;background:transparent;color:var(--fg);overflow:hidden}
+.peek::backdrop{background:transparent}
+.peek-shade{position:absolute;inset:0;background:rgba(11,13,18,.94)}
+.peek-in{position:relative;height:100%;display:flex;align-items:center;justify-content:center;gap:clamp(24px,5vw,72px);padding:24px;cursor:pointer}
+.peek-card{--w:min(300px,34vw,52svh);transform:none}
+.peek-txt{display:grid;gap:16px;justify-items:start;max-width:34ch}
+.peek-txt .h2{font-size:clamp(34px,4.6vw,64px)}
+.peek.evil .side-l{color:var(--evil)}
+.peek-hint{font-size:12px;color:var(--fg-soft)}
+
+/* 2 how */
+.how-in{display:grid;grid-template-columns:1fr 1.25fr;gap:clamp(32px,6vw,96px);align-items:start;max-width:1320px;margin:0 auto;width:100%}
+.how .side{display:grid;gap:22px;justify-items:start}
+.step{display:grid;grid-template-columns:64px 1fr;gap:20px;padding:30px 0;box-shadow:inset 0 1px 0 var(--line)}
+.step:last-child{box-shadow:inset 0 1px 0 var(--line),inset 0 -1px 0 var(--line)}
+.step .n{font-family:var(--display);font-style:italic;font-weight:300;font-size:44px;line-height:1;color:var(--accent)}
+.step h3{font-family:var(--display);font-weight:400;font-size:clamp(22px,2.4vw,32px);letter-spacing:-.02em;line-height:1.1}
+.step p{color:var(--fg-soft);margin-top:8px;max-width:44ch}
+:lang(zh) .step h3{letter-spacing:0;line-height:1.25}
+/* part 3: the story sits in the lower half of the pinned hero, under the card wall */
+.hero.is-staged .how{position:absolute;left:0;right:0;top:58%;bottom:0;z-index:3;padding:0 clamp(20px,5vw,72px);display:grid;align-items:center;text-align:left}
+.hero.is-staged .how-in{align-items:center}
+.hero.is-staged .how .side{gap:14px}
+.hero.is-staged .how .h2{font-size:clamp(28px,min(4.2vw,6.4svh),60px)}
+.hero.is-staged .step{padding:clamp(8px,1.8svh,18px) 0;gap:16px}
+.hero.is-staged .step .n{font-size:clamp(28px,5svh,40px)}
+.hero.is-staged .step h3{font-size:clamp(18px,min(2vw,3.4svh),28px)}
+.hero.is-staged .step p{margin-top:4px;font-size:clamp(13px,1.9svh,16px)}
+/* part 4: the camera pulls back and the ten cards are dealt onto a round table. The table is a flat disc drawn with CSS,
+   lying in the same tilted plane as the cards (cards.js sets its size, tilt and place). The words sit above it. */
+.table{display:none;position:absolute;left:0;top:0;width:var(--td,600px);height:var(--td,600px);margin:calc(var(--td,600px)*-.5) 0 0 calc(var(--td,600px)*-.5);border-radius:50%;opacity:0;pointer-events:none;will-change:transform,opacity;
+  background:
+    radial-gradient(circle at 50% 42%,rgba(255,228,176,.34),rgba(255,228,176,0) 56%),
+    radial-gradient(circle at 50% 50%,transparent 62%,rgba(0,0,0,.34) 100%),
+    repeating-conic-gradient(from 7deg at 50% 50%,rgba(255,210,150,.045) 0 3deg,rgba(40,22,8,.05) 3deg 7deg,rgba(255,210,150,.02) 7deg 11deg),
+    repeating-radial-gradient(circle at 50% 50%,#704728 0 .9%,#6a4424 .9% 1.7%,#744b2a 1.7% 2.1%),
+    #6a4424;
+  box-shadow:inset 0 0 0 calc(var(--td,600px)*.010) #2b190b,inset 0 0 0 calc(var(--td,600px)*.024) #9a6e3f,inset 0 0 0 calc(var(--td,600px)*.034) #2b190b,inset 0 0 calc(var(--td,600px)*.05) calc(var(--td,600px)*.034) rgba(0,0,0,.35),0 calc(var(--td,600px)*.012) calc(var(--td,600px)*.05) rgba(27,23,18,.55)}
+.table::after{content:"";position:absolute;inset:25%;border-radius:50%;box-shadow:0 0 0 calc(var(--td,600px)*.004) rgba(233,196,133,.38),inset 0 0 calc(var(--td,600px)*.06) rgba(0,0,0,.25)}
+.hero.is-staged .table{display:block}
+.deal{display:grid;gap:14px;justify-items:center;text-align:center}
+.hero.is-staged .deal{position:absolute;left:0;right:0;top:min(12.5svh,104px);z-index:3;padding:0 clamp(20px,5vw,72px);gap:10px;pointer-events:none}
+.hero.is-staged .deal .h2{font-size:clamp(26px,min(4.4vw,6.2svh),58px)}
+.hero.is-staged .deal .lede{font-size:clamp(14px,2svh,19px);max-width:62ch}
+
+/* part 5, the night (spec 005). Without scripts .night is a plain section: nine lines, then one row per seat.
+   With scripts it moves into the hero: the plain text stays for screen readers, the live words and the caption panel show.
+   Everything below is built from --u (set on .ring): the table's radius over 217, so shapes scale with the table. */
+.night,.vote,.quest,.lady,.climb,.blade,.seat{display:grid;gap:18px;justify-items:center;text-align:center}
+.night-static,.vote-static,.quest-static,.lady-static,.climb-static,.blade-static,.seat-static{display:grid;gap:18px;justify-items:center;max-width:62ch}
+.night-results{color:var(--fg-soft)}
+.night-steps{display:grid;gap:8px;color:var(--fg-soft)}
+.night-h3{font-family:var(--display);font-weight:380;font-size:clamp(22px,3vw,34px);margin-top:12px}
+.night-list{display:grid;gap:10px;text-align:left}
+.night-list b{display:block;color:var(--fg);font-family:var(--display);font-weight:400}
+.night-list li{color:var(--fg-soft)}
+.night-live{display:none}
+.hero.is-staged .night,.hero.is-staged .vote,.hero.is-staged .quest,.hero.is-staged .lady,.hero.is-staged .climb,.hero.is-staged .blade,.hero.is-staged .seat{position:absolute;inset:0;z-index:3;padding:0;display:block;pointer-events:none}
+.hero.is-staged .night-static,.hero.is-staged .vote-static,.hero.is-staged .quest-static,.hero.is-staged .lady-static,.hero.is-staged .climb-static,.hero.is-staged .blade-static,.hero.is-staged .seat-static{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.hero.is-staged .night-say{display:grid;position:absolute;left:0;right:0;top:min(12.5svh,104px);padding:0 clamp(20px,5vw,72px);text-align:center}
+/* chapters 3 and 4 put a score bar at the top, so their words sit below it (spec 006 open point 1) */
+.hero.is-staged .vote-say,.hero.is-staged .quest-say,.hero.is-staged .lady-say,.hero.is-staged .climb-say,.hero.is-staged .blade-say,.hero.is-staged .seat-say{top:calc(min(12.5svh,104px) + var(--bar-h,34px))}
+.night-say .ns{grid-area:1/1;margin:0;opacity:0;visibility:hidden;will-change:transform,opacity}
+.night-say b{display:block;font-family:var(--display);font-weight:380;font-size:clamp(26px,min(4.4vw,6.2svh),58px);line-height:1.04;letter-spacing:-.03em;text-wrap:balance;font-variation-settings:"opsz" 144}
+.night-say span{display:block;margin-top:.25em;font-family:var(--display);font-style:italic;font-weight:300;font-size:clamp(17px,min(2.4vw,3.6svh),32px);color:var(--accent);text-wrap:balance}
+:lang(zh) .night-say b{letter-spacing:0}
+.table .dim{position:absolute;inset:0;border-radius:50%;background:rgba(5,9,22,.62);opacity:0}
+
+/* the layers in the table's plane. 3D containers never get opacity (that would flatten them): they use visibility, scale or their children's opacity */
+.n-plane,.n-sky{position:absolute;left:0;top:0;width:0;height:0;transform-style:preserve-3d;pointer-events:none;visibility:hidden}
+.ring.is-night .n-plane,.ring.is-night .n-sky{visibility:visible}
+.ring.is-flat{transform-style:flat}
+.n-over{z-index:20}
+.n-thrs,.n-glows,.gem-wrap,.gem,.gem-spin,.arm-wrap,.arm,.arm-s{position:absolute;left:0;top:0;transform-style:preserve-3d}
+.gem-wrap,.arm-wrap{visibility:hidden}
+.n-sky{--sk:0}
+.moon{position:absolute;left:0;top:0;width:calc(var(--u)*150px);height:calc(var(--u)*150px);margin:calc(var(--u)*-75px) 0 0 calc(var(--u)*-75px);border-radius:50%;opacity:var(--sk);
+  background:radial-gradient(circle at 34% 30%,#fffdf0 0,#f0eacf 26%,#cbc6ab 54%,#8085a0 86%,#4d526c 100%);
+  box-shadow:0 0 calc(var(--u)*60px) rgba(190,210,255,.45),0 0 calc(var(--u)*150px) rgba(120,150,230,.25)}
+.moon::before{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 30% 42%,rgba(110,110,100,.34) 0 7%,transparent 8.5%),radial-gradient(circle at 63% 27%,rgba(110,110,100,.3) 0 5%,transparent 6.5%),radial-gradient(circle at 52% 66%,rgba(110,110,100,.3) 0 9%,transparent 10.5%),radial-gradient(circle at 74% 52%,rgba(110,110,100,.26) 0 4%,transparent 5.5%)}
+.moon::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 80% 64%,rgba(8,12,30,.8),rgba(8,12,30,0) 64%)}
+.star{position:absolute;left:0;top:0;width:calc(var(--u)*8px);height:calc(var(--u)*8px);margin:calc(var(--u)*-4px) 0 0 calc(var(--u)*-4px);opacity:var(--sk);transform:translate3d(calc(var(--u)*var(--x)*1px),calc(var(--u)*var(--y)*1px),calc(var(--u)*var(--z)*1px))}
+.star b{position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,#fff6d6 0,#f1c765 50%,rgba(241,199,101,0) 72%);animation:n-tw 2.8s ease-in-out infinite alternate}
+@keyframes n-tw{0%{opacity:.35;transform:scale(.8)}100%{opacity:1;transform:scale(1.15)}}
+/* the eye on every card back: two lids that open (scaleY only) over an iris. It lives in the back face, so it turns away with the card */
+.eye{position:absolute;left:50%;top:48%;width:66%;aspect-ratio:2.1/1;transform:translate(-50%,-50%);opacity:0}
+.eye-in{position:absolute;inset:0;clip-path:var(--almond);background:radial-gradient(circle at 50% 50%,#fff3cf 0 30%,#e6d39b 68%,#a98b45);overflow:hidden}
+.iris{position:absolute;left:50%;top:50%;width:52%;aspect-ratio:1;border-radius:50%;margin:-26% 0 0 -26%;background:radial-gradient(circle,#05050a 0 21%,#d7a23f 23% 52%,#7a4a14 64%,#2a1606 100%)}
+.lid{position:absolute;left:-3%;right:-3%;height:52%;background:linear-gradient(180deg,#1c2543,#111832)}
+.lid.up{top:-1%;transform-origin:50% 0}
+.lid.lo{bottom:-1%;transform-origin:50% 100%}
+.seam{position:absolute;left:4%;right:4%;top:6%;height:56%;border-bottom:calc(var(--w)*.032) solid #e0ad4f;border-radius:0 0 50% 50%/0 0 100% 100%;filter:drop-shadow(0 0 calc(var(--w)*.04) rgba(224,173,79,.8))}
+.lashes{position:absolute;left:14%;right:14%;top:50%;height:calc(var(--w)*.1);background:repeating-linear-gradient(90deg,#e0ad4f 0 calc(var(--w)*.022),transparent calc(var(--w)*.022) 26%);opacity:.9;transform:scaleY(.8)}
+.eye-glow{position:absolute;inset:-35%;border-radius:50%;background:radial-gradient(closest-side,rgba(224,173,79,.5),transparent 72%);opacity:0}
+/* pools of light on the table under a lit seat */
+.n-g{position:absolute;left:0;top:0;width:calc(var(--u)*78px);height:calc(var(--u)*117px);margin:calc(var(--u)*-58.5px) 0 0 calc(var(--u)*-39px)}
+.glow{position:absolute;inset:-18% -46%;border-radius:50%;opacity:0}
+.g-red{background:radial-gradient(closest-side,rgba(255,70,90,.85),rgba(255,70,90,.28) 55%,transparent 80%)}
+.g-gold{background:radial-gradient(closest-side,rgba(255,205,100,.9),rgba(255,205,100,.3) 55%,transparent 80%)}
+/* red, pale and gold threads: flat strips lifted off the table, with a soft shadow under each. They draw on with scaleX */
+.thr{position:absolute;left:0;top:0;height:0;transform-origin:0 0;transform-style:preserve-3d}
+.thr i{position:absolute;left:0;top:calc(var(--u)*-1.4px);height:calc(var(--u)*2.8px);width:100%;transform-origin:0 50%;transform:scaleX(0);border-radius:4px}
+.thr .sh{background:rgba(0,0,0,.5);filter:blur(calc(var(--u)*1.6px))}
+.thr.red .ln{background:linear-gradient(90deg,#ff7480,#d11f33);box-shadow:0 0 calc(var(--u)*9px) rgba(255,60,80,.95)}
+.thr.light .ln{background:linear-gradient(90deg,#fbfdff,#9ec4ff);box-shadow:0 0 calc(var(--u)*9px) rgba(160,200,255,.95)}
+.thr.gold .ln{background:linear-gradient(90deg,#ffeab0,#e0a23c);box-shadow:0 0 calc(var(--u)*9px) rgba(255,200,90,.95)}
+/* a crystal: an octahedron, four top and four bottom triangles shaded one by one */
+.gem-spin{width:0;height:0}
+.gf{position:absolute;left:calc(var(--u)*-17px);width:calc(var(--u)*34px);height:calc(var(--u)*40px);-webkit-backface-visibility:hidden;backface-visibility:hidden;
+  background:linear-gradient(var(--ang,160deg),hsl(var(--hue,350) 82% calc(var(--l)*1% + 14%)),hsl(var(--hue,350) 86% calc(var(--l)*1% - 10%)))}
+.gf.t{top:calc(var(--u)*-40px);transform-origin:50% 100%;clip-path:polygon(50% 0,0 100%,100% 100%);transform:rotateY(calc(var(--k)*90deg)) translateZ(calc(var(--u)*17px)) rotateX(25.3deg)}
+.gf.b{top:0;transform-origin:50% 0;clip-path:polygon(0 0,100% 0,50% 100%);transform:rotateY(calc(var(--k)*90deg)) translateZ(calc(var(--u)*17px)) rotateX(-25.3deg)}
+/* focus rings: three thin gold rings on different axes, like an armillary sphere */
+.rg{position:absolute;left:calc(var(--u)*-62px);top:calc(var(--u)*-62px);width:calc(var(--u)*124px);height:calc(var(--u)*124px);border-radius:50%;border:calc(var(--u)*1.8px) solid rgba(244,200,108,.96);box-shadow:0 0 calc(var(--u)*10px) rgba(224,173,79,.8),inset 0 0 calc(var(--u)*8px) rgba(224,173,79,.45)}
+.rg.r2{transform:rotateY(90deg)}
+.rg.r3{transform:rotateX(90deg)}
+.orb{position:absolute;left:calc(var(--u)*-7px);top:calc(var(--u)*-7px);width:calc(var(--u)*14px);height:calc(var(--u)*14px);border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3c8,#e0ad4f 55%,#7a4a14);box-shadow:0 0 calc(var(--u)*14px) rgba(240,190,90,.9)}
+
+/* chapters 3 and 4: the vote and the quest (specs 006 and 007). Everything here is built by vote.js and quest.js inside the pinned hero.
+   Shapes are built twice their size and scaled by one half (like the night's cards), so they stay sharp when the camera moves in. */
+.hero{--bar-h:34px}
+.hero:not(.is-staged) .vbar,.hero:not(.is-staged) .q-rule,.hero:not(.is-staged) .q-fly{display:none}
+/* the score bar: five quest circles and five reject marks, flat and facing the visitor */
+.vbar{position:absolute;left:0;right:0;top:78px;z-index:4;margin:0 auto;width:max-content;max-width:calc(100% - 24px);display:flex;align-items:center;gap:6px 28px;padding:6px 18px;border-radius:99px;background:var(--glass);box-shadow:inset 0 0 0 1px var(--line),0 14px 30px -22px rgba(0,0,0,.4);pointer-events:none;visibility:hidden;opacity:0}
+.vb-row{display:flex;align-items:center;gap:12px}
+.vb-l{font-size:10px;letter-spacing:.16em;text-transform:uppercase;font-weight:500;color:var(--fg-soft);white-space:nowrap}
+:lang(zh) .vb-l{letter-spacing:.1em;font-size:12px}
+.vb-dots{display:flex;gap:8px}
+.qd,.rd{position:relative;width:20px;height:20px;border-radius:50%;flex:none}
+.qd{box-shadow:inset 0 0 0 2px #4a86e0}
+.rd{box-shadow:inset 0 0 0 2px #c4394a}
+.qd b,.rd b{position:absolute;inset:3px;border-radius:50%;opacity:0}
+.qd .ok{background:radial-gradient(circle at 35% 30%,#a9cbff,#3f78d8 60%,#2a58ad)}
+.qd .bad,.rd b{background:radial-gradient(circle at 35% 30%,#ff9aa4,#d0414f 60%,#8e1b26)}
+.rd::before,.rd::after{content:"";position:absolute;left:50%;top:50%;width:10px;height:2px;margin:-1px 0 0 -5px;border-radius:1px;background:#c4394a;transform:rotate(45deg)}
+.rd::after{transform:rotate(-45deg)}
+.rd b::before,.rd b::after{content:"";position:absolute;left:50%;top:50%;width:8px;height:2px;margin:-1px 0 0 -4px;border-radius:1px;background:#fff4e0;transform:rotate(45deg)}
+.rd b::after{transform:rotate(-45deg)}
+
+/* layers of the table's plane. Under the cards (1), over the cards (15), over everything (21) */
+.x-under{z-index:1}
+.x-flat{z-index:15}
+.x-over{z-index:21}
+/* a card of the vote or the quest. --w is its width (built at twice its table size). Opacity sits on the faces (--o), never on the
+   3D parent, which would flatten the turn. */
+.pc{position:relative;width:var(--w);aspect-ratio:2/3;flex:none;perspective:calc(var(--w)*5)}
+.pcp{position:absolute;left:0;top:0;margin:calc(var(--w)*-.75) 0 0 calc(var(--w)*-.5);padding:0;--o:1}
+.pc-3d{position:absolute;inset:0;transform-style:preserve-3d;transform:rotateY(180deg)}
+.pc-side{position:absolute;inset:0;border-radius:calc(var(--w)*.085);padding:calc(var(--w)*.035);background:var(--card-edge),#1a1610;box-shadow:0 calc(var(--w)*.05) calc(var(--w)*.12) calc(var(--w)*-.04) rgba(0,0,0,.6);-webkit-backface-visibility:hidden;backface-visibility:hidden;opacity:var(--o)}
+.pc-back{transform:rotateY(180deg)}
+.pc-in{position:absolute;inset:calc(var(--w)*.035);border-radius:calc(var(--w)*.06);overflow:hidden;box-shadow:inset 0 1px 1px rgba(255,255,255,.18);background:#151a2a}
+.pc-in img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.pc-back .pc-in{inset:calc(var(--w)*.035);background:linear-gradient(160deg,#1c2338,#0e1220)}
+.pc-t{position:absolute;left:0;right:0;top:calc(var(--w)*.07);text-align:center;font-family:var(--display);font-size:calc(var(--w)*.15);line-height:1.1;letter-spacing:.06em;text-transform:uppercase;color:#f3dba0;text-shadow:0 1px 0 rgba(0,0,0,.5),0 0 calc(var(--w)*.06) rgba(0,0,0,.7)}
+.pc-approve .pc-t,.pc-reject .pc-t{color:#33240f;text-shadow:0 1px 0 rgba(255,244,214,.55)}
+:lang(zh) .pc-t{letter-spacing:.12em}
+.pc-bd{position:absolute;bottom:calc(var(--w)*.045);width:27%;aspect-ratio:1;background:center/contain no-repeat}
+.pc-bd.bl{left:calc(var(--w)*.045);background-image:url(/assets/badges/good-192.webp)}
+.pc-bd.br{right:calc(var(--w)*.045);background-image:url(/assets/badges/evil-192.webp)}
+.pc-bd::before{content:"";position:absolute;inset:-70%;border-radius:50%;opacity:var(--g,0);background:radial-gradient(closest-side,var(--gl,rgba(255,205,100,.9)),transparent 70%)}
+.pc-bd.bl{--gl:rgba(110,170,255,.95)}
+.pc-bd.br{--gl:rgba(255,70,90,.95)}
+.pc-glow{position:absolute;inset:-22%;border-radius:calc(var(--w)*.2);pointer-events:none;opacity:0;background:radial-gradient(closest-side,rgba(255,60,80,.95),rgba(255,60,80,.3) 60%,transparent 80%)}
+.pc-glow.gold{background:radial-gradient(closest-side,rgba(255,205,100,.95),rgba(255,205,100,.3) 60%,transparent 80%)}
+.pc .fr-bad{display:none}
+.pc.is-fail .fr-ok{display:none}
+.pc.is-fail .fr-bad{display:block}
+.pc .fr-bad .bl{display:none}
+/* vote cards (laid at the seats): 52 x 78 design pixels */
+.vc{--w:calc(var(--u)*96px)}
+.xq{--w:calc(var(--u)*132px)}
+.xh{--w:calc(var(--u)*200px)}
+button.xq{display:block;pointer-events:none;cursor:default;border-radius:calc(var(--w)*.085)}
+button.xq.is-open{pointer-events:auto;cursor:pointer}
+button.xq:focus-visible{outline:calc(var(--u)*5px) solid #f4c86c;outline-offset:calc(var(--u)*6px)}
+/* the count of a vote, flat at the middle of the table */
+.vcount{position:absolute;left:0;top:0;width:calc(var(--u)*340px);height:calc(var(--u)*160px);margin:calc(var(--u)*-80px) 0 0 calc(var(--u)*-170px);display:grid;grid-auto-flow:column;place-content:center;align-items:center;border-radius:calc(var(--u)*80px);background:rgba(20,13,6,.88);box-shadow:0 0 0 calc(var(--u)*6px) rgba(217,164,65,.85),0 calc(var(--u)*16px) calc(var(--u)*44px) rgba(0,0,0,.5);font-family:var(--display);font-size:calc(var(--u)*92px);line-height:1;letter-spacing:.02em;color:#f4d27a;font-variation-settings:"opsz" 144;opacity:0}
+.vcount i{font-style:normal;color:#e9d9b4;opacity:.7;margin:0 .22em}
+/* the crown: five points on a ring of ten faces, shaded one by one like the night's crystals */
+.cr-wrap,.cr,.cr-spin{position:absolute;left:0;top:0;width:0;height:0;transform-style:preserve-3d}
+.cr-wrap{visibility:hidden}
+.cf{position:absolute;left:calc(var(--u)*-20px);top:calc(var(--u)*-76px);width:calc(var(--u)*40px);height:calc(var(--u)*76px);transform:rotateY(calc(var(--k)*36deg)) translateZ(calc(var(--u)*62px));
+  background:linear-gradient(var(--ang,170deg),hsl(43 92% calc(var(--l)*.62% + 15%)),hsl(36 90% calc(var(--l)*.62% - 3%)));
+  clip-path:polygon(0 100%,0 42%,50% 0,100% 42%,100% 100%)}
+.cf.v{clip-path:polygon(0 100%,0 42%,100% 42%,100% 100%)}
+.cf::after{content:"";position:absolute;left:34%;top:58%;width:32%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffb0b8,#c8243a 60%,#6a0f1c)}
+.cf.v::after{display:none}
+.cr-sh{position:absolute;left:0;top:0;width:calc(var(--u)*160px);height:calc(var(--u)*160px);margin:calc(var(--u)*-80px) 0 0 calc(var(--u)*-80px);border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.55),transparent 80%);opacity:0}
+/* gold and red outlines under the cards of a team: they follow the card. Built at twice the size, scaled by one half */
+.tg{position:absolute;left:0;top:0;width:calc(var(--u)*184px);height:calc(var(--u)*268px);margin:calc(var(--u)*-134px) 0 0 calc(var(--u)*-92px);border-radius:calc(var(--u)*22px)}
+.tg i{position:absolute;inset:0;border-radius:inherit;opacity:0}
+.tg .g{box-shadow:0 0 0 calc(var(--u)*5px) rgba(244,200,108,.95),0 0 calc(var(--u)*36px) calc(var(--u)*8px) rgba(255,205,100,.7),inset 0 0 calc(var(--u)*34px) rgba(255,205,100,.45)}
+.tg .r{box-shadow:0 0 0 calc(var(--u)*5px) rgba(255,86,104,.95),0 0 calc(var(--u)*40px) calc(var(--u)*10px) rgba(255,50,70,.8),inset 0 0 calc(var(--u)*34px) rgba(255,60,80,.5)}
+/* red light that spreads over the table from the Fail */
+.rl{position:absolute;left:0;top:0;width:calc(var(--u)*1000px);height:calc(var(--u)*1000px);margin:calc(var(--u)*-500px) 0 0 calc(var(--u)*-500px);border-radius:50%;opacity:0;background:radial-gradient(closest-side,rgba(255,70,88,.5),rgba(190,30,50,.24) 52%,transparent 80%)}
+.n-thrs.x-thrs .thr.pale .ln{background:linear-gradient(90deg,#fffaf0,#e6d9bc);box-shadow:0 0 calc(var(--u)*7px) rgba(255,246,224,.8)}
+/* the rule close up of the quest: a Success and a Fail card, flat, facing the visitor. Not part of the table */
+.q-rule{position:absolute;left:0;right:0;top:34%;bottom:4%;z-index:3;display:flex;justify-content:center;align-items:center;pointer-events:none;visibility:hidden;perspective:1100px}
+.rc{--w:min(30svh,34vw,230px);gap:0}
+.q-rule .pc{margin:0 clamp(8px,2vw,26px);transform-style:preserve-3d;perspective:none}
+.q-rule .pc-3d{transform:none}
+.q-rule .pc-side{--o:1}
+.q-rule .pc-bd{bottom:calc(var(--w)*.05)}
+/* the badge that flies from the Fail up into the score bar */
+.q-fly{position:absolute;left:0;top:0;z-index:5;width:40px;height:40px;pointer-events:none;visibility:hidden;background:center/contain no-repeat url(/assets/badges/evil-192.webp);will-change:transform}
+/* reduced motion: four real buttons that turn with a fade */
+.quest-plain{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin:6px 0 4px}
+.quest-plain:empty{display:none}
+.qp{--w:clamp(96px,22vw,140px);position:relative;width:var(--w);aspect-ratio:2/3;border-radius:calc(var(--w)*.085);perspective:none}
+.qp .pc-3d{transform:none}
+.qp .pc-front,.qp .pc-back{transition:opacity .6s var(--ease);opacity:1}
+.qp .pc-front{opacity:0}
+.qp.is-turned .pc-front{opacity:1}
+.qp.is-turned .pc-back{opacity:0}
+.qp .pc-back{transform:none}
+.qp .pc-side{--o:1}
+.qp .pc-front{background:var(--card-edge),#1a1610}
+.qp[disabled]{cursor:default}
+/* 3 characters */
+
+/* 4 draw */
+.draw-in{display:grid;grid-template-columns:1fr 1fr;gap:clamp(32px,6vw,90px);align-items:center;max-width:1240px;margin:0 auto}
+.deck{position:relative;height:400px;display:grid;place-items:center}
+.deck .card{position:absolute;--w:200px;transform:none}
+.deck .card:nth-child(1){transform:rotate(-10deg) translate(-34px,10px)}
+.deck .card:nth-child(2){transform:rotate(-4deg) translate(-14px,4px)}
+.deck .card:nth-child(3){transform:rotate(1deg) translate(6px,-4px)}
+.deck .pick{transform:rotate(5deg) translate(26px,-12px);z-index:2}
+.deck .pick .halo{transition:opacity .8s var(--ease)}
+.draw[data-state="revealed"] .pick.evil .halo{opacity:1}
+.panel{position:relative;min-height:340px;display:grid;align-content:center}
+.idle,.result{display:grid;gap:22px;justify-items:start}
+.share{display:flex;flex-wrap:wrap;gap:10px}
+.share-label{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--fg-soft)}
+.rule{height:1px;width:100%;background:var(--line)}
+.link-field{width:100%;min-height:44px;padding:0 14px;border-radius:12px;border:0;box-shadow:inset 0 0 0 1px var(--line);background:transparent;color:var(--fg);font:inherit;font-size:14px}
+.result .h2:focus{outline:none}
+
+/* 5 final + footer */
+.final{text-align:center;display:grid;justify-items:center;gap:36px;padding-top:clamp(110px,15vw,200px);padding-bottom:clamp(110px,15vw,200px)}
+.final .h1{max-width:12ch}
+:lang(zh) .final .h1{max-width:9em}
+.foot{position:relative;padding:28px clamp(20px,5vw,72px);display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--mute);box-shadow:inset 0 1px 0 rgba(239,230,212,.14);background:var(--night)}
+.foot b{font-family:var(--display);font-weight:400;font-size:16px;color:var(--cream)}
+.foot-info{display:flex;flex-direction:column;gap:8px}
+.foot-credit{margin:0;line-height:1.6;opacity:.85}
+@media (min-width:821px){
+  .foot{display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
+  .foot-info{order:1;align-items:flex-start;text-align:left}
+  .foot b{order:2;font-size:32px;line-height:1.2}
+  .foot-lang{order:3;justify-self:end}
+  .foot-lang a{font-size:24px}
+}
+.foot-credit a{color:var(--cream);text-decoration:underline;text-underline-offset:2px;overflow-wrap:anywhere}
+.foot-lang a{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;color:var(--cream)}
+
+/* role share page and 404 */
+.role{min-height:100svh;display:grid;grid-template-columns:auto 1fr;gap:clamp(32px,6vw,90px);align-items:center;padding-top:140px;max-width:1240px;margin:0 auto}
+.role-card{display:grid;place-items:center;padding:20px}
+.role .card{--w:clamp(200px,24vw,300px);--ry:-12deg;--r:-3deg}
+.role .txt{display:grid;gap:22px;justify-items:start}
+.role-cta{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+.page-404 .final{min-height:100svh;align-content:center}
+@keyframes sway{
+  0%,100%{transform:perspective(1200px) rotate(-3deg) rotateY(-12deg) rotateX(2deg)}
+  50%{transform:perspective(1200px) rotate(-1.5deg) rotateY(-3deg) rotateX(-3deg) translateY(-8px)}
+}
+html.motion .idle-tilt{animation:sway 7s ease-in-out infinite}
+
+/* ---------- motion start states. Only when scripts run and motion is wanted. ---------- */
+html.motion [data-fade]{opacity:0}
+html.motion [data-split]{visibility:hidden}
+html.motion .ring .slot{opacity:0}
+
+/* reduced motion: no smooth scroll, no pins, simple fades only */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;scroll-behavior:auto!important}
+  .btn,.btn .dot{transition:none}
+}
+
+/* ---------- phone ---------- */
+@media (max-width:820px){
+  .eyebrow{letter-spacing:.16em;text-align:center}
+  .nav-wrap{top:10px}
+  .nav{padding-left:14px;gap:2px}
+  .nav .brand{margin-right:2px;font-size:17px}
+  .nav .lang a{padding:0 6px;min-width:44px}
+  .nav .wa{padding:0 13px;margin-left:2px}
+  .hero{--rx:37vw;--ry:35svh;--w:min(20vw,84px,11svh)}
+  .hero .btn{width:auto;white-space:nowrap;gap:10px;padding-left:18px;font-size:14px}
+  .hero .copy{max-width:calc(var(--rx)*2 - var(--w)*.9)}
+  .peek-in{flex-direction:column;text-align:center}
+  .peek-card{--w:min(60vw,260px,40svh)}
+  .peek-txt{justify-items:center}
+  .hero .eyebrow{font-size:10px;letter-spacing:.08em;padding:5px 10px}
+  .hero .cta{flex-direction:column;gap:6px}
+  .ring{top:53%}
+  .how-in,.draw-in{grid-template-columns:1fr}
+  .role{grid-template-columns:1fr;justify-items:center;text-align:center;padding-top:110px}
+  .role .txt{justify-items:center}
+  .role-cta{flex-direction:column;width:100%}
+  .step{grid-template-columns:44px 1fr;gap:14px}
+  .hero.is-staged .how{top:58%;align-items:start;padding-top:8px}
+  .hero.is-staged .how .eyebrow,.hero.is-staged .how .lede{display:none}
+  .hero.is-staged .how .h2{font-size:clamp(26px,8vw,36px)}
+  .hero.is-staged .deal{top:min(10svh,84px)}
+  .hero.is-staged .night-say{top:min(10svh,84px)}
+  .hero.is-staged .vote-say,.hero.is-staged .quest-say,.hero.is-staged .lady-say,.hero.is-staged .climb-say,.hero.is-staged .blade-say,.hero.is-staged .seat-say{top:calc(min(10svh,84px) + var(--bar-h,62px))}
+  .hero{--bar-h:66px}
+  .night-say b{font-size:clamp(24px,7.2vw,34px)}
+  .night-say span{font-size:clamp(16px,4.6vw,22px)}
+  .hero.is-staged .deal .h2{font-size:clamp(24px,7.2vw,34px)}
+  .hero.is-staged .how-in{gap:10px}
+  /* the three steps build up as a list: each fades in below the one before and stays there (cards.js) */
+  .hero.is-staged .step{padding:clamp(6px,1.4svh,12px) 0}
+  .hero.is-staged .step .n{font-size:clamp(26px,4.2svh,40px)}
+  .hero.is-staged .step h3{font-size:clamp(17px,2.4svh,26px)}
+  .hero.is-staged .step p{font-size:clamp(13px,1.7svh,17px)}
+  @media (max-height:700px){.hero.is-staged .how{top:55%}.hero.is-staged .how .h2{font-size:24px}.hero.is-staged .step{padding:4px 0}.hero.is-staged .step p{font-size:12.5px}}
+  .deck{height:320px}.deck .card{--w:160px}
+  .panel{min-height:0}
+  .btn{width:100%;justify-content:space-between}
+  .final > div{width:100%}
+  .foot{flex-direction:column;align-items:flex-start}
+}
+@media (max-width:380px){
+  .nav .brand{font-size:16px}
+  .nav{padding-left:12px}
+  .nav .lang a{padding:0 4px}
+  .nav .wa{padding:0 11px;font-size:12px}
+}
+/* phone: the music button takes the top-right corner, so the nav pill moves left and gets compact to leave it room */
+@media (max-width:560px){
+  .music{top:18px;right:8px;width:40px;height:40px}
+  .nav-wrap{justify-content:flex-start;padding-left:8px}
+  .nav{padding-left:12px}
+  .nav .brand{font-size:15px;margin-right:0}
+  .nav .lang a{min-width:40px;padding:0 3px}
+  .nav .wa{padding:0 10px;font-size:12px;margin-left:0}
+}
+@media (max-width:350px){
+  .nav .brand{display:none}
+  .nav{padding-left:6px}
+}
+@media (max-width:820px){
+  .vbar{top:68px;flex-direction:column;align-items:stretch;gap:4px;padding:5px 14px;border-radius:18px}
+  .vb-l{width:58px}
+  .rc{--w:min(26svh,36vw,190px)}
+  .q-rule .pc + .pc{margin-left:calc(var(--w)*-.16)}
+  .q-rule .pc{margin:0}
+}
+
+.pc-vote .rj,.pc-vote .t-rj{opacity:var(--rj,0)}
+.pc-vote .ap,.pc-vote .t-ap{opacity:calc(1 - var(--rj,0))}
+
+/* straight down on the quest cards the table fills the screen behind the words, so they turn cream while it does */
+.night-say.on-table b{color:#f6ecd6;text-shadow:0 1px 18px rgba(30,16,6,.7)}
+.night-say.on-table span{color:#f0c776}
+/* a phone: the table only reaches the words on a small screen, so they keep their ink and get a cream halo that reads on wood and on paper */
+.night-say.on-wood b,.night-say.on-wood span{text-shadow:0 0 5px rgba(243,236,223,.95),0 0 16px rgba(243,236,223,.9),0 0 30px rgba(243,236,223,.75)}
+.night-say.on-wood span{color:#7a5516}
+
+/* the hero's headline fades away but its split lines stay hit-testable: they must not swallow a tap on the water or the quest cards */
+.hero .copy .h1,.hero .copy .tag,.hero .copy .eyebrow,.hero.is-staged .how{pointer-events:none}
+/* chapter 5, the Lady of the Lake (spec 008): her painting, the standing card, the water in the middle of the table, "Evil." */
+.hero:not(.is-staged) .l-paint,.hero:not(.is-staged) .c-gold,.hero:not(.is-staged) .c-motes{display:none}
+.l-paint{--w:300px;--o:0;position:absolute;left:0;top:0;z-index:8;width:var(--w);aspect-ratio:2/3;pointer-events:none;visibility:hidden;border-radius:calc(var(--w)*.085);box-shadow:0 0 calc(var(--w)*.3) rgba(217,164,65,.35)}
+.l-paint .pc-side{box-shadow:var(--card-shadow)}
+.lc{--w:calc(var(--u)*158px);visibility:hidden}
+.l-nm{position:absolute;left:0;right:0;bottom:calc(var(--w)*.045);text-align:center;font-family:var(--display);font-size:calc(var(--w)*.085);letter-spacing:.04em;color:#f3dba0;text-shadow:0 1px 0 rgba(0,0,0,.6),0 0 calc(var(--w)*.05) rgba(0,0,0,.85)}
+.l-word{position:absolute;left:0;top:0;transform-origin:0 0;white-space:nowrap;font-family:var(--display);font-style:italic;font-weight:420;font-size:calc(var(--u)*96px);line-height:1;color:#C42A3A;text-shadow:0 0 calc(var(--u)*22px) rgba(220,50,70,.7);font-variation-settings:"opsz" 144;opacity:0;visibility:hidden}
+.l-word.gold{color:#d79a24;text-shadow:0 0 calc(var(--u)*22px) rgba(217,164,65,.75)}
+.l-word.l-tag{font-style:normal;font-family:var(--body);font-weight:500;font-size:calc(var(--u)*40px);letter-spacing:.05em;color:#fff6e0;text-shadow:0 1px calc(var(--u)*14px) rgba(30,16,6,.85)}
+.l-pool{position:absolute;left:0;top:0;width:calc(var(--u)*327px);height:calc(var(--u)*327px);margin:calc(var(--u)*-163.5px) 0 0 calc(var(--u)*-163.5px);border-radius:50%;overflow:hidden;visibility:hidden;opacity:0;pointer-events:none;background:#2E5550;box-shadow:0 0 0 calc(var(--u)*3px) rgba(233,196,133,.42),inset 0 0 calc(var(--u)*30px) rgba(0,0,0,.35)}
+.l-pool.is-live{pointer-events:auto}
+.l-pool.is-open{cursor:pointer}
+.l-pool:focus-visible{outline:calc(var(--u)*5px) solid #f4c86c;outline-offset:calc(var(--u)*6px)}
+.l-wc,.l-wc canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.l-mist{position:absolute;inset:0;border-radius:50%;pointer-events:none;opacity:0;background:radial-gradient(closest-side,rgba(243,236,223,.9),rgba(243,236,223,.58) 62%,rgba(243,236,223,.32))}
+.l-hint{position:absolute;inset:0;border-radius:50%;pointer-events:none;opacity:0;box-shadow:inset 0 0 0 calc(var(--u)*3px) rgba(255,236,190,.95),inset 0 0 calc(var(--u)*34px) rgba(255,214,130,.8)}
+.l-pool.is-hint .l-hint{animation:l-pulse 1.5s var(--ease) 2}
+@keyframes l-pulse{0%{opacity:0}35%{opacity:1}100%{opacity:0}}
+.w-ring{position:absolute;width:30%;aspect-ratio:1;margin:-15% 0 0 -15%;border-radius:50%;border:2px solid rgba(255,244,214,.85);transform:scale(.1);opacity:.9;pointer-events:none;animation:w-ring 1.4s var(--ease) forwards}
+@keyframes w-ring{to{transform:scale(2.4);opacity:0}}
+/* reduced motion and scripts off: the painting as a normal image, a still lake with a real button */
+.lady-art{width:min(80vw,300px);height:auto;border-radius:14px;box-shadow:var(--card-shadow)}
+.lady-plain{display:grid;justify-items:center;gap:14px}
+.lady-plain:empty{display:none}
+.l-plain-pool{position:relative;width:min(70vw,300px);aspect-ratio:1;border-radius:50%;overflow:hidden;box-shadow:0 0 0 3px rgba(168,120,42,.45),0 20px 40px -24px rgba(27,23,18,.5)}
+.l-plain-a,.l-plain-b{position:absolute;inset:0}
+.l-plain-a canvas,.l-plain-b canvas{width:100%;height:100%;display:block}
+.l-plain-b{opacity:0;transition:opacity .4s var(--ease)}
+.lady-plain.is-shown .l-plain-b{opacity:1}
+.hero.is-staged .lady-art{display:none}
+
+/* chapter 6, the climb (spec 009): the gold light, the motes, the pulse of the circles, and the plain score */
+.kq{--w:calc(var(--u)*132px)}
+.c-gold{position:absolute;inset:0;z-index:2;pointer-events:none;visibility:hidden;opacity:0;background:radial-gradient(ellipse 80% 70% at 50% 64%,rgba(247,205,112,.88),rgba(228,168,66,.5) 42%,rgba(217,164,65,0) 78%)}
+.c-motes{position:absolute;inset:0;z-index:2;overflow:hidden;pointer-events:none}
+.c-motes i{position:absolute;left:0;top:0;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;background:radial-gradient(circle,#fff6d6 0,#f1c765 50%,rgba(241,199,101,0) 72%);visibility:hidden;opacity:0;will-change:transform,opacity}
+.qh{position:absolute;inset:-4px;border-radius:50%;pointer-events:none;box-shadow:0 0 14px 4px rgba(217,164,65,.85);opacity:0}
+.climb-score{display:flex;gap:8px;justify-content:center}
+html:not(.js) .climb-score{display:none}
+.climb-score i{position:relative;width:20px;height:20px;border-radius:50%;box-shadow:inset 0 0 0 2px #4a86e0}
+.climb-score i:nth-child(even){box-shadow:inset 0 0 0 2px #c4394a}
+.climb-score i::after{content:"";position:absolute;inset:3px;border-radius:50%;opacity:0;transition:opacity .5s var(--ease);background:radial-gradient(circle at 35% 30%,#a9cbff,#3f78d8 60%,#2a58ad)}
+.climb-score i:nth-child(even)::after{background:radial-gradient(circle at 35% 30%,#ff9aa4,#d0414f 60%,#8e1b26)}
+.climb-score i.on::after{opacity:1}
+.climb-evil{color:#9a6b12;font-family:var(--display);font-style:italic;font-weight:500}
+.climb-won{padding:.45em 1.6em;border-radius:99px;color:var(--fg);background:linear-gradient(90deg,rgba(217,164,65,0),rgba(217,164,65,.3),rgba(217,164,65,0))}
+
+/* at the table the cards can be asked who they are (the ring turns them off while the deck gathers, and never turns them back on) */
+.ring.is-night .slot{pointer-events:auto}
+/* seat labels (seats.js): a number on every card, a name and team badge for the seats the story is about, and a small card on hover or tap */
+.hero:not(.is-staged) .sn-layer,.hero:not(.is-staged) .sn-pop{display:none}
+/* stacking: the name tag (layer) sits above the asked-for card (.sn-pop), so a popup opened below the 12 o'clock card never hides its tag */
+.sn-layer{position:absolute;inset:0;z-index:7;pointer-events:none;overflow:hidden;visibility:hidden}
+.sn{position:absolute;left:0;top:0;width:0;height:0;visibility:hidden}
+.sn-n{position:absolute;left:0;top:0;transform:translate(-50%,-50%);min-width:19px;height:19px;padding:0 4px;border-radius:99px;background:rgba(251,247,238,.95);color:#1b1712;font:600 11px/19px var(--body);text-align:center;font-style:normal;box-shadow:0 1px 5px rgba(0,0,0,.45)}
+.sn-t{position:absolute;left:0;top:0;transform:translate(-50%,var(--dy,0));white-space:nowrap;display:flex;align-items:center;gap:6px;padding:3px 10px 3px 4px;border-radius:99px;background:rgba(251,247,238,.97);color:#1b1712;font:600 12px/1 var(--body);box-shadow:0 2px 10px rgba(0,0,0,.35);opacity:0;will-change:opacity}
+.sn-t img{width:18px;height:18px;flex:none}
+.sn-t b{font-weight:600}
+.sn-pop{position:absolute;left:0;top:0;z-index:6;width:min(140px,34vw);pointer-events:none;visibility:hidden;border-radius:12px;overflow:hidden;background:#1a1610;box-shadow:0 18px 36px -10px rgba(0,0,0,.6),0 0 0 2px #d9a441}
+.sn-pop.is-evil{box-shadow:0 18px 36px -10px rgba(0,0,0,.6),0 0 0 2px #d0414f}
+.sn-art{display:block;width:100%;height:auto;aspect-ratio:2/3;object-fit:cover}
+.sn-meta{display:flex;align-items:center;gap:9px;padding:8px 10px 9px;background:linear-gradient(#1a1610,#120f0a);color:#f3e9d2}
+.sn-bd{width:26px;height:26px;flex:none}
+.sn-meta b{display:block;font:600 13px/1.15 var(--body)}
+.sn-meta span{display:block;font:500 11px/1.2 var(--body);color:#c9bea4;margin-top:2px}
+@media (max-width:820px){.sn-t{font-size:10.5px;padding:2px 8px 2px 3px}.sn-t img{width:15px;height:15px}.sn-n{min-width:17px;height:17px;font-size:10px;line-height:17px}}
+
+/* ---------- chapter 7, the blade (spec 010) ---------- */
+.hero:not(.is-staged) .bl-layer,.hero:not(.is-staged) .bl-ui{display:none}
+.bl-layer,.bl-ui{position:absolute;inset:0;z-index:5;pointer-events:none;overflow:hidden}
+.bl-ui{z-index:6;overflow:visible}
+.bl-dag{--dh:200px;position:absolute;left:0;top:0;width:calc(var(--dh)*60/214);height:var(--dh);visibility:hidden;will-change:transform,opacity}
+.bl-dag-in{width:100%;height:100%}
+.bl-flash{position:absolute;inset:0;background:#fff;opacity:0}
+.bl-ash{visibility:hidden}
+.bl-ash i{position:absolute;left:0;top:0;width:var(--s);height:var(--s);border-radius:50%;background:#2a2622;opacity:0}
+.bl-ash i.em{background:#ff9a3c;box-shadow:0 0 6px 1px rgba(255,140,50,.8)}
+.bl-ghost{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;mix-blend-mode:screen;border-radius:inherit}
+.bl-no{position:absolute;left:0;right:0;bottom:6%;text-align:center;font-style:normal;font-family:var(--display);font-size:calc(var(--w)*.1);color:#f3dba0;opacity:0;text-shadow:0 1px 3px rgba(0,0,0,.8)}
+.bl-crack{position:absolute;inset:0;width:100%;height:100%;z-index:4;pointer-events:none;border-radius:inherit}
+.bl-crack .cs{opacity:0}
+.card.bl-grey .card-front .in::after{filter:grayscale(1) brightness(.8)}
+/* glows and rings on a seat card are CSS vars on the slot (blade.js): red burn, gold, the gold rim sweep, the red aim ring, and a grey veil */
+.ring.is-night .slot{box-shadow:0 0 calc(var(--w2)*.22) calc(var(--w2)*.03) rgba(255,40,60,calc(.85*var(--bg,0))),0 0 calc(var(--w2)*.2) calc(var(--w2)*.02) rgba(255,205,100,calc(.9*var(--gd,0))),0 0 0 calc(var(--w2)*.012) rgba(240,200,110,calc(.8*var(--rm,0))),0 0 calc(var(--w2)*.1) calc(var(--w2)*.02) rgba(255,60,80,calc(.95*var(--am,0)));border-radius:calc(var(--w2)*.085)}
+.ring.is-night .slot::after{content:"";position:absolute;inset:0;border-radius:inherit;background:#26262c;opacity:var(--gy,0);pointer-events:none}
+.bl-red,.bl-gold{position:absolute;inset:3px;border-radius:50%;opacity:0;pointer-events:none}
+.bl-red{background:radial-gradient(circle at 35% 30%,#ff9aa4,#d0414f 60%,#8e1b26)}
+.bl-gold{background:radial-gradient(circle at 35% 30%,#fff1b8,#e3a93a 60%,#9a6612);box-shadow:0 0 10px 2px rgba(240,190,80,.9)}
+.bl-ck{position:absolute;inset:0;width:100%;height:100%;opacity:0;pointer-events:none}
+.bl-strike,.bl-other{position:absolute;left:50%;transform:translateX(-50%);pointer-events:auto;font:inherit;cursor:pointer}
+.bl-strike{top:var(--ay,50%);transform:translate(-50%,-100%);min-height:48px;padding:0 24px;border:0;border-radius:99px;background:#b3283a;color:#fff6e8;font-weight:500;font-size:15px;box-shadow:0 10px 24px -10px rgba(179,40,58,.8)}
+.bl-other{left:auto;right:clamp(12px,4vw,56px);transform:none;bottom:max(14px,2svh);min-height:44px;padding:0 14px;border:0;background:none;color:var(--fg-soft);font-size:13px;text-decoration:underline;text-underline-offset:4px}
+.bl-strike[hidden],.bl-other[hidden]{display:none}
+.blade.is-tapped .blade-say:not(.blade-a):not(.blade-b) .ns:nth-last-child(-n+2){display:none}
+.blade-btns{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;width:100%}
+.blade-btns .ghost{justify-content:flex-start;text-align:left;font:inherit;cursor:pointer;background:none;border:0}
+.blade-btns .ghost img{width:30px;height:45px;border-radius:4px;object-fit:cover}
+.blade-btns .ghost.is-picked{box-shadow:inset 0 0 0 1px var(--accent)}
+.blade-or{color:var(--fg-soft);font-size:14px}
+.blade-plain:empty{display:none}
+.tint{position:absolute;inset:0;opacity:0;pointer-events:none}
+.tint-crimson{background:radial-gradient(ellipse 90% 80% at 50% 60%,#8e1424,#4a0914 55%,#1a0409)}
+.tint-dawn{background:radial-gradient(ellipse 90% 70% at 50% 100%,rgba(247,205,112,.95),rgba(214,150,60,.55) 45%,rgba(40,24,30,0) 80%)}
+
+/* ---------- chapter 8, your seat (spec 011) ---------- */
+.hero:not(.is-staged) .st-card,.hero:not(.is-staged) .st-panel,.hero:not(.is-staged) .st-cone{display:none}
+.st-chair{position:absolute;left:0;top:0;width:calc(var(--u)*56px);height:calc(var(--u)*40px);margin:calc(var(--u)*-20px) 0 0 calc(var(--u)*-28px);border-radius:calc(var(--u)*10px);background:linear-gradient(#3a2412,#1d1109);box-shadow:0 calc(var(--u)*5px) calc(var(--u)*10px) rgba(0,0,0,.55);visibility:hidden;opacity:0}
+.st-chair b{position:absolute;left:8%;right:8%;top:-18%;height:34%;border-radius:calc(var(--u)*8px);background:linear-gradient(#5a381d,#2b190c)}
+.st-pool{position:absolute;left:0;top:0;width:calc(var(--u)*300px);height:calc(var(--u)*300px);margin:calc(var(--u)*-150px) 0 0 calc(var(--u)*-150px);border-radius:50%;background:radial-gradient(closest-side,rgba(255,226,160,.85),rgba(255,200,110,.35) 55%,transparent);visibility:hidden;opacity:0}
+.st-anchor{position:absolute;left:0;top:0;width:calc(var(--u)*100px);height:calc(var(--u)*150px);margin:calc(var(--u)*-75px) 0 0 calc(var(--u)*-50px);visibility:hidden}
+.st-cone{--cw:300px;--ch:300px;position:absolute;left:0;top:0;z-index:1;width:var(--cw);height:var(--ch);pointer-events:none;visibility:hidden;opacity:0;background:linear-gradient(to bottom,rgba(255,226,160,0),rgba(255,214,140,.2) 60%,rgba(255,214,140,0));clip-path:polygon(40% 0,60% 0,100% 100%,0 100%)}
+.st-card{--hw:200px;position:absolute;left:0;top:0;z-index:5;width:var(--hw);height:calc(var(--hw)*1.5);visibility:hidden;will-change:transform,opacity}
+.st-btn{position:absolute;inset:0;padding:0;border:0;background:none;cursor:default;pointer-events:none;border-radius:calc(var(--hw)*.085)}
+.st-card.is-open .st-btn{cursor:pointer;pointer-events:auto}
+.st-card.is-open .st-btn:focus-visible{outline:3px solid #f4c86c;outline-offset:4px}
+.st-btn .card{--w:var(--hw);position:absolute;inset:0;transform:none}
+.st-btn .card .halo{display:none}
+.st-card.is-pulse .st-btn::after{content:"";position:absolute;inset:-6%;border-radius:calc(var(--hw)*.1);box-shadow:0 0 0 2px rgba(255,214,130,.9),0 0 30px 6px rgba(255,200,110,.7);animation:l-pulse 1.3s var(--ease) 2;pointer-events:none}
+.st-panel{position:absolute;z-index:6;overflow:auto;visibility:hidden;opacity:0;pointer-events:none}
+.st-panel .result{display:grid;gap:14px;justify-items:start}
+.st-panel .result .h2{font-size:clamp(26px,3.4vw,46px)}
+.final-cta{display:grid;justify-items:center;gap:16px}
+@media (max-width:820px){
+  .st-panel .result{gap:8px;justify-items:center;text-align:center}
+  .st-panel .share{justify-content:center}
+  .st-panel .result .h2{font-size:26px}
+  .st-panel .result .lede{font-size:14px;line-height:1.35}
+  .st-panel .rule,.st-panel .share-label{display:none}
+  .st-panel .share{gap:6px}
+  .st-panel .ghost{min-height:38px;padding:0 12px;font-size:13px}
+  .final-cta{width:100%}
+  .final-cta .ghost{width:100%;justify-content:center}
+}
+.draw.is-moved{display:none}
+
+/* the win screen after each ending (red "Evil wins", blue "Good wins"), above the cards and the words */
+.bl-win{position:absolute;inset:0;display:grid;place-items:center;visibility:hidden;opacity:0;background:radial-gradient(ellipse 90% 80% at 50% 50%,#3f7be0,#1c4399 60%,#0c2253)}
+.bl-win.is-a{background:radial-gradient(ellipse 90% 80% at 50% 50%,#b81c30,#6b0d1b 60%,#2a050c)}
+.bl-win b{font-family:var(--display);font-weight:380;font-size:clamp(44px,9vw,120px);line-height:1.02;letter-spacing:-.03em;text-align:center;color:#fbf1de;padding:0 24px;text-wrap:balance;text-shadow:0 4px 40px rgba(0,0,0,.35)}
+:lang(zh) .bl-win b{letter-spacing:0}
+.blade-say:not(.blade-a):not(.blade-b) .ns:nth-last-child(2) b{font-weight:600}

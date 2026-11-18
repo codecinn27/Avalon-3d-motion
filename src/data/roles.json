@@ -1,0 +1,9 @@
+[
+  { "slug": "merlin", "side": "good", "order": 1 },
+  { "slug": "percival", "side": "good", "order": 2 },
+  { "slug": "loyal-servant", "side": "good", "order": 3 },
+  { "slug": "assassin", "side": "evil", "order": 4 },
+  { "slug": "morgana", "side": "evil", "order": 5 },
+  { "slug": "mordred", "side": "evil", "order": 6 },
+  { "slug": "oberon", "side": "evil", "order": 7 }
+]

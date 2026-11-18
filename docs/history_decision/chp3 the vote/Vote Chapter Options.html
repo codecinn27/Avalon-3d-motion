@@ -1,0 +1,148 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Vote Chapter Options</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Geist:wght@400;600&display=swap">
+<style>
+/* Layout: three short sections, each with three small animated stages to compare. Night blue, gold and red from the site. */
+:root{--bg:#0b1020;--panel:#141a30;--line:#2a3354;--ink:#ece6d4;--mute:#9aa3c0;--gold:#d9b45a;--red:#c8453b;--blue:#5b8bd6;--cream:#f1e8cf;--font:'Geist',system-ui,sans-serif;--disp:'Fraunces',Georgia,serif;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);margin:0;padding-block:28px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+main{max-width:1060px;margin:0 auto}
+h1{font:600 30px/1.1 var(--disp);margin:0 0 6px}
+h2{font:600 22px/1.2 var(--disp);margin:44px 0 4px;color:var(--gold)}
+p.lede{color:var(--mute);margin:0 0 16px;max-width:62ch;line-height:1.5}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px}
+.opt{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;min-width:0}
+.opt h3{margin:0 0 2px;font-size:15px}
+.opt small{display:block;color:var(--mute);line-height:1.4;margin-bottom:10px;min-height:4.2em}
+.stage{position:relative;aspect-ratio:16/10;background:#070b18;border-radius:6px;overflow:hidden}
+button{font:600 13px var(--font);background:var(--gold);color:#1a1405;border:0;border-radius:6px;padding:9px 14px;margin-top:10px;cursor:pointer;min-height:40px}
+button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.tag{display:inline-block;background:var(--line);border-radius:4px;padding:1px 6px;font-size:11px;margin-right:6px}
+/* table */
+.world,.next{position:absolute;inset:0}
+.table{position:absolute;left:12%;right:12%;top:14%;bottom:14%;border-radius:50%;background:radial-gradient(#27325c,#141b38 70%);border:2px solid #3a4676}
+.seat{position:absolute;width:6.5%;aspect-ratio:2/3;transform:translate(-50%,-50%);background:#1d2650;border:1px solid var(--gold);border-radius:2px}
+.seat.s1{border-color:var(--gold)}
+.crown{position:absolute;width:5%;aspect-ratio:1;transform:translate(-50%,-190%);background:var(--gold);clip-path:polygon(0 100%,0 30%,25% 60%,50% 0,75% 60%,100% 30%,100% 100%);opacity:0}
+.next{opacity:0;background:#070b18}
+.dot{position:absolute;width:3.2%;aspect-ratio:1;border-radius:50%;border:1.5px solid var(--gold)}
+/* replay trick: .play starts the animations */
+/* ---- zoom A: dive to seat 1 ---- */
+.zA .world{transform-origin:50% 84%}
+.zA.play .world{animation:zA 4s ease-in-out forwards}
+@keyframes zA{0%{transform:scale(1)}35%,55%{transform:scale(3.4)}100%{transform:scale(1)}}
+.zA.play .crown{animation:drop 4s forwards}
+@keyframes drop{0%,40%{opacity:0;transform:translate(-50%,-420%)}55%,100%{opacity:1;transform:translate(-50%,-190%)}}
+/* ---- zoom B: through the centre ---- */
+.zB .world{transform-origin:50% 50%}
+.zB.play .world{animation:zBw 4s ease-in forwards}
+@keyframes zBw{0%{transform:scale(1);opacity:1}40%{transform:scale(6);opacity:0}100%{transform:scale(6);opacity:0}}
+.zB.play .next{animation:zBn 4s ease-out forwards}
+@keyframes zBn{0%,35%{opacity:0;transform:scale(.2)}55%{opacity:1;transform:scale(.6)}100%{opacity:1;transform:scale(1)}}
+/* ---- zoom C: into a card ---- */
+.zC .world{transform-origin:30% 50%}
+.zC.play .world{animation:zCw 4s ease-in forwards}
+@keyframes zCw{0%{transform:scale(1)}45%{transform:scale(16)}100%{transform:scale(16)}}
+.zC.play .next{animation:zCn 4s ease-out forwards}
+@keyframes zCn{0%,42%{opacity:0;transform:scale(4)}60%{opacity:1;transform:scale(2.5)}100%{opacity:1;transform:scale(1)}}
+.zC .seat.pick{background:linear-gradient(#2d3a7a,#1d2650);border-color:var(--gold)}
+/* ---- tracks ---- */
+.rim{position:absolute;width:3.4%;aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%);border:1.5px solid var(--mute)}
+.rim.q{border-color:var(--blue)}.rim.r{border-color:var(--red)}
+.play .lit{animation:lit 3s forwards}
+@keyframes lit{0%,30%{background:transparent;box-shadow:none}50%,100%{background:var(--red);box-shadow:0 0 10px var(--red)}}
+.bar{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:6px;align-items:center;font-size:9px;color:var(--mute)}
+.bar i{width:11px;height:11px;border-radius:50%;border:1.5px solid var(--blue);display:inline-block}
+.bar i.r{border-color:var(--red)}
+.bar i.lit{display:inline-block}
+.side{position:absolute;display:flex;flex-direction:column;gap:7px;align-items:center;font-size:9px;color:var(--mute)}
+.side i{width:11px;height:11px;border-radius:50%;border:1.5px solid var(--blue);display:block}
+.side i.r{border-color:var(--red)}
+/* ---- vote cards ---- */
+.vc{position:absolute;width:5.6%;aspect-ratio:2/3;transform:translate(-50%,-50%);perspective:200px}
+.vc b{position:absolute;inset:0;border-radius:2px;backface-visibility:hidden}
+.vc .bk{background:#2d3a7a;border:1px solid var(--gold)}
+.vc .fr{transform:rotateY(180deg);display:grid;place-items:center}
+.vc .fr::after{content:"";width:62%;aspect-ratio:1;border-radius:50%}
+.vc.ap .fr{background:var(--cream)}.vc.ap .fr::after{background:#fff;box-shadow:inset 0 0 0 2px var(--gold)}
+.vc.rj .fr{background:var(--cream)}.vc.rj .fr::after{background:#101018;box-shadow:0 0 0 2px #444}
+.vA .vc,.vB .vc{transition:none}
+.vA.play .vc{animation:flipin 3.4s forwards}
+@keyframes flipin{0%,45%{transform:translate(-50%,-50%) rotateY(0)}70%,100%{transform:translate(-50%,-50%) rotateY(180deg)}}
+.vA .vc{transform-style:preserve-3d}.vA .vc b{transform-style:flat}
+.vA .vc .bk{transform:translateZ(.1px)}.vA .vc .fr{transform:rotateY(180deg) translateZ(.1px)}
+.vB.play .vc{animation:pile 4.2s forwards}
+@keyframes pile{0%,15%{left:var(--x);top:var(--y);transform:translate(-50%,-50%)}40%,55%{left:50%;top:50%;transform:translate(-50%,-50%) rotate(0)}85%,100%{left:calc(50% + var(--fx));top:50%;transform:translate(-50%,-50%) rotate(var(--fr))}}
+.vB .vc .bk,.vB .vc .fr{transition:none}
+.vB.play .vc .bk{animation:hideb 4.2s forwards}
+@keyframes hideb{0%,60%{opacity:1}61%,100%{opacity:0}}
+.vB .vc .fr{transform:none;opacity:0}
+.vB.play .vc .fr{animation:showf 4.2s forwards}
+@keyframes showf{0%,60%{opacity:0}61%,100%{opacity:1}}
+.orb{position:absolute;width:3.4%;aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%) scale(0)}
+.orb.ap{background:#fff;box-shadow:0 0 8px #fff8}.orb.rj{background:#101018;box-shadow:0 0 0 1.5px #666,0 0 8px #c8453b88}
+.vC.play .orb{animation:pop 3s forwards}
+@keyframes pop{0%,30%{transform:translate(-50%,-50%) scale(0)}55%{transform:translate(-50%,-50%) scale(1.4)}70%,100%{transform:translate(-50%,-50%) scale(1)}}
+.count{position:absolute;bottom:4%;left:0;right:0;text-align:center;font-size:11px;color:var(--ink);opacity:0}
+.play .count{animation:cnt 4s forwards}
+@keyframes cnt{0%,70%{opacity:0}85%,100%{opacity:1}}
+.cap{position:absolute;left:8px;top:6px;font-size:10px;color:var(--mute);z-index:2}
+@media (prefers-reduced-motion:reduce){.play *{animation-duration:.01s!important}}
+</style>
+<main>
+<h1>Chapter 3: The Vote</h1>
+<p class="lede">Three quick choices. Each box is a rough sketch of one idea, not the final look. Press Play on each one, then tell me your pick for each section, for example "zoom B, tracks A, vote cards A".</p>
+
+<h2>1. The zoom from the night into the vote</h2>
+<p class="lede">The night ends at dawn on the wide table. Which dive carries the eye into "one player leads"?</p>
+<div class="row">
+  <div class="opt"><h3><span class="tag">A</span>Dive to the leader's seat</h3><small>Camera drops onto seat 1, the crown lands on it, then it pulls back wide. The table never leaves.</small>
+    <div class="stage zA" data-seats="1"><div class="world"><div class="table"></div><div class="crown" style="left:50%;top:86%"></div></div><span class="cap">wide → seat 1 → wide</span></div><button data-play>Play</button></div>
+  <div class="opt"><h3><span class="tag">B</span>Dive through the centre</h3><small>The camera falls into the middle of the table, goes dark, then pulls back out into a fresh vote scene with the tracks.</small>
+    <div class="stage zB"><div class="next"><div class="table"></div></div><div class="world"><div class="table"></div></div><span class="cap">table → dark → vote scene</span></div><button data-play>Play</button></div>
+  <div class="opt"><h3><span class="tag">C</span>Dive into one card</h3><small>The camera pushes into a face down card until its back fills the screen, and that colour opens into the vote scene.</small>
+    <div class="stage zC"><div class="next" style="background:#2d3a7a"><div class="table" style="opacity:.9"></div></div><div class="world"><div class="table"></div></div><span class="cap">card back → vote scene</span></div><button data-play>Play</button></div>
+</div>
+
+<h2>2. Where the score track and the reject track live</h2>
+<p class="lede">Five blue/red circles for quests, five marks for rejects. Play lights the first reject mark.</p>
+<div class="row">
+  <div class="opt"><h3><span class="tag">A</span>Around the table rim</h3><small>Part of the 3D scene. Turns with the camera, always there for chapters 4 to 7.</small>
+    <div class="stage tA" id="tA"><div class="table"></div></div><button data-play>Play</button></div>
+  <div class="opt"><h3><span class="tag">B</span>Fixed bar at the top</h3><small>Flat rows above the table, always facing the visitor. Easiest to read, but outside the table world.</small>
+    <div class="stage tB"><div class="bar" style="top:4%">QUESTS <i></i><i></i><i></i><i></i><i></i></div><div class="bar" style="top:15%">REJECTS <i class="r lit"></i><i class="r"></i><i class="r"></i><i class="r"></i><i class="r"></i></div><div class="table" style="top:28%;bottom:8%"></div></div><button data-play>Play</button></div>
+  <div class="opt"><h3><span class="tag">C</span>Beside the table</h3><small>Flat column next to the table on desktop. On a phone it would sit above it, as in B.</small>
+    <div class="stage tC"><div class="side" style="left:4%;top:20%">QUESTS<i></i><i></i><i></i><i></i><i></i></div><div class="side" style="right:4%;top:20%">REJECTS<i class="r lit"></i><i class="r"></i><i class="r"></i><i class="r"></i><i class="r"></i></div><div class="table" style="left:22%;right:22%"></div></div><button data-play>Play</button></div>
+</div>
+
+<h2>3. How the ten votes appear and turn</h2>
+<p class="lede">Four Approve (white), six Reject (black). The story rule is "everyone votes, all at once, in the open".</p>
+<div class="row">
+  <div class="opt"><h3><span class="tag">A</span>Cards at each seat flip together</h3><small>Each seat lays a card face down in front of it. All ten flip at the same moment. Keeps who voted what.</small>
+    <div class="stage vA" id="vA"><div class="table"></div><div class="count">4 Approve · 6 Reject — rejected</div></div><button data-play>Play</button></div>
+  <div class="opt"><h3><span class="tag">B</span>Pile in the middle, then fan out</h3><small>Cards slide to the centre, shuffle, and fan out face up. Looks like a real count but hides who voted what.</small>
+    <div class="stage vB" id="vB"><div class="table"></div><div class="count">4 Approve · 6 Reject — rejected</div></div><button data-play>Play</button></div>
+  <div class="opt"><h3><span class="tag">C</span>Orbs pop above each seat</h3><small>No cards. A white or black sphere pops over each seat. Lightest to build, does not use our vote card art.</small>
+    <div class="stage vC" id="vC"><div class="table"></div><div class="count">4 Approve · 6 Reject — rejected</div></div><button data-play>Play</button></div>
+</div>
+</main>
+<script>
+// seat i (0 to 9): seat 1 is nearest the viewer, going clockwise
+function pos(i,rx,ry,cx,cy){var a=(90+36*i)*Math.PI/180;return[cx+rx*Math.cos(a),cy+ry*Math.sin(a)]}
+var APPROVE=[0,2,5,8];
+function seats(stage,pick){var w=stage.querySelector('.world')||stage;for(var i=0;i<10;i++){var p=pos(i,38,34,50,50),s=document.createElement('div');s.className='seat'+(i==pick?' pick':'');s.style.left=p[0]+'%';s.style.top=p[1]+'%';w.appendChild(s)}}
+document.querySelectorAll('.zA,.zB,.zC').forEach(function(s){seats(s,s.classList.contains('zC')?3:-1)});
+document.querySelectorAll('.zB .next,.zC .next').forEach(function(n){for(var i=0;i<10;i++){var p=pos(i,38,34,50,50),d=document.createElement('div');d.className='dot';d.style.left=p[0]+'%';d.style.top=p[1]+'%';d.style.transform='translate(-50%,-50%)';n.appendChild(d)}var c=document.createElement('div');c.className='crown';c.style.cssText='left:50%;top:86%;opacity:1';n.appendChild(c)});
+// tracks A: rim marks
+(function(){var st=document.getElementById('tA');for(var i=0;i<5;i++){var q=document.createElement('div');q.className='rim q';q.style.left=(30+i*10)+'%';q.style.top='9%';st.appendChild(q);var r=document.createElement('div');r.className='rim r'+(i==0?' lit':'');r.style.left=(30+i*10)+'%';r.style.top='92%';st.appendChild(r)}})();
+// votes
+function cards(id,mode){var st=document.getElementById(id);for(var i=0;i<10;i++){var ap=APPROVE.indexOf(i)>-1,p=pos(i,38,34,50,50);
+ if(mode=='orb'){var o=document.createElement('div');o.className='orb '+(ap?'ap':'rj');o.style.left=p[0]+'%';o.style.top=(p[1]-9)+'%';o.style.animationDelay='0s';st.appendChild(o);var s=document.createElement('div');s.className='seat';s.style.left=p[0]+'%';s.style.top=p[1]+'%';st.appendChild(s);continue}
+ var s2=document.createElement('div');s2.className='seat';s2.style.left=p[0]+'%';s2.style.top=p[1]+'%';st.appendChild(s2);
+ var c=document.createElement('div');c.className='vc '+(ap?'ap':'rj');var cx=50+(p[0]-50)*.72,cy=50+(p[1]-50)*.72;c.style.left=cx+'%';c.style.top=cy+'%';c.style.setProperty('--x',cx+'%');c.style.setProperty('--y',cy+'%');c.style.setProperty('--fx',((i-4.5)*5.2)+'%');c.style.setProperty('--fr',((i-4.5)*5)+'deg');c.innerHTML='<b class="bk"></b><b class="fr"></b>';st.appendChild(c)}}
+cards('vA','card');cards('vB','card');cards('vC','orb');
+document.querySelectorAll('[data-play]').forEach(function(b){b.addEventListener('click',function(){var st=b.previousElementSibling;st.classList.remove('play');void st.offsetWidth;st.classList.add('play')})});
+</script>
+
+</body></html>

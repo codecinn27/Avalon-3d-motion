@@ -1,0 +1,317 @@
+{
+  "meta": {
+    "title": "Avalon online game nights · Trust no one at the round table",
+    "description": "Avalon is a game of hidden roles, bold lies, and one perfect betrayal. Draw your role card, share it with friends, and ask us on WhatsApp about the next online night."
+  },
+  "a11y": {
+    "skip": "Skip to content",
+    "nav": "Main",
+    "language": "Language",
+    "newTab": "opens in a new tab",
+    "cardAlt": "{role} card, original painted art",
+    "deckAlt": "A face down Avalon card",
+    "turnCard": "Turn over card {n} of {total}",
+    "musicOff": "Turn background music off",
+    "musicOn": "Turn background music on"
+  },
+  "nav": {
+    "whatsapp": "WhatsApp"
+  },
+  "hero": {
+    "eyebrow": "Game Night",
+    "title": "Trust *no one* at the round table.",
+    "cta": "Ask on WhatsApp",
+    "drawLink": "Draw your card"
+  },
+  "how": {
+    "eyebrow": "How it works",
+    "title": "Three rounds of *doubt.*",
+    "lede": "New to Avalon? You will have it in two minutes. The rest is reading faces.",
+    "step1Title": "You get a secret role",
+    "step1Body": "Loyal knight or hidden traitor. Only you know which.",
+    "step2Title": "The table goes on quests",
+    "step2Body": "Teams are picked, votes are cast, and every choice says something about you.",
+    "step3Title": "Find the traitors before they win",
+    "step3Body": "Three failed quests and evil takes the throne. Talk, accuse, bluff."
+  },
+  "deal": {
+    "title": "Ten seats. Six are loyal. Four are *lying.*",
+    "lede": "Every player gets one secret card. Nobody shows it. Not even to friends."
+  },
+  "night": {
+    "title": "Night falls. Everyone knows something different.",
+    "fall": "Night falls.",
+    "fallSub": "Everyone, close your eyes.",
+    "evil": "Evil, open your eyes.",
+    "traitors": "The traitors find each other.",
+    "oberon": "Oberon works alone.",
+    "merlin": "Merlin, open your eyes.",
+    "merlinSees": "Merlin sees the traitors.",
+    "merlinSub": "All but one.",
+    "percival": "Percival, open your eyes.",
+    "percivalSees": "Percival sees two Merlins.",
+    "percivalSub": "Only one is real.",
+    "others": "Everyone else saw nothing at all.",
+    "open": "Everyone, open your eyes.",
+    "know": "Now everyone knows something different.",
+    "whoTitle": "Who knows what",
+    "seat": "Seat {n}: {role}",
+    "sees": {
+      "merlin": "Sees the Assassin, Morgana and Oberon as evil. Cannot see Mordred.",
+      "assassin": "Knows Morgana and Mordred. Does not know Oberon.",
+      "morgana": "Knows the Assassin and Mordred. Looks like Merlin to Percival.",
+      "mordred": "Knows the Assassin and Morgana. Merlin cannot see him.",
+      "oberon": "Knows nobody. Oberon is alone in the dark.",
+      "percival": "Sees two cards that could be Merlin: Merlin and Morgana. Cannot tell which is real.",
+      "loyal-servant": "Saw nothing at all."
+    },
+    "seen": {
+      "merlin": "Seen by Percival, who thinks he may be Merlin.",
+      "assassin": "Seen by Merlin, Morgana and Mordred.",
+      "morgana": "Seen by Merlin, the Assassin, Mordred and Percival.",
+      "mordred": "Seen by the Assassin and Morgana. Merlin cannot see him.",
+      "oberon": "Seen by Merlin only.",
+      "percival": "Seen by nobody.",
+      "loyal-servant": "Seen by nobody."
+    }
+  },
+  "vote": {
+    "title": "The vote",
+    "leader": "Each round, one player leads.",
+    "team1": "The leader picks who goes on the quest.",
+    "cards": "Every player holds two cards: Approve and Reject.",
+    "all": "Everyone votes. All at once. In the open.",
+    "rejected": "Rejected. The crown moves on.",
+    "five": "Five rejected teams in a row,",
+    "fiveSub": "and evil wins without lifting a blade.",
+    "team2": "The new leader picks again.",
+    "approved": "Seven Approve. Three Reject. Approved.",
+    "approve": "Approve",
+    "reject": "Reject",
+    "barQuests": "Quests",
+    "barRejects": "Rejects",
+    "howTitle": "How a vote works",
+    "how1": "The leader picks a team.",
+    "how2": "Every player lays one vote card face down.",
+    "how3": "All the cards are turned over at once.",
+    "how4": "More than half must Approve for the team to go.",
+    "how5": "A tie rejects the team.",
+    "how6": "Five rejected teams in a row, and evil wins."
+  },
+  "quest": {
+    "title": "The quest",
+    "secret": "The team goes on the quest. In secret.",
+    "rule": "The loyal must play Success. Traitors may play either.",
+    "q1": "Even the Assassin plays Success. For now.",
+    "q1done": "The first quest succeeds.",
+    "team2": "A new leader. A team of four. Approved.",
+    "hand": "Only you see it. The Assassin picks Fail.",
+    "shuffle": "Shuffled. Nobody can follow which is which.",
+    "turn": "Turn them over.",
+    "fail": "One Fail is enough. Nobody knows whose.",
+    "both": "Seat 3 was on both quests.",
+    "points": "The traitor points first.",
+    "cardLabel": "Quest card {n} of 4, face down. Turn it over.",
+    "cardSuccess": "Success",
+    "cardFail": "Fail",
+    "r1": "Quest 1: three cards, all Success. The quest succeeds.",
+    "r2": "Quest 2: four cards, one Fail. The quest fails.",
+    "live1": "Success.",
+    "liveFail": "Fail. One Fail is enough.",
+    "howTitle": "How a quest works",
+    "how1": "Each player on the team plays one card, face down.",
+    "how2": "The loyal must play Success. Traitors may play either.",
+    "how3": "The cards are shuffled before they are turned.",
+    "how4": "One Fail and the quest fails (quest 4 at seven players or more needs two).",
+    "how5": "Nobody learns who played what."
+  },
+  "sides": {
+    "good": "Good",
+    "evil": "Evil",
+    "goodLong": "Good side",
+    "evilLong": "Evil side"
+  },
+  "draw": {
+    "eyebrow": "Draw your card",
+    "title": "Which side are *you* on?",
+    "lede": "Seven cards, face down. Tap once and fate deals you a role. Share it and see what your friends get.",
+    "button": "Draw your card",
+    "noscript": "The card draw needs JavaScript. You can still ask us anything on WhatsApp.",
+    "resultEyebrow": "Fate has dealt",
+    "resultTitle": "You drew *{role}.*",
+    "ask": "Ask about game nights",
+    "shareLabel": "Share your role",
+    "copy": "Copy link",
+    "copied": "Copied",
+    "again": "Draw again",
+    "linkField": "Link to this role",
+    "save": "Save my card"
+  },
+  "share": {
+    "text": "I drew {role} at the Avalon round table. Which role will you get?"
+  },
+  "final": {
+    "eyebrow": "Online, every game night",
+    "title": "Your seat is *waiting.*",
+    "lede": "Online Avalon nights. Come alone or bring your group. We fill the table.",
+    "cta": "Save me a seat"
+  },
+  "footer": {
+    "note": "Original artwork. Not an official product of any game publisher."
+  },
+  "rolePage": {
+    "eyebrow": "A friend drew this role",
+    "title": "{role}. *Which one are you?*",
+    "tail": "Seven roles, one table, and nobody is who they say they are.",
+    "cta": "Draw your own",
+    "wa": "Ask on WhatsApp",
+    "metaTitle": "{role} · Avalon online game nights",
+    "metaDescription": "A friend drew {role}. {line} Draw your own role and join an online Avalon night."
+  },
+  "notFound": {
+    "title": "This seat is *empty.*",
+    "body": "The page you are looking for is not at the table.",
+    "link": "Back to the round table"
+  },
+  "waMessage": {
+    "general": "Hi! I want to know more about the online Avalon game nights.",
+    "withRole": "Hi! I drew {role} on your Avalon page. Tell me more about the online game nights.",
+    "seat": "Hi! Save me a seat at the next online Avalon night."
+  },
+  "roles": {
+    "merlin": {
+      "name": "Merlin",
+      "line": "Knows who is evil, but must never be found out.",
+      "drawLine": "You know every traitor at the table. Guide the loyal without giving yourself away."
+    },
+    "percival": {
+      "name": "Percival",
+      "line": "Knows Merlin, and must shield him from the Assassin.",
+      "drawLine": "You know who Merlin is, or you think you do. Protect him to the very end."
+    },
+    "loyal-servant": {
+      "name": "Loyal Servant",
+      "line": "No special knowledge. Just sharp eyes and a loyal heart.",
+      "drawLine": "No secrets and no powers. Only your wits to tell friend from traitor."
+    },
+    "assassin": {
+      "name": "Assassin",
+      "line": "If good wins the quests, one strike at Merlin can still steal the game.",
+      "drawLine": "Lose the quests and you still get one strike. Name Merlin and evil takes it all."
+    },
+    "morgana": {
+      "name": "Morgana",
+      "line": "Poses as Merlin to mislead Percival.",
+      "drawLine": "You pose as Merlin and send the loyal down the wrong path. Can you keep a straight face?"
+    },
+    "mordred": {
+      "name": "Mordred",
+      "line": "The one traitor even Merlin cannot see.",
+      "drawLine": "Even Merlin cannot see you. Hide in plain sight and pull the strings."
+    },
+    "oberon": {
+      "name": "Oberon",
+      "line": "Evil, but alone. The other traitors do not know him.",
+      "drawLine": "You are evil and nobody knows it, not even your own side. Cause chaos alone."
+    }
+  },
+  "peek": {
+    "close": "Close",
+    "hint": "Tap anywhere to put the card back"
+  },
+  "lady": {
+    "title": "The Lady of the Lake",
+    "name": "Lady of the Lake",
+    "wakes": "After the second quest, the Lady of the Lake wakes.",
+    "holds": "Mordred holds her.",
+    "looks": "He looks at seat 3, the one the table blames.",
+    "still": "The table turns to still water.",
+    "touch": "Touch the water.",
+    "shows": "She shows her holder one player's true side.",
+    "blue": "Blue. Seat 3 is loyal.",
+    "evil": "Evil.",
+    "never": "The Lady never lies.",
+    "might": "The one holding her might.",
+    "merlin": "Even Merlin can't see this lie.",
+    "merlinWhy": "Merlin sees three traitors. Mordred is not one of them.",
+    "moves": "She moves on.",
+    "again": "She wakes again after quests 3 and 4.",
+    "poolLabel": "The Lady's water. Touch it to see seat 3's true side.",
+    "result": "Mordred saw that seat 3 is loyal, and told the table seat 3 is evil.",
+    "howTitle": "How the Lady works",
+    "how1": "After quests 2, 3 and 4, whoever holds the Lady chooses one player.",
+    "how2": "They secretly see that player's side, loyal or evil, but not the role.",
+    "how3": "They may tell the table the truth or lie.",
+    "how4": "Then they hand the Lady to that player.",
+    "how5": "Someone who has already held the Lady can't be chosen.",
+    "seatTag": "{n} · {role}"
+  },
+  "climb": {
+    "title": "The climb",
+    "q3lead": "Quest 3. Morgana leads.",
+    "approved": "Approved.",
+    "q3cards": "Even Morgana plays Success. She needs their trust.",
+    "ladyAgain": "The Lady wakes again. Seat 3 looks at the Assassin.",
+    "red": "Red.",
+    "truth": "This time, the truth.",
+    "q4lead": "Percival leads. He trusts the wrong Merlin.",
+    "q4rule": "At ten players, quest four needs two Fails.",
+    "twoAll": "Two all. One quest left.",
+    "ladyOnce": "She wakes once more. The Assassin looks at Percival, and says nothing.",
+    "q5lead": "Seat 6 leads. Percival names the team.",
+    "bluff": "Percival plays Merlin. On purpose.",
+    "q5done": "Five Success.",
+    "won": "Good has won.",
+    "liveRed": "Red. The Assassin is evil, and seat 3 tells the truth.",
+    "liveScore": "Loyal {good}, evil {evil}.",
+    "r3": "Quest 3 succeeded: four cards, all Success.",
+    "rLady": "Seat 3 looked at the Assassin, saw red, and told the truth.",
+    "r4": "Quest 4 failed with two Fail cards, from Morgana and Mordred.",
+    "r5": "Quest 5 succeeded: five cards, all Success. Loyal win, three quests to two.",
+    "howTitle": "How the game is won",
+    "how1": "The first side to win three quests wins.",
+    "how2": "The leader moves one seat to the left after every team, approved or not.",
+    "how3": "At seven players or more, quest 4 needs two Fail cards to fail.",
+    "how4": "The Lady of the Lake wakes after quests 2, 3 and 4."
+  },
+  "seat": {
+    "hidden": "Could you have hidden Merlin?",
+    "found": "Could you have found Merlin?",
+    "friend": "Now imagine the liar is your best friend.",
+    "turn": "Your turn. Draw your card.",
+    "cardLabel": "Draw your card"
+  },
+  "blade": {
+    "title": "The blade",
+    "remains": "But one blade remains.",
+    "evilWin": "Evil can lose every quest and still win.",
+    "name": "Name Merlin, and everything goes to evil.",
+    "slows": "It slows between two.",
+    "percival": "All game, Percival played Merlin to draw the blade.",
+    "saw": "You saw everything tonight. The Assassin saw nothing.",
+    "where": "Where does the blade fall?",
+    "hintMouse": "Point at a card, then click.",
+    "hintTouch": "Tap to aim. Tap again to strike.",
+    "strike": "Strike seat {n}",
+    "cardLabel": "Seat {n}, {name}. Aim the blade here.",
+    "chooses": "The Assassin chooses.",
+    "merlin": "Merlin.",
+    "taken": "The win is taken back.",
+    "lost": "Three quests won. One name lost it all.",
+    "notMerlin": "Not Merlin.",
+    "hidden": "Merlin stayed hidden.",
+    "saved": "The blade missed. The realm is saved.",
+    "other": "See the other ending",
+    "liveA": "The blade found Merlin. Evil wins.",
+    "liveB": "The blade missed. {name} was loyal, not Merlin. The realm is saved.",
+    "orScroll": "Or keep scrolling, and the Assassin chooses.",
+    "seatBtn": "Seat {n}, {name}",
+    "plainA": "The Assassin named Merlin. Evil wins.",
+    "howTitle": "The last strike",
+    "how1": "If the loyal win three quests, the game is not over.",
+    "how2": "The Assassin gets one guess: he names the player he thinks is Merlin.",
+    "how3": "If he is right, evil wins the whole game. If he is wrong, the loyal win.",
+    "winEvil": "Evil wins",
+    "winGood": "Good wins"
+  }
+}

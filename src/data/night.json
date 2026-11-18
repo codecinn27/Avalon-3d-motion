@@ -1,0 +1,9 @@
+{
+  "sees": {
+    "merlin": ["assassin", "morgana", "oberon"],
+    "assassin": ["morgana", "mordred"],
+    "morgana": ["assassin", "mordred"],
+    "mordred": ["assassin", "morgana"],
+    "percival": ["merlin", "morgana"]
+  }
+}

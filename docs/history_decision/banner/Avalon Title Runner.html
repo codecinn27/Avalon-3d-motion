@@ -1,0 +1,392 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Avalon Title Runner</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..700&family=Geist:wght@400..600&display=swap">
+<style>
+/* Layout: one column of five live hero mock-ups, each the real Avalon title on paper, so the options compare like for like.
+   Deliberately single-theme: it mirrors the site's light paper hero, where the runner will live. */
+:root{
+  --paper:#F3ECDF; --paper-2:#E8DDC9; --ink:#1B1712; --ink-soft:#5B5246; --gold:#A8782A; --gold-text:#7A5516;
+  --line:rgba(27,23,18,.13);
+  --display:"Fraunces","Songti SC","Noto Serif SC",Georgia,serif;
+  --body:"Geist","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  color-scheme:light;
+}
+body{background:var(--paper-2);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:36px 72px}
+main{max-width:880px;margin:0 auto;display:grid;gap:36px}
+.intro{display:grid;gap:10px}
+.intro h1{font:400 clamp(30px,5vw,46px)/1.05 var(--display);font-variation-settings:"opsz" 144;letter-spacing:-.02em;margin:0;text-wrap:balance}
+.intro p{margin:0;color:var(--ink-soft);max-width:62ch}
+.route{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:4px 0 0;padding:0;list-style:none;font-size:13px;color:var(--ink-soft)}
+.route li{display:flex;align-items:center;gap:6px}
+.route b{font:500 17px/1 var(--display);color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:6px;min-width:26px;padding:4px 6px;text-align:center}
+.route i{font-style:normal;color:var(--gold-text)}
+.controls{display:flex;flex-wrap:wrap;gap:8px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;padding-block:10px;background:var(--paper-2)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper-2)}
+.controls button{font:500 13px/1 var(--body);color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:9px 15px;cursor:pointer}
+.controls button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.controls button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.opts{display:grid;gap:40px}
+.opt{display:grid;gap:12px;min-width:0}
+.opt-head{display:grid;grid-template-columns:auto 1fr;gap:2px 14px;align-items:start}
+.num{grid-row:span 2;font:400 44px/0.9 var(--display);font-variation-settings:"opsz" 144;color:var(--gold)}
+.opt-head h2{margin:0;font:600 16px/1.3 var(--body)}
+.opt-head p{margin:0;color:var(--ink-soft);font-size:14px;max-width:62ch}
+.stage{--fs:clamp(56px,15vw,132px);position:relative;background:var(--paper);border-radius:14px;box-shadow:0 0 0 1px var(--line),0 10px 30px -18px rgba(27,23,18,.35);
+  padding:calc(var(--fs)*.95) 16px calc(var(--fs)*.32);text-align:center;overflow:hidden;max-width:100%}
+.title{font-family:"Fraunces",Georgia,serif;font-weight:380;font-size:var(--fs);line-height:.94;letter-spacing:-.035em;font-variation-settings:"opsz" 144;margin:0;white-space:nowrap}
+.bl{display:inline-block;width:0;height:0}
+.sub{margin:.55em 0 0;font:400 clamp(16px,2.6vw,24px)/1.3 "Songti SC","Noto Serif SC","STSong","SimSun",serif;color:var(--ink-soft)}
+.sub em{font-style:normal;color:var(--gold)}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.notes{display:grid;gap:8px;border-top:1px solid var(--line);padding-top:20px}
+.notes h2{margin:0;font:600 15px var(--body)}
+.notes ul{margin:0;padding-left:18px;color:var(--ink-soft);display:grid;gap:4px;max-width:66ch}
+</style>
+
+<main>
+  <header class="intro">
+    <h1>Who runs across the title?</h1>
+    <p>Five takes on a small figure for the first section of the site. All five follow the same route over the real “Avalon” letters, measured from the title itself. Pick one by number.</p>
+    <ol class="route" aria-label="Route">
+      <li><b>A</b><i>run</i></li><li><b>a</b><i>jump</i></li><li><b>l</b><i>slide</i></li><li><b>o</b><i>run</i></li><li><b>n</b><i>repeat</i></li>
+    </ol>
+  </header>
+
+  <div class="controls" role="toolbar" aria-label="Playback">
+    <button type="button" id="play" aria-pressed="false">Pause</button>
+    <button type="button" id="slow" aria-pressed="false">Slow motion</button>
+    <button type="button" id="path" aria-pressed="false">Show route</button>
+  </div>
+
+  <div class="opts" id="opts"></div>
+
+  <section class="notes">
+    <h2>How the chosen one would ship</h2>
+    <ul>
+      <li>Only in the first section (the hero with the title). It pauses as soon as the hero scrolls out of view and never appears in later chapters.</li>
+      <li>A transparent canvas sits over the title. The real text stays text, so reading, translation and search are untouched.</li>
+      <li>The route is measured from the live letters, so it fits every screen size from phone to desktop.</li>
+      <li>With reduced motion turned on, the figure stands still on the A.</li>
+    </ul>
+  </section>
+</main>
+
+<script>
+(() => {
+const INK='#1B1712', SOFT='#5B5246', GOLD='#A8782A', RED='#9B2C24', NAVY='#26366A', PAPER='#F3ECDF';
+const TAU=Math.PI*2, lerp=(a,b,t)=>a+(b-a)*t, clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+
+const OPTS=[
+  {name:'Ink runner', desc:'The plainest: a stick figure in the title’s own ink. After the n it hops down, runs off and drops back onto the A from above.',
+   S:{color:INK,lw:.075,head:.105,headFill:PAPER,torso:.27,thigh:.21,shin:.21,upper:.15,fore:.14,size:.23,speed:3.6}, end:'runoff'},
+  {name:'Little knight', desc:'Gold helmet and a red plume, for the round table. Plants a pennant on the n, salutes, then leaps all the way back to the A.',
+   S:{color:INK,lw:.075,head:.11,headFill:GOLD,helmet:true,plume:true,torso:.27,thigh:.21,shin:.21,upper:.15,fore:.14,size:.24,speed:3.4}, end:'flag'},
+  {name:'Round head', desc:'A chubby head with blinking eyes, squash and stretch on every landing. Bounces twice on the n and somersaults home.',
+   S:{color:INK,lw:.1,head:.2,headFill:INK,eyes:true,torso:.15,thigh:.14,shin:.13,upper:.11,fore:.1,size:.27,speed:3.3,squash:true}, end:'flip'},
+  {name:'Merlin’s apprentice', desc:'Pointed hat and a wand, leaving a trail of gold sparks. Waves the wand on the n, vanishes in a puff and reappears on the A.',
+   S:{color:INK,lw:.075,head:.105,headFill:PAPER,hat:true,wand:true,sparkle:true,torso:.27,thigh:.21,shin:.21,upper:.15,fore:.14,size:.23,speed:3.4}, end:'poof'},
+  {name:'Gold whisper', desc:'The quietest: smaller, slower, drawn in the gold accent. Sits on the edge of the n swinging its legs, then fades back to the A.',
+   S:{color:GOLD,lw:.07,head:.105,headFill:PAPER,torso:.27,thigh:.21,shin:.21,upper:.15,fore:.14,size:.18,speed:2.6}, end:'sit'},
+];
+
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let playing=!reduce, slow=false, showPath=false;
+const host=document.getElementById('opts');
+const mctx=document.createElement('canvas').getContext('2d');
+
+const stages=OPTS.map((o,i)=>{
+  const sec=document.createElement('section');
+  sec.className='opt';
+  sec.innerHTML=`<div class="opt-head"><span class="num">${i+1}</span><h2>${o.name}</h2><p>${o.desc}</p></div>
+  <div class="stage" role="img" aria-label="Option ${i+1}, ${o.name}: a small figure running across the Avalon title">
+    <p class="title" aria-hidden="true"><span>A</span><span>v</span><span>a</span><span>l</span><span>o</span><span>n</span><i class="bl"></i></p>
+    <p class="sub" aria-hidden="true">圆桌之上，<em>谁都</em>不可信。</p>
+    <canvas aria-hidden="true"></canvas>
+  </div>`;
+  host.append(sec);
+  const el=sec.querySelector('.stage');
+  return {o,S:o.S,el,cv:el.querySelector('canvas'),h1:el.querySelector('.title'),bl:el.querySelector('.bl'),
+    spans:[...el.querySelectorAll('.title span')],t:i*0.9,last:-1,parts:[],emit:0,vis:true,segs:[],total:1,ready:false};
+});
+
+/* ---------- geometry from the live letters ---------- */
+function measure(st){
+  const r=st.el.getBoundingClientRect(), dpr=Math.min(2,devicePixelRatio||1);
+  st.w=r.width; st.h=r.height; st.dpr=dpr;
+  st.cv.width=Math.round(r.width*dpr); st.cv.height=Math.round(r.height*dpr);
+  const fs=parseFloat(getComputedStyle(st.h1).fontSize);
+  const base=st.bl.getBoundingClientRect().bottom-r.top;
+  mctx.font=`380 ${fs}px Fraunces, Georgia, serif`;
+  const L=st.spans.map(sp=>{
+    const rr=sp.getBoundingClientRect(), m=mctx.measureText(sp.textContent), x0=rr.left-r.left;
+    const l=x0-m.actualBoundingBoxLeft, rt=x0+m.actualBoundingBoxRight;
+    return {ch:sp.textContent,l,r:rt,w:rt-l,cx:(l+rt)/2,top:base-m.actualBoundingBoxAscent};
+  });
+  const topAt=(i,x)=>{
+    const c=L[i];
+    if(c.ch!=='o') return c.top;
+    const rx=c.w/2, ry=(base-c.top)/2, u=clamp((x-c.cx)/rx,-.7,.7);
+    return c.top+ry*(1-Math.sqrt(1-u*u));
+  };
+  const surf=x=>{
+    for(let i=0;i<L.length;i++){
+      if(x>=L[i].l&&x<=L[i].r) return topAt(i,x);
+      if(i<L.length-1&&x>L[i].r&&x<L[i+1].l) return lerp(topAt(i,L[i].r),topAt(i+1,L[i+1].l),(x-L[i].r)/(L[i+1].l-L[i].r));
+    }
+    return base;
+  };
+  st.g={L,base,surf,fs};
+  st.s=fs*st.S.size;
+  build(st);
+  st.ready=true;
+}
+
+/* ---------- the route, as a list of timed segments ---------- */
+function build(st){
+  const g=st.g, S=st.S, s=st.s, spd=S.speed*s, sq=!!S.squash, L=g.L, segs=[];
+  const P=x=>({x,y:g.surf(x)});
+  const ext=(x,u)=>typeof x==='function'?x(u):x;
+  const hold=(p,dur,pose,x={})=>({dur,at:u=>({x:p.x,y:p.y,pose,...ext(x,u)})});
+  const prep=(p,x={})=>({dur:.11,at:u=>({x:p.x,y:p.y,pose:'crouch',sq:sq?.82:1,...ext(x,u)})});
+  const land=(p,x={})=>({dur:.15,fx:[{t:'dust',x:p.x,y:p.y}],at:u=>({x:p.x,y:p.y,pose:'land',sq:sq?1-.28*Math.sin(u*Math.PI):1,...ext(x,u)})});
+  const hop=(p0,p1,h,dur,x={})=>({dur,at:u=>{
+    const yp=Math.min(p0.y,p1.y)-h, c=2*yp-(p0.y+p1.y)/2;
+    return {x:lerp(p0.x,p1.x,u),y:(1-u)**2*p0.y+2*u*(1-u)*c+u*u*p1.y,pose:'jump',sq:sq?1+.16*Math.sin(u*Math.PI):1,moving:true,...ext(x,u)};
+  }});
+  const run=(x0,x1,yf=g.surf,x={})=>({dur:Math.abs(x1-x0)/spd,at:u=>{
+    const xx=lerp(x0,x1,u);
+    return {x:xx,y:yf(xx),pose:'run',phi:Math.abs(xx-x0)/(.5*s)*Math.PI,moving:true,...ext(x,u)};
+  }});
+  const slide=(p0,p1,dur)=>({dur,at:u=>{const e=u*u;return {x:lerp(p0.x,p1.x,e),y:lerp(p0.y,p1.y,e),pose:'slide',moving:true};}});
+
+  const A={x:L[0].cx,y:L[0].top};
+  const V1=P(L[1].l+.16*L[1].w), V2=P(L[1].r-.16*L[1].w);
+  const AE=P(L[2].r-.12*L[2].w);
+  const LT={x:L[3].cx,y:L[3].top};
+  const O=P(L[4].l+.3*L[4].w);
+  const N=P(L[5].r-.14*L[5].w);
+  const SIT=P(L[5].r-S.thigh*s*.55);
+  const over=(p,q)=>Math.min(p.y,q.y)-LT.y; // how far below the l's top the lower jump end sits
+
+  // A → a: hop down off the A onto the v, skip across it, run over the a
+  segs.push(hold(A,.55,'stand'),prep(A),hop(A,V1,.3*s,.42),land(V1),prep(V1),hop(V1,V2,.22*s,.3),land(V2),run(V2.x,AE.x));
+  // jump onto the l, wobble at the top, slide down to the o, run to the n
+  segs.push(prep(AE),hop(AE,LT,.45*s,.5),land(LT),hold(LT,.35,'teeter'),slide(LT,O,.42),land(O));
+  segs.push(run(O.x,(st.o.end==='sit'?SIT:N).x));
+
+  const flagAt={x:N.x+.28*s,y:g.surf(N.x)};
+  const flag=(h,a=1)=>({flag:{x:flagAt.x,y:flagAt.y,h,a}});
+  switch(st.o.end){
+    case 'runoff':{
+      const G0={x:L[5].r+.55*s,y:g.base}, G1=G0.x+1.7*s;
+      segs.push(prep(N),hop(N,G0,.25*s,.4),land(G0),run(G0.x,G1,()=>g.base,u=>({alpha:1-u})),hold(G0,.35,'stand',{alpha:0}),
+        {dur:.55,at:u=>({x:A.x,y:lerp(A.y-2.6*s,A.y,u*u),pose:'jump',alpha:Math.min(1,u*2.5),moving:true})},land(A));
+      break;}
+    case 'flag':{
+      segs.push(hold(N,.45,'plant',u=>flag(Math.min(1,u*1.6))),hold(N,.85,'salute',flag(1)),hold(N,.2,'stand',{facing:-1,...flag(1)}),
+        prep(N,{facing:-1,...flag(1)}),hop(N,A,over(N,A)+1.1*s,1.15,u=>({facing:-1,...flag(1,1-u)})),land(A,{facing:-1}),hold(A,.25,'stand',{facing:-1}));
+      break;}
+    case 'flip':{
+      segs.push(prep(N),hop(N,N,.35*s,.32),land(N),prep(N),hop(N,N,.55*s,.4),land(N),hold(N,.2,'stand',{facing:-1}),prep(N,{facing:-1}),
+        hop(N,A,over(N,A)+1.4*s,1.2,u=>({facing:-1,rot:u*TAU})),land(A,{facing:-1}),hold(A,.25,'stand',{facing:-1}));
+      break;}
+    case 'poof':{
+      segs.push(hold(N,.75,'wave',{glow:true}),
+        {dur:.12,fx:[{t:'poof',x:N.x,y:N.y-.45*s}],at:u=>({x:N.x,y:N.y,pose:'wave',glow:true,alpha:1-u})},
+        hold(N,.55,'stand',{alpha:0}),
+        {dur:.28,fx:[{t:'poof',x:A.x,y:A.y-.45*s}],at:u=>({x:A.x,y:A.y,pose:'stand',alpha:u})});
+      break;}
+    case 'sit':{
+      segs.push(hold(SIT,.22,'crouch'),hold(SIT,1.8,'sit'),hold(SIT,.45,'sit',u=>({alpha:1-u})),hold(A,.35,'stand',{alpha:0}),hold(A,.45,'stand',u=>({alpha:u})));
+      break;}
+  }
+  st.segs=segs;
+  st.total=segs.reduce((a,b)=>a+b.dur,0);
+  // a dotted line of the route, for the "Show route" toggle
+  st.route=[];
+  for(let t=0;t<st.total;t+=.025){const {state}=evalAt(st,t); if(state.alpha>.5) st.route.push(state.x,state.y);}
+}
+
+function evalAt(st,t){
+  let tt=((t%st.total)+st.total)%st.total, i=0;
+  for(;i<st.segs.length-1&&tt>st.segs[i].dur;i++) tt-=st.segs[i].dur;
+  const seg=st.segs[i], u=seg.dur?clamp(tt/seg.dur,0,1):1;
+  return {i,state:{facing:1,alpha:1,sq:1,rot:0,phi:0,...seg.at(u)}};
+}
+
+/* ---------- poses: angles in radians from straight down, positive = forward ---------- */
+function pose(p,tt){
+  const f=p.phi, PI=Math.PI;
+  switch(p.pose){
+    case 'run': return {lean:.22,
+      legs:[[.75*Math.sin(f),.2+1.1*Math.max(0,Math.cos(f))],[.75*Math.sin(f+PI),.2+1.1*Math.max(0,Math.cos(f+PI))]],
+      arms:[[-.9*Math.sin(f),1.4],[-.9*Math.sin(f+PI),1.4]]};
+    case 'crouch': return {lean:.35,legs:[[.8,1.5],[.4,1.2]],arms:[[-.7,.3],[-.9,.3]]};
+    case 'land': return {lean:.3,legs:[[.75,1.4],[.35,1.1]],arms:[[1.1,.3],[.9,.3]]};
+    case 'jump': return {lean:.1,legs:[[1.0,1.7],[.35,1.3]],arms:[[2.7,.2],[2.4,.2]]};
+    case 'slide': return {lean:-.3,legs:[[1.1,.15],[.6,1.0]],arms:[[2.4+.12*Math.sin(tt*16),.1],[1.6,.2]]};
+    case 'teeter': {const w=Math.sin(tt*14); return {lean:.2+.15*Math.sin(tt*10),legs:[[.15,.1],[-.1,.1]],arms:[[1.6+1.2*w,.2],[1.6-1.2*w,.2]]};}
+    case 'salute': return {lean:0,legs:[[.1,.05],[-.1,.05]],arms:[[1.9,2.3],[-.15,.2]]};
+    case 'plant': return {lean:.2,legs:[[.25,.3],[-.15,.1]],arms:[[.9,.1],[-.2,.2]]};
+    case 'wave': return {lean:-.05,legs:[[.1,.05],[-.1,.05]],arms:[[2.5+.35*Math.sin(tt*12),.25],[-.2,.2]]};
+    case 'sit': {const k=.35*Math.sin(tt*5); return {lean:.05,legs:[[1.45,1.45+k],[1.35,1.45-k]],arms:[[-.4,.3],[.3,.3]]};}
+    default: return {lean:0,legs:[[.1,.05],[-.1,.05]],arms:[[.25+.04*Math.sin(tt*2.2),.2],[-.2,.2]]};
+  }
+}
+
+/* ---------- drawing ---------- */
+function drawFig(ctx,S,s,p,tt){
+  const A=pose(p,tt), lw=S.lw*s;
+  const th=S.thigh*s, sh=S.shin*s, up=S.upper*s, fo=S.fore*s, to=S.torso*s, hr=S.head*s;
+  const leg=([a,k])=>{const kx=Math.sin(a)*th,ky=Math.cos(a)*th,b=a-k;return [kx,ky,kx+Math.sin(b)*sh,ky+Math.cos(b)*sh];};
+  const L1=leg(A.legs[0]), L2=leg(A.legs[1]);
+  const hipH=p.pose==='sit'?0:Math.max(L1[3],L2[3]);
+  const a0=clamp(p.alpha,0,1);
+  if(a0<=0) return;
+  ctx.save();
+  ctx.translate(p.x,p.y);
+  ctx.scale(1/p.sq,p.sq);
+  ctx.scale(p.facing,1);
+  if(p.rot){const cy=-hipH-to*.5;ctx.translate(0,cy);ctx.rotate(p.rot);ctx.translate(0,-cy);}
+  const hy=-hipH, nx=Math.sin(A.lean)*to, ny=hy-Math.cos(A.lean)*to;
+  const hd=hr+lw*.7, cx=nx+Math.sin(A.lean)*hd, cy=ny-Math.cos(A.lean)*hd;
+  const sx=lerp(0,nx,.82), sy=lerp(hy,ny,.82);
+  const arm=([a,e])=>{const ex=sx+Math.sin(a)*up,ey=sy+Math.cos(a)*up,b=a+e;return [ex,ey,ex+Math.sin(b)*fo,ey+Math.cos(b)*fo];};
+  const R1=arm(A.arms[0]), R2=arm(A.arms[1]);
+  ctx.lineCap='round'; ctx.lineJoin='round'; ctx.lineWidth=lw; ctx.strokeStyle=S.color;
+  const poly=pts=>{ctx.beginPath();ctx.moveTo(pts[0],pts[1]);for(let i=2;i<pts.length;i+=2)ctx.lineTo(pts[i],pts[i+1]);ctx.stroke();};
+  // far limbs a little lighter, for depth
+  ctx.globalAlpha=a0*.55;
+  poly([sx,sy,R2[0],R2[1],R2[2],R2[3]]);
+  poly([0,hy,L2[0],hy+L2[1],L2[2],hy+L2[3]]);
+  ctx.globalAlpha=a0;
+  poly([0,hy,nx,ny]);
+  poly([0,hy,L1[0],hy+L1[1],L1[2],hy+L1[3]]);
+
+  // plume behind the head
+  if(S.plume){
+    const wob=Math.sin((p.phi||tt*5))*hr*.3;
+    ctx.save();ctx.strokeStyle=RED;ctx.lineWidth=lw*1.7;
+    ctx.beginPath();ctx.moveTo(cx-.1*hr,cy-.95*hr);ctx.quadraticCurveTo(cx-1.3*hr,cy-2*hr+wob,cx-2.3*hr,cy-.8*hr+wob);ctx.stroke();ctx.restore();
+  }
+  // head
+  ctx.beginPath();ctx.arc(cx,cy,hr,0,TAU);ctx.fillStyle=S.headFill;ctx.fill();
+  if(!S.eyes) ctx.stroke();
+  if(S.helmet){ctx.save();ctx.lineWidth=lw*.8;ctx.strokeStyle=INK;ctx.beginPath();ctx.moveTo(cx+.05*hr,cy-.05*hr);ctx.lineTo(cx+.95*hr,cy-.05*hr);ctx.stroke();ctx.restore();}
+  if(S.eyes){
+    const blink=(tt%3.1)<.12?.15:1;
+    ctx.fillStyle=PAPER;
+    for(const ex of [.28,.66]){ctx.beginPath();ctx.ellipse(cx+ex*hr,cy-.05*hr,.13*hr,.17*hr*blink,0,0,TAU);ctx.fill();}
+  }
+  if(S.hat){
+    const tip=Math.sin(tt*3+(p.phi||0))*.15*hr;
+    ctx.save();ctx.fillStyle=NAVY;ctx.strokeStyle=INK;ctx.lineWidth=lw*.6;
+    ctx.beginPath();ctx.moveTo(cx-.85*hr,cy-.62*hr);ctx.lineTo(cx+.85*hr,cy-.72*hr);
+    ctx.quadraticCurveTo(cx+.15*hr,cy-2*hr,cx-.95*hr+tip,cy-2.6*hr);ctx.closePath();ctx.fill();ctx.stroke();
+    ctx.lineWidth=lw*1.1;ctx.strokeStyle=NAVY;ctx.beginPath();ctx.moveTo(cx-1.3*hr,cy-.6*hr);ctx.lineTo(cx+1.3*hr,cy-.78*hr);ctx.stroke();
+    ctx.strokeStyle=GOLD;ctx.lineWidth=lw*.7;ctx.beginPath();ctx.moveTo(cx-.72*hr,cy-.86*hr);ctx.lineTo(cx+.7*hr,cy-.95*hr);ctx.stroke();
+    ctx.restore();
+  }
+  // near arm in front
+  poly([sx,sy,R1[0],R1[1],R1[2],R1[3]]);
+  if(S.wand){
+    const dx=R1[2]-R1[0], dy=R1[3]-R1[1], d=Math.hypot(dx,dy)||1, tx=R1[2]+dx/d*.24*s, ty=R1[3]+dy/d*.24*s;
+    ctx.save();ctx.strokeStyle=SOFT;ctx.lineWidth=lw*.7;ctx.beginPath();ctx.moveTo(R1[2],R1[3]);ctx.lineTo(tx,ty);ctx.stroke();
+    star(ctx,tx,ty,(p.glow?.11:.06)*s*(1+(p.glow?.25*Math.sin(tt*20):0)),GOLD);ctx.restore();
+  }
+  ctx.restore();
+}
+function star(ctx,x,y,r,c){
+  ctx.beginPath();
+  for(let i=0;i<8;i++){const a=i*Math.PI/4, rr=i%2?r*.38:r;ctx.lineTo(x+Math.sin(a)*rr,y-Math.cos(a)*rr);}
+  ctx.closePath();ctx.fillStyle=c;ctx.fill();
+}
+function drawFlag(ctx,f,s,tt){
+  if(!f||f.a<=0) return;
+  const h=.95*s*f.h, x=f.x, y=f.y;
+  ctx.save();ctx.globalAlpha=f.a;ctx.lineCap='round';
+  ctx.strokeStyle=INK;ctx.lineWidth=.05*s;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x,y-h);ctx.stroke();
+  if(f.h>.6){
+    const w=Math.sin(tt*7)*.06*s;
+    ctx.fillStyle=RED;ctx.beginPath();ctx.moveTo(x,y-h);ctx.quadraticCurveTo(x+.25*s,y-h+.06*s+w,x+.5*s,y-h+.13*s+w);
+    ctx.quadraticCurveTo(x+.25*s,y-h+.22*s+w,x,y-h+.3*s);ctx.closePath();ctx.fill();
+    star(ctx,x+.17*s,y-h+.15*s+w*.5,.055*s,GOLD);
+  }
+  ctx.restore();
+}
+
+/* ---------- particles: landing dust, sparks, puffs ---------- */
+function fire(st,f){
+  const s=st.s;
+  if(f.t==='dust') for(let i=0;i<5;i++) st.parts.push({t:'dust',x:f.x+(i-2)*.07*s,y:f.y-.02*s,vx:(i-2)*.55*s,vy:-.25*s,r:.035*s,life:.42,age:0});
+  if(f.t==='poof'){
+    for(let i=0;i<10;i++){const a=i/10*TAU;st.parts.push({t:'puff',x:f.x,y:f.y,vx:Math.cos(a)*1.3*s,vy:Math.sin(a)*1.1*s,r:.12*s,life:.55,age:0});}
+    for(let i=0;i<7;i++){const a=Math.random()*TAU;st.parts.push({t:'spark',x:f.x,y:f.y,vx:Math.cos(a)*1.8*s,vy:Math.sin(a)*1.8*s-.6*s,r:.09*s,life:.7,age:0});}
+  }
+}
+function stepParts(st,dt,ctx){
+  const out=[];
+  for(const q of st.parts){
+    q.age+=dt; if(q.age>q.life) continue;
+    q.x+=q.vx*dt; q.y+=q.vy*dt; q.vx*=.92; q.vy*=.92;
+    out.push(q);
+    const k=q.age/q.life;
+    if(q.t==='dust'){ctx.globalAlpha=.32*(1-k);ctx.fillStyle=SOFT;ctx.beginPath();ctx.arc(q.x,q.y,q.r*(1+k*1.6),0,TAU);ctx.fill();}
+    if(q.t==='puff'){ctx.globalAlpha=.9*(1-k);ctx.fillStyle=PAPER;ctx.strokeStyle=SOFT;ctx.lineWidth=.03*st.s;ctx.beginPath();ctx.arc(q.x,q.y,q.r*(1+k*.8),0,TAU);ctx.fill();ctx.stroke();}
+    if(q.t==='spark'){ctx.globalAlpha=1-k;star(ctx,q.x,q.y,q.r*(1-k*.6),GOLD);}
+  }
+  ctx.globalAlpha=1;
+  st.parts=out;
+}
+
+/* ---------- loop ---------- */
+function render(st,dt,tt){
+  const ctx=st.cv.getContext('2d');
+  ctx.setTransform(st.dpr,0,0,st.dpr,0,0);
+  ctx.clearRect(0,0,st.w,st.h);
+  st.t+=dt;
+  const {i,state}=evalAt(st,st.t);
+  if(i!==st.last){st.last=i;(st.segs[i].fx||[]).forEach(f=>fire(st,f));}
+  if(showPath){
+    ctx.fillStyle=GOLD;ctx.globalAlpha=.45;
+    for(let k=0;k<st.route.length;k+=6){ctx.beginPath();ctx.arc(st.route[k],st.route[k+1],1.3,0,TAU);ctx.fill();}
+    ctx.globalAlpha=1;
+  }
+  drawFlag(ctx,state.flag,st.s,tt);
+  if(st.S.sparkle&&state.moving&&state.alpha>.5&&dt>0){
+    st.emit+=dt*38;
+    while(st.emit>=1){st.emit--;st.parts.push({t:'spark',x:state.x-state.facing*.12*st.s+(Math.random()-.5)*.2*st.s,y:state.y-Math.random()*.6*st.s,vx:-state.facing*.3*st.s,vy:-.25*st.s,r:.06*st.s,life:.6,age:0});}
+  }
+  stepParts(st,dt,ctx);
+  drawFig(ctx,st.S,st.s,state,tt);
+}
+
+let last=performance.now(), clock=0;
+function frame(now){
+  const raw=Math.min(.05,(now-last)/1000); last=now;
+  const dt=playing?raw*(slow?.35:1):0;
+  clock+=dt;
+  for(const st of stages) if(st.ready&&st.vis) render(st,dt,clock);
+  requestAnimationFrame(frame);
+}
+
+const io=new IntersectionObserver(es=>es.forEach(e=>{const st=stages.find(s=>s.el===e.target);if(st) st.vis=e.isIntersecting;}),{rootMargin:'80px'});
+const ro=new ResizeObserver(es=>es.forEach(e=>{const st=stages.find(s=>s.el===e.target);if(st&&document.fonts.status==='loaded') measure(st);}));
+stages.forEach(st=>{io.observe(st.el);ro.observe(st.el);});
+document.fonts.load('380 100px Fraunces').catch(()=>{}).then(()=>document.fonts.ready).then(()=>{stages.forEach(measure);requestAnimationFrame(frame);});
+
+/* ---------- controls ---------- */
+const bPlay=document.getElementById('play'), bSlow=document.getElementById('slow'), bPath=document.getElementById('path');
+const syncPlay=()=>{bPlay.textContent=playing?'Pause':'Play';bPlay.setAttribute('aria-pressed',String(!playing));};
+syncPlay();
+bPlay.addEventListener('click',()=>{playing=!playing;syncPlay();});
+bSlow.addEventListener('click',()=>{slow=!slow;bSlow.setAttribute('aria-pressed',String(slow));});
+bPath.addEventListener('click',()=>{showPath=!showPath;bPath.setAttribute('aria-pressed',String(showPath));});
+})();
+</script>
+
+</body></html>

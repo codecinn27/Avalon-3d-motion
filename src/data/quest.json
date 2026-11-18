@@ -1,0 +1,44 @@
+{
+  "quests": [
+    {
+      "n": 1,
+      "leader": 2,
+      "team": [
+        2,
+        3,
+        10
+      ],
+      "result": "success",
+      "glint": 2
+    },
+    {
+      "n": 2,
+      "leader": 3,
+      "team": [
+        2,
+        3,
+        5,
+        8
+      ],
+      "result": "fail",
+      "failBy": 2,
+      "tapped": true
+    }
+  ],
+  "blame": {
+    "target": 3,
+    "order": [
+      2,
+      4,
+      7,
+      6,
+      8,
+      10,
+      9,
+      5
+    ],
+    "silent": [
+      1
+    ]
+  }
+}

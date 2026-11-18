@@ -1,0 +1,8 @@
+[
+  { "label": "baseline", "dir": "perf/builds/baseline" },
+  { "label": "P1-no-grain", "dir": "perf/builds/baseline", "css": ".grain{display:none!important}" },
+  { "label": "P2-no-glass-blur", "dir": "perf/builds/baseline", "css": ".nav,.music{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}" },
+  { "label": "P3-no-silk", "dir": "perf/builds/baseline", "query": "?webgl=off", "css": ".silk{display:none!important}" },
+  { "label": "P4-no-will-change", "dir": "perf/builds/baseline", "css": "*,*::before,*::after{will-change:auto!important}" },
+  { "label": "P1-P4-all", "dir": "perf/builds/baseline", "query": "?webgl=off", "css": ".grain,.silk{display:none!important}.nav,.music{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}*,*::before,*::after{will-change:auto!important}" }
+]

@@ -1,0 +1,7 @@
+[
+  { "label": "cp5-control", "dir": "perf/builds/cp4" },
+  { "label": "cp5-flat-cards", "dir": "perf/builds/cp4", "css": ".card-3d{transform-style:flat!important}" },
+  { "label": "cp5-no-clip", "dir": "perf/builds/cp4", "css": "[class*=-static],.vh{clip-path:none!important}" },
+  { "label": "cp5-slot-no-will-opacity", "dir": "perf/builds/cp4", "css": ".slot{will-change:transform!important}" },
+  { "label": "cp5-no-cards", "dir": "perf/builds/cp4", "css": ".slot,.slot *{visibility:hidden!important}" }
+]

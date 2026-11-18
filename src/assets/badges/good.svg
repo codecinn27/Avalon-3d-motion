@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <radialGradient id="e" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#4f7fe0"/><stop offset=".6" stop-color="#1f3f9a"/><stop offset="1" stop-color="#112463"/></radialGradient>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6dc93"/><stop offset=".5" stop-color="#c8923a"/><stop offset="1" stop-color="#8a5e1c"/></linearGradient>
+  </defs>
+  <g fill="url(#g)">
+    <path id="p" d="M50 2 56 20 44 20Z"/>
+    <use href="#p" transform="rotate(45 50 50)"/><use href="#p" transform="rotate(90 50 50)"/><use href="#p" transform="rotate(135 50 50)"/>
+    <use href="#p" transform="rotate(180 50 50)"/><use href="#p" transform="rotate(225 50 50)"/><use href="#p" transform="rotate(270 50 50)"/><use href="#p" transform="rotate(315 50 50)"/>
+  </g>
+  <circle cx="50" cy="50" r="33" fill="url(#g)"/>
+  <circle cx="50" cy="50" r="28.5" fill="url(#e)"/>
+  <circle cx="50" cy="50" r="28.5" fill="none" stroke="#0a1440" stroke-opacity=".55" stroke-width="1.2"/>
+  <g fill="url(#g)">
+    <path d="M37 41 40 52 46 45 50 54 54 45 60 52 63 41 63 56 37 56Z"/>
+    <rect x="48.4" y="54" width="3.2" height="17" rx="1"/>
+    <rect x="43" y="58" width="14" height="2.6" rx="1.2"/>
+  </g>
+  <path d="M30 36a26 26 0 0 1 22-9" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="2.4" stroke-linecap="round"/>
+</svg>

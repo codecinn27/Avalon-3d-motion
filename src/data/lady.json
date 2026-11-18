@@ -1,0 +1,8 @@
+{
+  "after": 2,
+  "holder": 7,
+  "target": 3,
+  "said": "evil",
+  "turn": { "order": [2, 4, 6, 8, 10, 9, 5], "silent": [1] },
+  "nextHolder": 3
+}

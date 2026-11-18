@@ -1,0 +1,4 @@
+[
+  { "label": "cp5-square-in", "dir": "perf/builds/cp4", "css": ".card .in{border-radius:0!important}" },
+  { "label": "cp5-flat-and-square-in", "dir": "perf/builds/cp4", "css": ".card-3d{transform-style:flat!important}.card .in{border-radius:0!important}" }
+]

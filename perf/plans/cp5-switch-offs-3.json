@@ -1,0 +1,4 @@
+[
+  { "label": "cp5-flat-ring", "dir": "perf/builds/cp4", "css": ".ring{transform-style:flat!important}" },
+  { "label": "cp5-flat-ring-and-cards", "dir": "perf/builds/cp4", "css": ".ring,.card-3d{transform-style:flat!important}" }
+]

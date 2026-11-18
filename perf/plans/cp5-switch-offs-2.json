@@ -1,0 +1,4 @@
+[
+  { "label": "cp5-slot-opacity-1", "dir": "perf/builds/cp4", "css": ".slot{opacity:1!important}" },
+  { "label": "cp5-flat-and-opacity-1", "dir": "perf/builds/cp4", "css": ".card-3d{transform-style:flat!important}.slot{opacity:1!important}" }
+]

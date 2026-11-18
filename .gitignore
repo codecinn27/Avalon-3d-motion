@@ -1,0 +1,11 @@
+node_modules/
+dist/
+perf/builds/
+perf/results/*-trace.json
+perf/results/*
+.astro/
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db

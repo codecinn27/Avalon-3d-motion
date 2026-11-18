@@ -1,0 +1,12 @@
+{
+  "brandName": "Avalon",
+  "whatsappNumber": "60176016227",
+  "siteUrl": "",
+  "siteUrlPlaceholder": "https://avalon.example",
+  "defaultLocale": "en",
+  "locales": [
+    { "code": "en", "prefix": "", "htmlLang": "en", "ogLocale": "en_US", "label": "EN", "name": "English" },
+    { "code": "zh", "prefix": "/zh", "htmlLang": "zh-Hans", "ogLocale": "zh_CN", "label": "中文", "name": "中文" },
+    { "code": "ms", "prefix": "/ms", "htmlLang": "ms", "ogLocale": "ms_MY", "label": "BM", "name": "Bahasa Melayu" }
+  ]
+}

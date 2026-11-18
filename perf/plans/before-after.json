@@ -1,0 +1,4 @@
+[
+  { "label": "before", "dir": "perf/builds/baseline" },
+  { "label": "after", "dir": "dist" }
+]
