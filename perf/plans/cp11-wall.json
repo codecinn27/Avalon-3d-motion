@@ -1,0 +1,8 @@
+[
+  { "label": "cp11-control", "dir": "perf/builds/cp10" },
+  { "label": "cp11-flat-ring", "dir": "perf/builds/cp10", "css": ".ring{transform-style:flat!important}" },
+  { "label": "cp11-no-extras", "dir": "perf/builds/cp10", "css": ".slot.is-extra{visibility:hidden!important}" },
+  { "label": "cp11-no-real-cards", "dir": "perf/builds/cp10", "css": ".slot:not(.is-extra),.slot:not(.is-extra) *{visibility:hidden!important}" },
+  { "label": "cp11-no-card-shadow", "dir": "perf/builds/cp10", "css": ".slot .card-side{box-shadow:none!important}" },
+  { "label": "cp11-no-will-change", "dir": "perf/builds/cp10", "css": ".slot{will-change:auto!important}" }
+]

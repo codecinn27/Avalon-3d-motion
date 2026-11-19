@@ -92,12 +92,16 @@ Future:
 
 
 # Debugging with phone:
-step 1: 
+
+Phone: 
+1. settings > Developer options > usb debugging on > allow ADB debugging in charge only mode
+
+2. 
 ```bash
 $adb = "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe"; & $adb devices -l; & $adb forward tcp:9333 localabstract:chrome_devtools_remote; & $adb forward --list; try { (Invoke-WebRequest -UseBasicParsing http://127.0.0.1:9333/json/version -TimeoutSec 5).Content } catch { "Chrome on the phone not reachable: $($_.Exception.Message)" }
 ```
 
-step 2: 
+3. 
 ```bash
 npm run build
 & "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe" reverse tcp:4870 tcp:4870

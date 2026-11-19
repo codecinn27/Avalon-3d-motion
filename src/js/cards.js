@@ -155,6 +155,9 @@ function hero(desktop, theme, draw) {
   };
   let night = null, isDealing = false, extrasSettled = false, wasFlat = false;
   const nightZ = slots.map(() => 0);
+  // phones, the flat ring from the drum to the deal (CP-12): each card's depth toward the viewer, and the z-index it was given
+  const wallDepth = slots.map(() => 0), wallZ = slots.map(() => null), wallRank = slots.map((_, i) => i);
+  let extrasZFlat = false;
   measure();
 
   // how far card number k (0 = middle of the wall) has got on its way, 0 to 1
@@ -195,7 +198,12 @@ function hero(desktop, theme, draw) {
     isDealing = dealing;
     // while the table is at rest and the night plays, the ring is flat: cards, table and layers are drawn in a fixed order
     const flat = nightMode && q >= DEAL_AT + (n - 1) * DEAL_STEP + DEAL_EACH + 0.005;
-    if (flat !== wasFlat) ring.classList.toggle('is-flat', (wasFlat = flat));
+    // phones (spec 013, CP-12): the ring is flat too from the moment the drum opens until the deal. The cards fly into
+    // the wall as one tilted plane. Each shadowed card in a 3D ring costs the GPU an off-screen pass (CP-11). The drum
+    // and the deal keep their 3D: the drum needs real depth sorting.
+    const wallFlat = lite && u > 0.001 && !dealing;
+    const ringFlat = flat || wallFlat;
+    if (ringFlat !== wasFlat) ring.classList.toggle('is-flat', (wasFlat = ringFlat));
     for (let i = 0; i < n; i++) {
       const a = base + i * STEP;
       const cos = Math.cos(a), sin = Math.sin(a);
@@ -274,6 +282,7 @@ function hero(desktop, theme, draw) {
         const k3 = (sc / SS).toFixed(3);
         tf = `${nightMode ? night.plane : `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0) rotateX(${tilt.toFixed(2)}deg) rotateZ(${zw.toFixed(2)}deg)`} translate3d(${lx.toFixed(1)}px,${ly.toFixed(1)}px,0) rotateY(${ry.toFixed(2)}deg) translateZ(${rz.toFixed(1)}px) rotateY(${ed.toFixed(1)}deg) rotateZ(${rot.toFixed(2)}deg) scale3d(${k3},${k3},${k3})${nightMode ? night.liftTail(i) : ''}`;
         op = (ringOp * (1 - t) + t) * (X ? X.op[i] : 1);
+        wallDepth[i] = rz * Math.cos((ry * Math.PI) / 180);
         flip = nightMode ? night.FL[i] : clamp01((t - 0.1) / 0.45) * (1 - down);
       }
       el.style.transform = tf;
@@ -289,17 +298,31 @@ function hero(desktop, theme, draw) {
           flips[i].style.transform = e > 0 ? `rotateY(${(180 * (1 - e)).toFixed(1)}deg)` : '';
         }
       }
-      if (flat) {
+      if (wallFlat) {
+        front[i] = null; // drawn in depth order after the loop
+      } else if (flat) {
         // the night: the nearer to the viewer, the later the card is drawn
         front[i] = null;
         if (night.Z[i] !== nightZ[i]) el.style.zIndex = nightZ[i] = night.Z[i];
       } else {
         nightZ[i] = 0;
+        wallZ[i] = null;
         const isFront = i === active || depth > 0.5;
         if (isFront !== front[i]) {
           front[i] = isFront;
           el.style.zIndex = i === active ? 6 : isFront ? 4 : 1;
         }
+      }
+    }
+    // phones, the flat ring (CP-12): no depth sorting, so draw in the order the 3D gave. Each card flies in its own plane,
+    // tilted about where it is, so a card further along its way is nearer. The ten seat cards are always the furthest
+    // along (z-index 31 to 40, nearest last: the drum's near side over its far side), then the extras (11 to 30, below).
+    if (wallFlat) {
+      wallRank.sort((a, b) => wallDepth[a] - wallDepth[b]);
+      for (let r = 0; r < n; r++) {
+        const i = wallRank[r];
+        const z = 31 + r;
+        if (z !== wallZ[i]) slots[i].style.zIndex = wallZ[i] = z;
       }
     }
     // the extra cards fly in from below the screen while the drum opens
@@ -309,6 +332,11 @@ function hero(desktop, theme, draw) {
       extrasSettled = dealing && q >= SLIDE_LEN;
 
       extrasOn = showExtras;
+      // the extras' order while the ring is flat on phones (see above): the earlier a card sets off, the nearer it is
+      if (wallFlat !== extrasZFlat) {
+        extrasZFlat = wallFlat;
+        extras.forEach((el, j) => (el.style.zIndex = wallFlat ? 30 - j : ''));
+      }
       for (let j = 0; j < extras.length; j++) {
         const k = slots.length + j;
         const el = extras[j];

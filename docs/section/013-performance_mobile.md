@@ -1,6 +1,6 @@
 # 013 Mobile performance (scroll lag on real phones)
 
-**Status**: in progress, worked one checkpoint at a time (see "Checkpoints" below). CP-1 and CP-2 measured: fewer layers (351 → 210), steadier frames (p95 108 → 58 ms), but the average is still about 21 to 25 fps because of freezes of up to about 3 s. CP-3 traced them: inside the pinned story the GPU draws 13 to 38 off-screen surfaces per frame (filters, 3D contexts, clip-paths, blends), against 1 after it, and that backs up the main thread. CP-4 hid the undrawn threads: layers 211 → 146, but the surfaces per frame did not fall, so the threads were not drawing them. CP-5 traced switch-offs: **the ten story cards make most of the surfaces and the freezes**, and only removing both their 3D context and their rounded clip cuts them (freezes over 500 ms 11 → 1). CP-6 did that for real: average fps 21.9 → 40.1 (run ranges apart), worst frame 3.2 s → 0.55 s, wall surfaces 41 → 15.5 per frame. CP-7 traced seven suspects in tenth 8 and ruled them all out: the heavy places are two narrow hot spots, 40 to 43% and 70 to 71%, at 18 to 19 surfaces per frame whatever is switched off. CP-8 proved the cause: the chapters' own small cards (`.pc`, the vote, quest and climb cards) stay 3D contexts even at rest. Flattened, both spots go (peaks 19 → 10 and 17 → 13), and freezes over 500 ms fall 4 → 1. CP-9 did that on phones (resting chapter cards flat, 3D only while they turn): fps 39 → 42 against cp6 (run ranges apart), the 70% spot gone, at no visible change. The vote's ten-cards-at-once turn (43 to 44%) is still a hot spot. CP-10 made every chapter card's turn a flat 2D squash on phones (owner's choice C, desktops keep the 3D turn): the vote's peak 19 → 9, worst frame 1371 → 532 ms, no freeze over 500 ms left on the page, average 40.7 fps. Next: CP-11 and on: the wall, then the chapters' own effects. **Not ready to ship**: the goal is the ship rule in "What counts as smooth".
+**Status**: in progress, worked one checkpoint at a time (see "Checkpoints" below). CP-1 and CP-2 measured: fewer layers (351 → 210), steadier frames (p95 108 → 58 ms), but the average is still about 21 to 25 fps because of freezes of up to about 3 s. CP-3 traced them: inside the pinned story the GPU draws 13 to 38 off-screen surfaces per frame (filters, 3D contexts, clip-paths, blends), against 1 after it, and that backs up the main thread. CP-4 hid the undrawn threads: layers 211 → 146, but the surfaces per frame did not fall, so the threads were not drawing them. CP-5 traced switch-offs: **the ten story cards make most of the surfaces and the freezes**, and only removing both their 3D context and their rounded clip cuts them (freezes over 500 ms 11 → 1). CP-6 did that for real: average fps 21.9 → 40.1 (run ranges apart), worst frame 3.2 s → 0.55 s, wall surfaces 41 → 15.5 per frame. CP-7 traced seven suspects in tenth 8 and ruled them all out: the heavy places are two narrow hot spots, 40 to 43% and 70 to 71%, at 18 to 19 surfaces per frame whatever is switched off. CP-8 proved the cause: the chapters' own small cards (`.pc`, the vote, quest and climb cards) stay 3D contexts even at rest. Flattened, both spots go (peaks 19 → 10 and 17 → 13), and freezes over 500 ms fall 4 → 1. CP-9 did that on phones (resting chapter cards flat, 3D only while they turn): fps 39 → 42 against cp6 (run ranges apart), the 70% spot gone, at no visible change. The vote's ten-cards-at-once turn (43 to 44%) is still a hot spot. CP-10 made every chapter card's turn a flat 2D squash on phones (owner's choice C, desktops keep the 3D turn): the vote's peak 19 → 9, worst frame 1371 → 532 ms, no freeze over 500 ms left on the page, average 40.7 fps. CP-11 traced the wall (9 to 17%, peak 20 to 22, about 2.9 s of freezes): it is the cards' box shadows inside the 3D ring. A flat ring alone, or no shadows alone, takes it to 1 to 3. CP-12 made the ring flat on phones from the drum's opening to the deal (owner's choice C), with the 3D's order kept by z-index: the wall's peak 22 → 1, average 41.1 → 42.2 fps against cp10, no visible change. Next: CP-13 and on, the chapters' own effects. **Not ready to ship**: the goal is the ship rule in "What counts as smooth".
 **Reported by**: owner ([own.md](../own.md) item 6). Scrolling is very laggy on a real phone. Desktop is smooth, and desktop Chrome in mobile view (DevTools device mode) is smooth too. It happens on Cloudflare and on cPanel alike.
 **Test phone**: Honor X9b (ALI-NX1), 1200x2652, 3.25 device pixels per CSS pixel, screen at 60 Hz during the tests, Chrome 157.
 **Code involved**: `src/templates/layout.mjs` (the `lite` class), `src/styles/main.css`, `src/js/shader.js`, `src/js/main.js`, `src/js/cards.js`, the chapter files. Measuring: `scripts/perf-phone.mjs`, `perf/`.
@@ -56,6 +56,9 @@ The numbers are medians of the runs ("range" = slowest to fastest run). The wors
 | 7 | No change: switch-off traces for tenth 8 | same as CP-6 | | | | | | | diagnosis: none of the seven suspects (slot glow, grey veil, ghost blend, badge shadow, flash, dagger, slot opacity) is the cause. Two narrow hot spots, 40 to 43% and 70 to 71%, peak at 18 to 19 passes per frame with all of them off. The tenth average there tracks freeze length, not what is drawn |
 | 8 | No change to the site: the two hot spots. Script: a 1% breakdown in `--trace` | same as CP-6 | | | | | | | diagnosis: **the chapter cards' (`.pc`) `preserve-3d`** makes both spots. Flat: peaks 19 → 10 and 17 → 13, freezes over 500 ms 4 → 1. Seat cards, silk and tints change nothing there |
 | 9 | Phone-only: vote, quest and climb cards flat at rest, 3D only while they turn (`night.turn`) | 42 (41.2 to 43.5) | 18.4 fps | 58.2 ms | 17.1% | 98 | 1072 ms | 112 | **keep**: against cp6 39 (37.5 to 39) in the same session, ranges apart. 70% spot gone (peak 17 → 14). The vote's ten-at-once turn (43 to 44%, peak 19) remains. No visible change (phone screenshots, pixel diff) |
+| 10 | Phone-only: every chapter card turns as a flat 2D squash (owner's choice C) | 40.7 (40.2 to 41.8) | 18.2 fps | 74.7 ms | 18.9% | 110 | 532 ms | 105 | **keep**: the vote's peak 19 → 9, no freeze over 500 ms left, worst frame 1371 → 532 ms. Averages within run spread against cp9 |
+| 11 | No change: switch-off traces at the wall (9 to 17%) | same as CP-10 | | | | | | | diagnosis: **the cards' box shadows inside the 3D ring**. A flat ring alone or no shadows alone takes the peak 22 → 1 to 3. The extras' shadows are half of it, the 10 real cards' the other half and the drum spot (2 to 5%). `will-change` is not it |
+| 12 | Phone-only: a flat ring from the drum's opening to the deal, cards ordered by depth with z-index (owner's choice C) | 42.2 (42.2 to 44) | 21.2 fps | 66.4 ms | 18.3% | 105 | 549 ms | 103 | **keep**: the wall's peak 22 → 1, no freeze there, tenth 2 51 → 57 fps. Against cp10 41.1 (40.6 to 42.2) in the same session. No visible change (phone screenshots) |
 | Ship rule | | 55 or more (45 acceptable) | 45 (30 acceptable) | 20 ms (33) | under 5% (15%) | 0 to 2 (10) | under 100 ms (200) | under 50 (100) | |
 
 ### [x] CP-0 Baseline (2026-11-18)
@@ -557,10 +560,110 @@ By tenth, before: 54.2 / 51.7 / 28.5 / 16.5 / 20 / 29.2 / 19.2 / 22.9 / 48.4 / 7
 
 (Against cp9 measured in the same session: average 39.9 → 40.7, worst tenth 16.5 → 18.2. The CP9 column came from an earlier session; see the first table.)
 
-### [ ] CP-11 and on: the wall, then the chapters' own effects
+### [x] CP-11 No change: the wall's hot spot (2026-11-19)
+
+**The problem** (CP-10's trace): from 9 to 17% of the page (the drum opens and the 30 cards fly into the wall) every trace peaks at 20 to 22 passes per frame, with about 2.9 s of freezes on it. A smaller spot at 2 to 4% (the drum, peak 16). CP-8 showed both go with no seat cards at all. The question here: which part of the cards.
+
+**Suspects** (from the code): the `.ring` is `preserve-3d` (`main.css:173`), so all 30 slots, each with its own `rotateX` tilt (`cards.js:337`), are drawn in one 3D context. The 20 extras. The cards' soft shadow on phones (`html.lite .slot .card-side`, `main.css:184`, CP-2). `will-change: transform, opacity` on every slot (`main.css:177`).
+
+**Switch-off traces** on cp10 (`--plan perf/plans/cp11-wall.json --trace --port 4880`, then `cp11-wall-2.json` with a second control), the most passes in one frame by 1% of the page:
+
+| Variant (CSS added) | 2–5% (drum) | 9% | 10% | 11% | 12% | 13–17% | 18–19% | Wall hot spot (15+) |
+|---|---|---|---|---|---|---|---|---|
+| control | 15 16 16 | 18 | 22 | – | 22 | 15 15 15 15 16 | – 13 | 9–17%, peak 22, 2.9 s |
+| control 2 | 14 16 16 14 | 18 | 20 | 20 | 19 | 15 15 15 15 16 | 13 13 | 9–17%, peak 20, 2.9 s |
+| **flat ring** (`.ring{transform-style:flat}`) | 8 10 11 1 | 1 | 1 | 1 | 2 | 1 1 1 1 1 | 2 1 | **none** |
+| no extras (`.slot.is-extra` hidden) | 15 16 16 16 | 11 | 11 | 11 | 12 | 12 11 11 11 12 | 13 12 | none, but 11 to 13 |
+| no real cards (the 10 hidden) | 2 2 2 1 | 8 | 17 | 9 | 6 | 5 5 5 5 6 | 3 2 | 10% only, peak 17, 0.5 s |
+| **no card shadows** (`.slot .card-side{box-shadow:none}`) | 4 6 6 1 | 1 | 1 | 1 | 2 | 2 1 1 1 2 | 3 2 | **none** (drum spot gone too) |
+| no shadow on the extras only | 15 17 17 16 | 11 | 11 | 11 | 12 | 11 11 11 11 12 | 13 12 | none, but 11 to 13 |
+| no `will-change` | 10 15 16 13 | 20 | 25 | 15 | 16 | 16 15 15 15 15 | 13 12 | 9–17%, peak 25, 3.2 s (worse) |
+
+Freezes over 200 ms on the whole page: control 16 and 11, flat ring 10, no card shadows 9, no real cards 3, no will-change 15. Elsewhere on the page the variants match the controls (the spots at 28 to 34% and 64 to 65% stay in all of them).
+
+**What it shows:**
+- **The wall's cost is the cards' box shadows inside the 3D ring.** Each half alone is enough to clear it: a flat ring (shadows kept) takes the peak 22 → 1 to 2, and no shadows (ring kept in 3D) takes it 22 → 1 to 3. Unlike CP-5, either one alone does it.
+- **Every shadowed card in the 3D ring costs about a pass.** The extras' shadows are about half (20 → 11 to 13, the same as no extras at all), the 10 real cards' shadows the other half and all of the drum spot (2 to 5%: 16 → 6 with no shadows, unchanged with the extras' shadows off).
+- **`will-change` is not the cause.** Without it the wall is worse (peak 25), as in CP-0 (P4).
+- The CP-2 shadow is already the tight one. It is the shadow being there at all, in a 3D context, that makes the surface, not its size.
+
+**Options for CP-12** (phones only, desktop unchanged):
+
+| | Option | What the visitor sees on a phone | Expected peak, 9–17% (2–5%) | Needs |
+|---|---|---|---|---|
+| A | No shadow on the 20 extras | no change you would notice (small cards, packed close together) | 11 to 13 (16, the drum stays) | already okayed by the owner |
+| B | **No shadow on all wall cards from the drum to the deal**, back once the cards land on the table | the 10 real cards lose their shadow in the drum and the wall | 1 to 3 (6) | owner's choice: comparison first |
+| C | **Flat ring from the moment the drum opens** (fly-in and wall), 3D again for the drum and the deal | the cards fly into the wall as one tilted plane (okayed: "flatter fly-in"). The drum keeps its 3D | 1 to 2 (16, the drum stays) | screenshot check at 9 to 17%. The drum needs real 3D sorting (`rotateY` + `translateZ`, only a two-level `z-index`), so the ring cannot be flat there |
+| D | C + A, or C + no shadow only while in the drum | as C, plus B's change during the drum only | 1 to 2 (about 6) | as C, plus the comparison for the drum |
+| E | Keep the shadow, but drawn differently (a gradient under the card, not a `box-shadow`) | the same, roughly | not measured | a switch-off trace first |
+
+**Verdict: diagnosis, no change to the site.** The cause is proven at 1% resolution. CP-12 builds the owner's pick, measured against cp10.
+
+Results: `perf/results/2026-11-19-11-58-cp11-*-trace.json` (6 variants), `2026-11-19-12-08-cp11-control-2-trace.json`, `2026-11-19-12-08-cp11-no-extra-shadow-trace.json`. Plans: `perf/plans/cp11-wall.json`, `cp11-wall-2.json`.
+
+| Measure | Smooth (ship) | Acceptable | Laggy | Baseline | CP1 | CP2 | CP3 | CP4 | CP5 | CP6 | CP7 | CP8 | CP9 | CP10 | **CP11** |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Average fps while scrolling | ≥ 55 | 45–55 | < 45 | 15.3 | 25.5 | 21.3 | 21.3 (no change) | 27.3 | 27.3 (no change) | 40.1 | 40.1 (no change) | 40.1 (no change) | 42 | 40.7 | **40.7 (no change)** |
+| Worst tenth of the page | ≥ 45 fps | 30–45 | < 30 | 0.4 | 1.3 | 0.7 | 0.7 (no change) | 7.5 | 7.5 (no change) | 18.8 | 18.8 (no change) | 18.8 (no change) | 18.4 | 18.2 | **18.2 (no change)** |
+| p95 frame time | ≤ 20 ms | ≤ 33 ms | > 33 ms | 241 ms | 74.9 ms | 58.2 ms | 58.2 ms (no change) | 83.1 ms | 83.1 ms (no change) | 74.8 ms | 74.8 ms (no change) | 74.8 ms (no change) | 58.2 ms | 74.7 ms | **74.7 ms (no change)** |
+| Dropped frames | < 5% | 5–15% | > 15% | 31% | 20.9% | 16.6% | 16.6% (no change) | 19.9% | 19.9% (no change) | 17% | 17% (no change) | 17% (no change) | 17.1% | 18.9% | **18.9% (no change)** |
+| Freezes over 50 ms | 0–2 | ≤ 10 | > 10 | 37 | 55 | 38 | 38 (no change) | 60 | 60 (no change) | 119 | 119 (no change) | 119 (no change) | 98 | 110 | **110 (no change)** |
+| GPU layers | < 50 | 50–100 | > 200 | 339 | 210 | 210 | 210 (no change) | 146 | 146 (no change) | 109 | 109 (no change) | 109 (no change) | 112 | 105 | **105 (no change)** |
+| GPU memory | < 50% of max | < 75% | near max | 76 MB | 75 MB | 62 MB | 62 MB (no change) | 68 MB | 68 MB (no change) | 88 MB | 88 MB (no change) | 88 MB (no change) | 83 MB | 76 MB | **76 MB (no change)** |
+
+### [x] CP-12 The wall: a flat ring on phones (2026-11-19)
+
+**Owner's choice** (from CP-11's options): **C, a flat ring from the moment the drum opens until the deal**, on phones only. Desktops keep the 3D ring.
+
+**Change** (`cards.js`, phones only under `html.lite`):
+- The ring gets `is-flat` (`transform-style: flat`, the night's existing rule) while `u > 0` (the drum has started to open) and the deal has not begun. The drum before it and the deal after it keep their 3D.
+- A flat ring does not sort by depth, so the order the 3D gave is set by `z-index`. The first try, with no order, drew the drum's far cards over its near ones at 8% and some flying extras over seat cards. Fixed in two parts:
+  - The ten seat cards (z-index 31 to 40) are ranked every frame by their depth toward the viewer, `rz · cos(ry)`, so the drum's near side is drawn over its far side as it opens.
+  - The 20 extras sit below them, in reverse order (z-index 30 down to 11). Each card flies in its own plane, tilted about where it is, so a card further along its way is nearer. The earlier a card sets off, the further along it always is, so this order is fixed. It is set once when the ring turns flat and cleared when it turns back.
+
+**Visual check** (phone screenshots of cp10 and cp12 at 2 to 22%, in steps of 1%, with 0.5% steps from 8 to 11%). The ring is flat from 8 to 17% on cp12, in 3D everywhere else (as cp10). Side by side at 8, 8.5, 9, 9.5, 10, 12 and 18%: **the same**, including which card overlaps which in the drum and in flight. (The screenshot script was a scratch script, not kept.)
+
+**Measured** (`--before perf/builds/cp10 --after dist --runs 3 --port 4880`):
+
+| | Avg fps (range) | p95 | Dropped | Hitches | Worst frame | Blocking | Layers | GPU MB |
+|---|---|---|---|---|---|---|---|---|
+| before (cp10) | 41.1 (40.6 to 42.2) | 66.6 ms | 19.4% | 111 | 391 ms | 38 ms | 109 | 85 |
+| after (cp12) | 42.2 (42.2 to 44) | 66.4 ms | 18.3% | 105 | 549 ms | 72 ms | 103 | 79 |
+
+Each run, before / after: 42.2 / 44, 40.6 / 42.2, 41.1 / 42.2 fps.
+By tenth of the page, before: 54.3 / 51.1 / 30.1 / 19.8 / 29.6 / 29 / 18.7 / 26.5 / 47.3 / 73.9. After: 50.6 / **57** / **36** / 21.2 / 29.3 / 30.6 / **24.3** / 22.6 / 48.8 / 71.6.
+
+**Trace** (`--label cp12 --dir dist --trace`), against CP-11's two cp10 controls:
+
+| | 2–5% (drum) | 9% | 10–12% | 13–16% | 17% | Wall hot spot | Freezes > 200 ms |
+|---|---|---|---|---|---|---|---|
+| cp10 (CP-11 controls) | 15–16 | 18 | 19 to 22 | 15 to 16 | 15 to 16 | 9–17%, peak 20 to 22, 2.9 s | 16 and 11 (258 ms at 10%) |
+| **cp12** | 12–16 | **1** | **1** | **1 to 2** | 16 | **none** | 14 (none from 9 to 18%) |
+
+- **The wall's hot spot is gone**: 9 to 16% peak at 1 to 2 passes, as CP-11's flat-ring switch-off predicted. 17% stays at 16: that is the deal starting, where the ring is 3D again by design.
+- The drum spot (3 to 4%, peak 16) is unchanged, as expected for option C.
+- Hot spots left (15 passes or more): 3 to 4% (16, the drum), 17% (16, the deal's start), 27 to 28% (15), 31% (17), 65% (16).
+
+**Verdict: keep.** The target is met (peak 22 → 1 at the wall), tenth 2 gains 6 fps (51.1 → 57), and the runs only touch (40.6 to 42.2 against 42.2 to 44), with no visible change. p95, dropped frames, hitches, layers and GPU memory are the same or better. The worst frame (391 → 549 ms) and blocking time (38 → 72 ms) are worse in this session: neither is at the wall (the trace has no freeze there), and both have moved by this much between sessions before (CP-10: 532 ms, 78 ms). Watch them in the next checkpoint. Still not at the ship rule: average 42.2, worst tenth 21.2.
+
+`npm test`: 33 pass, 0 fail. Frozen as `perf/builds/cp12/`. Results: `perf/results/2026-11-19-12-38-*` (runs), `2026-11-19-12-43-cp12-trace.json`.
+
+| Measure | Smooth (ship) | Acceptable | Laggy | Baseline | CP1 | CP2 | CP3 | CP4 | CP5 | CP6 | CP7 | CP8 | CP9 | CP10 | CP11 | **CP12** |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Average fps while scrolling | ≥ 55 | 45–55 | < 45 | 15.3 | 25.5 | 21.3 | 21.3 (no change) | 27.3 | 27.3 (no change) | 40.1 | 40.1 (no change) | 40.1 (no change) | 42 | 40.7 | 40.7 (no change) | **42.2** |
+| Worst tenth of the page | ≥ 45 fps | 30–45 | < 30 | 0.4 | 1.3 | 0.7 | 0.7 (no change) | 7.5 | 7.5 (no change) | 18.8 | 18.8 (no change) | 18.8 (no change) | 18.4 | 18.2 | 18.2 (no change) | **21.2** |
+| p95 frame time | ≤ 20 ms | ≤ 33 ms | > 33 ms | 241 ms | 74.9 ms | 58.2 ms | 58.2 ms (no change) | 83.1 ms | 83.1 ms (no change) | 74.8 ms | 74.8 ms (no change) | 74.8 ms (no change) | 58.2 ms | 74.7 ms | 74.7 ms (no change) | **66.4 ms** |
+| Dropped frames | < 5% | 5–15% | > 15% | 31% | 20.9% | 16.6% | 16.6% (no change) | 19.9% | 19.9% (no change) | 17% | 17% (no change) | 17% (no change) | 17.1% | 18.9% | 18.9% (no change) | **18.3%** |
+| Freezes over 50 ms | 0–2 | ≤ 10 | > 10 | 37 | 55 | 38 | 38 (no change) | 60 | 60 (no change) | 119 | 119 (no change) | 119 (no change) | 98 | 110 | 110 (no change) | **105** |
+| GPU layers | < 50 | 50–100 | > 200 | 339 | 210 | 210 | 210 (no change) | 146 | 146 (no change) | 109 | 109 (no change) | 109 (no change) | 112 | 105 | 105 (no change) | **103** |
+| GPU memory | < 50% of max | < 75% | near max | 76 MB | 75 MB | 62 MB | 62 MB (no change) | 68 MB | 68 MB (no change) | 88 MB | 88 MB (no change) | 88 MB (no change) | 83 MB | 76 MB | 76 MB (no change) | **79 MB** |
+
+(Against cp10 measured in the same session: average 41.1 → 42.2, worst tenth 18.7 → 21.2. The CP10 column came from an earlier session; see the first table.)
+
+### [ ] CP-13 and on: the chapters' own effects
 
 Cheapest first:
-- **The wall, 9 to 17%** (peak 21 to 24 in every trace, the seat cards and the 20 extras: gone with no seat cards in CP-8). Diagnose first, as in CP-8: what is in 3D or mid-animation there at 1% resolution (the probe), then switch-off traces.
+- **The drum, 2 to 5%** (peak 16): left by option C. The 10 seat cards' shadows in the 3D drum make it (CP-11: 16 → 6 with no shadows). Only if the owner wants it: no shadow while in the drum, with a comparison first.
 - **The chapters' own effects** (tenths 5 and 7, 10 to 15 surfaces with no cards). Prove each by a switch-off trace first, as here: the thread shadows' `blur` while drawn (`.thr .sh`, `main.css:288`, a soft gradient on phones), `i.seam` `drop-shadow`, the `.gf`/`.cf`/`.eye-in` `clip-path` (clear it once the reveal is done). (`img.bl-ghost` `mix-blend-mode` was ruled out in CP-7.)
 - Small main-thread items: cache the scroll position once per tick (`cards.js:161`), no layout reads inside frame loops (`night.js:101`, `seats.js`).
 - `ScrollTrigger.normalizeScroll(true)` on touch devices, if the pins jitter once the freezes are gone (P5).

@@ -1,0 +1,4 @@
+[
+  { "label": "cp11-control-2", "dir": "perf/builds/cp10" },
+  { "label": "cp11-no-extra-shadow", "dir": "perf/builds/cp10", "css": ".slot.is-extra .card-side{box-shadow:none!important}" }
+]
