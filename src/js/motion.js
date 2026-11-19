@@ -7,6 +7,10 @@ export function initMotion() {
   gsap.registerPlugin(ScrollTrigger);
   if (SplitText) gsap.registerPlugin(SplitText);
   ScrollTrigger.config({ ignoreMobileResize: true });
+  // phones and tablets (html.lite, spec 013 CP-13, P5): a finger scroll is run from JavaScript, in the same tick as the pinned
+  // story, instead of on the browser's own scroll thread. Without it the page moves under the finger at full speed while
+  // the story, drawn on the main thread, falls behind and jumps to catch up. (A mouse wheel already goes through Lenis.)
+  if (document.documentElement.classList.contains('lite')) ScrollTrigger.normalizeScroll(true);
   gsap.defaults({ ease: 'power3.out' });
 
   if (Lenis) {

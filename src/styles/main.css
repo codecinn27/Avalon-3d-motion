@@ -262,6 +262,10 @@ html.lite .card-3d[data-face=front] .card-back,html.lite .card-3d[data-face=back
 /* the layers in the table's plane. 3D containers never get opacity (that would flatten them): they use visibility, scale or their children's opacity */
 .n-plane,.n-sky{position:absolute;left:0;top:0;width:0;height:0;transform-style:preserve-3d;pointer-events:none;visibility:hidden}
 .ring.is-night .n-plane,.ring.is-night .n-sky{visibility:visible}
+/* out of the night nothing in its planes may show. visibility:hidden is not enough: a chapter that set an inline
+   visibility:visible on its own layer (the seat's chairs and pool of light) stays visible inside a hidden parent. A fast
+   scroll back up leaves the night before that chapter's frame has run once more to hide them. display:none hides it all. */
+.ring:not(.is-night) .n-plane,.ring:not(.is-night) .n-sky{display:none}
 .ring.is-flat{transform-style:flat}
 .n-over{z-index:20}
 .n-thrs,.n-glows,.gem-wrap,.gem,.gem-spin,.arm-wrap,.arm,.arm-s{position:absolute;left:0;top:0;transform-style:preserve-3d}
