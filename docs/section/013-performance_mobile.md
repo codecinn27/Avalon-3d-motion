@@ -1,6 +1,6 @@
 # 013 Mobile performance (scroll lag on real phones)
 
-**Status**: in progress, worked one checkpoint at a time (see "Checkpoints" below). CP-1 and CP-2 measured: fewer layers (351 → 210), steadier frames (p95 108 → 58 ms), but the average is still about 21 to 25 fps because of freezes of up to about 3 s. CP-3 traced them: inside the pinned story the GPU draws 13 to 38 off-screen surfaces per frame (filters, 3D contexts, clip-paths, blends), against 1 after it, and that backs up the main thread. CP-4 hid the undrawn threads: layers 211 → 146, but the surfaces per frame did not fall, so the threads were not drawing them. CP-5 traced switch-offs: **the ten story cards make most of the surfaces and the freezes**, and only removing both their 3D context and their rounded clip cuts them (freezes over 500 ms 11 → 1). CP-6 did that for real: average fps 21.9 → 40.1 (run ranges apart), worst frame 3.2 s → 0.55 s, wall surfaces 41 → 15.5 per frame. CP-7 traced seven suspects in tenth 8 and ruled them all out: the heavy places are two narrow hot spots, 40 to 43% and 70 to 71%, at 18 to 19 surfaces per frame whatever is switched off. CP-8 proved the cause: the chapters' own small cards (`.pc`, the vote, quest and climb cards) stay 3D contexts even at rest. Flattened, both spots go (peaks 19 → 10 and 17 → 13), and freezes over 500 ms fall 4 → 1. CP-9 did that on phones (resting chapter cards flat, 3D only while they turn): fps 39 → 42 against cp6 (run ranges apart), the 70% spot gone, at no visible change. The vote's ten-cards-at-once turn (43 to 44%) is still a hot spot. CP-10 made every chapter card's turn a flat 2D squash on phones (owner's choice C, desktops keep the 3D turn): the vote's peak 19 → 9, worst frame 1371 → 532 ms, no freeze over 500 ms left on the page, average 40.7 fps. CP-11 traced the wall (9 to 17%, peak 20 to 22, about 2.9 s of freezes): it is the cards' box shadows inside the 3D ring. A flat ring alone, or no shadows alone, takes it to 1 to 3. CP-12 made the ring flat on phones from the drum's opening to the deal (owner's choice C), with the 3D's order kept by z-index: the wall's peak 22 → 1, average 41.1 → 42.2 fps against cp10, no visible change. Next: CP-13 and on, the chapters' own effects. **Not ready to ship**: the goal is the ship rule in "What counts as smooth".
+**Status**: in progress, worked one checkpoint at a time (see "Checkpoints" below). CP-1 and CP-2 measured: fewer layers (351 → 210), steadier frames (p95 108 → 58 ms), but the average is still about 21 to 25 fps because of freezes of up to about 3 s. CP-3 traced them: inside the pinned story the GPU draws 13 to 38 off-screen surfaces per frame (filters, 3D contexts, clip-paths, blends), against 1 after it, and that backs up the main thread. CP-4 hid the undrawn threads: layers 211 → 146, but the surfaces per frame did not fall, so the threads were not drawing them. CP-5 traced switch-offs: **the ten story cards make most of the surfaces and the freezes**, and only removing both their 3D context and their rounded clip cuts them (freezes over 500 ms 11 → 1). CP-6 did that for real: average fps 21.9 → 40.1 (run ranges apart), worst frame 3.2 s → 0.55 s, wall surfaces 41 → 15.5 per frame. CP-7 traced seven suspects in tenth 8 and ruled them all out: the heavy places are two narrow hot spots, 40 to 43% and 70 to 71%, at 18 to 19 surfaces per frame whatever is switched off. CP-8 proved the cause: the chapters' own small cards (`.pc`, the vote, quest and climb cards) stay 3D contexts even at rest. Flattened, both spots go (peaks 19 → 10 and 17 → 13), and freezes over 500 ms fall 4 → 1. CP-9 did that on phones (resting chapter cards flat, 3D only while they turn): fps 39 → 42 against cp6 (run ranges apart), the 70% spot gone, at no visible change. The vote's ten-cards-at-once turn (43 to 44%) is still a hot spot. CP-10 made every chapter card's turn a flat 2D squash on phones (owner's choice C, desktops keep the 3D turn): the vote's peak 19 → 9, worst frame 1371 → 532 ms, no freeze over 500 ms left on the page, average 40.7 fps. CP-11 traced the wall (9 to 17%, peak 20 to 22, about 2.9 s of freezes): it is the cards' box shadows inside the 3D ring. A flat ring alone, or no shadows alone, takes it to 1 to 3. CP-12 made the ring flat on phones from the drum's opening to the deal (owner's choice C), with the 3D's order kept by z-index: the wall's peak 22 → 1, average 41.1 → 42.2 fps against cp10, no visible change. CP-13 ran touch scrolling from JavaScript on phones (`normalizeScroll`, P5): average 42.5 → 65.9 fps, worst frame 1031 → 183 ms, no freeze over 200 ms left. The average now meets the ship rule. CP-14 shortened the flick's glide after the owner's finger test ("the screen moves too fast"): `momentum: 1`, the owner's pick of four, at no measurable cost (67.4 fps). Next: CP-15, tenth 8 (the climb and the blade, the worst tenth) and p95 (41.5 ms). **Not ready to ship**: the goal is the ship rule in "What counts as smooth".
 **Reported by**: owner ([own.md](../own.md) item 6). Scrolling is very laggy on a real phone. Desktop is smooth, and desktop Chrome in mobile view (DevTools device mode) is smooth too. It happens on Cloudflare and on cPanel alike.
 **Test phone**: Honor X9b (ALI-NX1), 1200x2652, 3.25 device pixels per CSS pixel, screen at 60 Hz during the tests, Chrome 157.
 **Code involved**: `src/templates/layout.mjs` (the `lite` class), `src/styles/main.css`, `src/js/shader.js`, `src/js/main.js`, `src/js/cards.js`, the chapter files. Measuring: `scripts/perf-phone.mjs`, `perf/`.
@@ -59,6 +59,8 @@ The numbers are medians of the runs ("range" = slowest to fastest run). The wors
 | 10 | Phone-only: every chapter card turns as a flat 2D squash (owner's choice C) | 40.7 (40.2 to 41.8) | 18.2 fps | 74.7 ms | 18.9% | 110 | 532 ms | 105 | **keep**: the vote's peak 19 → 9, no freeze over 500 ms left, worst frame 1371 → 532 ms. Averages within run spread against cp9 |
 | 11 | No change: switch-off traces at the wall (9 to 17%) | same as CP-10 | | | | | | | diagnosis: **the cards' box shadows inside the 3D ring**. A flat ring alone or no shadows alone takes the peak 22 → 1 to 3. The extras' shadows are half of it, the 10 real cards' the other half and the drum spot (2 to 5%). `will-change` is not it |
 | 12 | Phone-only: a flat ring from the drum's opening to the deal, cards ordered by depth with z-index (owner's choice C) | 42.2 (42.2 to 44) | 21.2 fps | 66.4 ms | 18.3% | 105 | 549 ms | 103 | **keep**: the wall's peak 22 → 1, no freeze there, tenth 2 51 → 57 fps. Against cp10 41.1 (40.6 to 42.2) in the same session. No visible change (phone screenshots) |
+| 13 | Phone-only: touch scrolling from JavaScript (`ScrollTrigger.normalizeScroll(true)`, P5) | 65.9 (61.8 to 65.9) | 26.4 fps | 41.6 ms | 11.6% | 44 | 183 ms | 105 | **keep** (pending the owner's finger test): against cp12 + chairs fix 42.5 (41.6 to 45) in the same session, ranges far apart. No freeze over 200 ms left. Average meets the ship rule |
+| 14 | Phone-only: a shorter flick glide, `normalizeScroll({ momentum: 1 })` (owner's choice d of 2.8, 2, 1.4, 1) | 67.4 (66.8 to 67.6) | 34.5 fps | 41.5 ms | 10.4% | 48 | 191 ms | 98 | **keep**: the owner's feel choice, at no measurable cost (against cp13 66.4, 65.2 to 69.6, in the same session) |
 | Ship rule | | 55 or more (45 acceptable) | 45 (30 acceptable) | 20 ms (33) | under 5% (15%) | 0 to 2 (10) | under 100 ms (200) | under 50 (100) | |
 
 ### [x] CP-0 Baseline (2026-11-18)
@@ -660,13 +662,92 @@ By tenth of the page, before: 54.3 / 51.1 / 30.1 / 19.8 / 29.6 / 29 / 18.7 / 26.
 
 (Against cp10 measured in the same session: average 41.1 → 42.2, worst tenth 18.7 → 21.2. The CP10 column came from an earlier session; see the first table.)
 
-### [ ] CP-13 and on: the chapters' own effects
+### [x] CP-13 Touch scrolling from JavaScript: `normalizeScroll` on phones (2026-11-19)
+
+**The problem** (owner, 2026-11-19): scrolling with the mouse through `chrome://inspect` feels smooth on the phone, a finger does not. They are two different scroll engines. A mouse wheel goes through Lenis (`motion.js`), which moves the page from JavaScript in the same tick that GSAP redraws the pinned story, so the two move together. A finger scrolls natively on the browser's own scroll thread, at full speed, while the story is drawn on the main thread, which waits for the GPU (CP-3). The page moves under the finger and the story falls behind and jumps to catch up. This was P5 in the first list of suspects.
+
+**Change** (`motion.js`, phones only under `html.lite`): `ScrollTrigger.normalizeScroll(true)`. A finger scroll is then run from JavaScript too, in the same tick as the story. Desktops, and the mouse wheel through Lenis, are unchanged.
+
+**Before build**: `perf/builds/cp12-chairs` = cp12 plus the chairs fix of 2026-11-19 (`main.css`, `.n-plane` hidden with `display: none` out of the night, see 011 "As built"), so this checkpoint measures `normalizeScroll` alone.
+
+**Measured** (`--before perf/builds/cp12-chairs --after dist --runs 3 --port 4880`):
+
+| | Avg fps (range) | p95 | Dropped | Hitches | Worst frame | Blocking | Layers | GPU MB | Script s |
+|---|---|---|---|---|---|---|---|---|---|
+| before (cp12 + chairs fix) | 42.5 (41.6 to 45) | 66.4 ms | 17.7% | 101 | 1031 ms | 59 ms | 109 | 81 | 2.57 |
+| after (cp13) | **65.9 (61.8 to 65.9)** | **41.6 ms** | **11.6%** | **44** | **183 ms** | 68 ms | 105 | 89 | 3.24 |
+
+Each run, before / after: 42.5 / 65.9, 45 / 61.8, 41.6 / 65.9 fps.
+By tenth of the page, before: 50.1 / 56.9 / 33.9 / 17 / 28.1 / 32.7 / 20.4 / 23.4 / 49.1 / 74.3. After: **100 / 86.8 / 58.1 / 49 / 49.2 / 45.5 / 40.9** / 26.4 / **74.7 / 88.6**.
+
+**Trace** (`--label cp13 --dir dist --trace`): the scroll still ends at 100% of the page with the same swipes. **No main-thread freeze over 200 ms anywhere** (cp12: 14), and no commit over 100 ms. The share of time the GPU spends drawing surfaces falls in every tenth of the story (cp12: 12 to 32%, cp13: 7 to 18%). The peaks per 1% are about the same as cp12 (the hot spots are what is drawn, and that has not changed): 3 to 4% (17, the drum), 17% (18, the deal's start), 29% (23), 64% (16).
+
+**What it shows:**
+- **The freezes were the two engines fighting.** With native touch scrolling the compositor drew about 110 frames a second (cp12's trace) of a page full of off-screen surfaces, while the main thread queued behind it. Driven from JavaScript, the page is drawn once per main-thread frame, the GPU has less to do, and the main thread no longer stalls on it.
+- **Fps over 60 on a "60 Hz" screen**: the script reads the refresh rate while the page stands still (60 Hz). While a finger is down the phone raises it (up to 120 Hz on the Honor X9b), so tenth 1 reaches 100 frames a second. Compare columns with each other, not with 60.
+- What the numbers cannot show: the flick. Native momentum and the overscroll bounce are replaced by GSAP's own momentum, which can feel heavier or shorter. **The owner should try it with a finger before shipping.**
+
+**Verdict: keep** (pending the owner's finger test). The runs are far apart (41.6 to 45 against 61.8 to 65.9 fps), the worst frame falls 1031 → 183 ms, hitches 101 → 44, and every tenth gains except tenth 8 (23.4 → 26.4). The average now meets the ship rule (55). Still short: the worst tenth (26.4, tenth 8: the climb and the blade) and p95 (41.6 ms against 33 acceptable). GPU memory (81 → 89 MB) and script time (2.57 → 3.24 s, the scroll now runs in JavaScript) are up a little. Neither is near a limit.
+
+`npm test`: 33 pass, 0 fail. Frozen as `perf/builds/cp13/` (and the before as `perf/builds/cp12-chairs/`). Results: `perf/results/2026-11-19-13-06-*` (runs), `2026-11-19-13-11-cp13-trace.json`.
+
+| Measure | Smooth (ship) | Acceptable | Laggy | Baseline | CP1 | CP2 | CP3 | CP4 | CP5 | CP6 | CP7 | CP8 | CP9 | CP10 | CP11 | CP12 | **CP13** |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Average fps while scrolling | ≥ 55 | 45–55 | < 45 | 15.3 | 25.5 | 21.3 | 21.3 (no change) | 27.3 | 27.3 (no change) | 40.1 | 40.1 (no change) | 40.1 (no change) | 42 | 40.7 | 40.7 (no change) | 42.2 | **65.9** |
+| Worst tenth of the page | ≥ 45 fps | 30–45 | < 30 | 0.4 | 1.3 | 0.7 | 0.7 (no change) | 7.5 | 7.5 (no change) | 18.8 | 18.8 (no change) | 18.8 (no change) | 18.4 | 18.2 | 18.2 (no change) | 21.2 | **26.4** |
+| p95 frame time | ≤ 20 ms | ≤ 33 ms | > 33 ms | 241 ms | 74.9 ms | 58.2 ms | 58.2 ms (no change) | 83.1 ms | 83.1 ms (no change) | 74.8 ms | 74.8 ms (no change) | 74.8 ms (no change) | 58.2 ms | 74.7 ms | 74.7 ms (no change) | 66.4 ms | **41.6 ms** |
+| Dropped frames | < 5% | 5–15% | > 15% | 31% | 20.9% | 16.6% | 16.6% (no change) | 19.9% | 19.9% (no change) | 17% | 17% (no change) | 17% (no change) | 17.1% | 18.9% | 18.9% (no change) | 18.3% | **11.6%** |
+| Freezes over 50 ms | 0–2 | ≤ 10 | > 10 | 37 | 55 | 38 | 38 (no change) | 60 | 60 (no change) | 119 | 119 (no change) | 119 (no change) | 98 | 110 | 110 (no change) | 105 | **44** |
+| GPU layers | < 50 | 50–100 | > 200 | 339 | 210 | 210 | 210 (no change) | 146 | 146 (no change) | 109 | 109 (no change) | 109 (no change) | 112 | 105 | 105 (no change) | 103 | **105** |
+| GPU memory | < 50% of max | < 75% | near max | 76 MB | 75 MB | 62 MB | 62 MB (no change) | 68 MB | 68 MB (no change) | 88 MB | 88 MB (no change) | 88 MB (no change) | 83 MB | 76 MB | 76 MB (no change) | 79 MB | **89 MB** |
+
+(Against cp12 + the chairs fix measured in the same session: average 42.5 → 65.9, worst tenth 17 → 26.4. The CP12 column came from an earlier session; see the first table.)
+
+### [x] CP-14 The flick: a shorter glide (2026-11-19)
+
+**The problem** (owner's finger test of CP-13): smoother, but "the screen moves too fast". With `normalizeScroll`, once the finger lifts GSAP glides the page on a `power4.out` curve for `momentum` seconds (default 2.8), over a distance of about `momentum × 0.22 ×` the flick's speed (`ScrollTrigger.js`, the normalizer's `onRelease`). The default glides much further than the phone's own scroll did.
+
+**Comparison** (owner's standing preference: try look and feel options first): one test build with a temporary switch, `?flick=a|b|c|d` for `momentum` 2.8 (the default), 2, 1.4 and 1, and `?flick=native` for the phone's own scroll, served to the phone over USB. **Owner's choice: d, `momentum: 1`** (a 1 s glide, about a third of the default distance). The switch was removed once picked.
+
+**Change** (`motion.js`, phones only under `html.lite`): `ScrollTrigger.normalizeScroll({ momentum: 1 })` instead of `normalizeScroll(true)`. Dragging with the finger down is unchanged; only the glide after it is shorter.
+
+**Measured** (`--before perf/builds/cp13 --after dist --runs 3 --port 4880`):
+
+| | Avg fps (range) | p95 | Dropped | Hitches | Worst frame | Blocking | Layers | GPU MB | Script s |
+|---|---|---|---|---|---|---|---|---|---|
+| before (cp13) | 66.4 (65.2 to 69.6) | 41.5 ms | 11.3% | 41 | 166 ms | 42 ms | 106 | 94 | 3.37 |
+| after (cp14) | 67.4 (66.8 to 67.6) | 41.5 ms | 10.4% | 48 | 191 ms | 49 ms | 98 | 91 | 3.8 |
+
+Each run, before / after: 66.4 / 67.4, 69.6 / 66.8, 65.2 / 67.6 fps.
+By tenth of the page, before: 99.2 / 85.9 / 56.3 / 42.2 / 46.4 / 46.4 / 45.5 / 46.4 / 79.4 / 89.9. After: 98.4 / 91.6 / 56.4 / 43.1 / 48.8 / 48.8 / 39.9 / 34.5 / 85.3 / 88.7.
+
+**Trace** (`--label cp14 --dir dist --trace`): the scroll still ends at 100% of the page with the shorter glide. No freeze over 200 ms, no commit over 100 ms, as in cp13. The peaks per 1% match cp13's (3 to 4% 16, 17% 18, 28% 23, 31% 18, 64% 16).
+
+- Tenth 8 swings a lot between sessions: cp13 measured 26.4 in CP-13 and 46.4 here, cp14 34.5. It is the noisiest tenth, and the next target.
+
+**Verdict: keep.** A feel change the owner chose, at no measurable cost: every measure is within run spread of cp13 (the averages' ranges overlap). Not yet at the ship rule: worst tenth (34.5, tenth 8) and p95 (41.5 ms).
+
+`npm test`: 33 pass, 0 fail. Frozen as `perf/builds/cp14/`. Results: `perf/results/2026-11-19-13-37-*` (runs), `2026-11-19-13-42-cp14-trace.json`.
+
+| Measure | Smooth (ship) | Acceptable | Laggy | Baseline | CP1 | CP2 | CP3 | CP4 | CP5 | CP6 | CP7 | CP8 | CP9 | CP10 | CP11 | CP12 | CP13 | **CP14** |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Average fps while scrolling | ≥ 55 | 45–55 | < 45 | 15.3 | 25.5 | 21.3 | 21.3 (no change) | 27.3 | 27.3 (no change) | 40.1 | 40.1 (no change) | 40.1 (no change) | 42 | 40.7 | 40.7 (no change) | 42.2 | 65.9 | **67.4** |
+| Worst tenth of the page | ≥ 45 fps | 30–45 | < 30 | 0.4 | 1.3 | 0.7 | 0.7 (no change) | 7.5 | 7.5 (no change) | 18.8 | 18.8 (no change) | 18.8 (no change) | 18.4 | 18.2 | 18.2 (no change) | 21.2 | 26.4 | **34.5** |
+| p95 frame time | ≤ 20 ms | ≤ 33 ms | > 33 ms | 241 ms | 74.9 ms | 58.2 ms | 58.2 ms (no change) | 83.1 ms | 83.1 ms (no change) | 74.8 ms | 74.8 ms (no change) | 74.8 ms (no change) | 58.2 ms | 74.7 ms | 74.7 ms (no change) | 66.4 ms | 41.6 ms | **41.5 ms** |
+| Dropped frames | < 5% | 5–15% | > 15% | 31% | 20.9% | 16.6% | 16.6% (no change) | 19.9% | 19.9% (no change) | 17% | 17% (no change) | 17% (no change) | 17.1% | 18.9% | 18.9% (no change) | 18.3% | 11.6% | **10.4%** |
+| Freezes over 50 ms | 0–2 | ≤ 10 | > 10 | 37 | 55 | 38 | 38 (no change) | 60 | 60 (no change) | 119 | 119 (no change) | 119 (no change) | 98 | 110 | 110 (no change) | 105 | 44 | **48** |
+| GPU layers | < 50 | 50–100 | > 200 | 339 | 210 | 210 | 210 (no change) | 146 | 146 (no change) | 109 | 109 (no change) | 109 (no change) | 112 | 105 | 105 (no change) | 103 | 105 | **98** |
+| GPU memory | < 50% of max | < 75% | near max | 76 MB | 75 MB | 62 MB | 62 MB (no change) | 68 MB | 68 MB (no change) | 88 MB | 88 MB (no change) | 88 MB (no change) | 83 MB | 76 MB | 76 MB (no change) | 79 MB | 89 MB | **91 MB** |
+
+(Against cp13 measured in the same session: average 66.4 → 67.4, worst tenth 42.2 → 34.5, within spread. The CP13 column came from an earlier session; see the first table.)
+
+### [ ] CP-15 and on: tenth 8, the chapters' own effects
 
 Cheapest first:
+- **Tenth 8, the climb and the blade** (the worst tenth: 26 to 46 fps, the noisiest from session to session). Trace it at 1% first, as in CP-8 and CP-11.
 - **The drum, 2 to 5%** (peak 16): left by option C. The 10 seat cards' shadows in the 3D drum make it (CP-11: 16 → 6 with no shadows). Only if the owner wants it: no shadow while in the drum, with a comparison first.
 - **The chapters' own effects** (tenths 5 and 7, 10 to 15 surfaces with no cards). Prove each by a switch-off trace first, as here: the thread shadows' `blur` while drawn (`.thr .sh`, `main.css:288`, a soft gradient on phones), `i.seam` `drop-shadow`, the `.gf`/`.cf`/`.eye-in` `clip-path` (clear it once the reveal is done). (`img.bl-ghost` `mix-blend-mode` was ruled out in CP-7.)
 - Small main-thread items: cache the scroll position once per tick (`cards.js:161`), no layout reads inside frame loops (`night.js:101`, `seats.js`).
-- `ScrollTrigger.normalizeScroll(true)` on touch devices, if the pins jitter once the freezes are gone (P5).
 
 Phone checks before each run: unlocked, Chrome in front, no `chrome://inspect` window open. Port 4870 is often taken by a leftover server: add `--port 4880`. A trace takes about 3 minutes and writes about 320 to 420 MB. A `--plan` file with `--trace` traces every variant in one go.
 
@@ -688,7 +769,7 @@ Kept for reference. CP-0 showed that P1 to P3 are small, P4 makes things worse, 
 | P2 | **`backdrop-filter: blur(18px)` on fixed elements** | `main.css` `.nav`, `.music` | The blur is recalculated every frame while the content behind moves | On touch devices a near-solid glass colour | small gain. Done in CP-1 (phones) |
 | P3 | **The WebGL silk backdrop redraws all the time** | `shader.js` `frame()` | A full-screen canvas drawn on every frame | Still on touch devices, drawn only while the colours turn | small gain. Done in CP-1 (phones) |
 | P4 | **Permanent `will-change` layers** | `main.css`: `.slot`, `.table`, `.st-card`, `.bl-dag`, `.c-motes i`, `.q-fly`, `.night-say .ns`, `.sn-t`, `.btn` | Each keeps a GPU layer | Remove them | **worse** without them. Dropped |
-| P5 | **Pinned story scenes during native touch scrolling** | `motion.js`, `cards.js` (`pin:true`), the chapters | Pins updated from JavaScript can fall out of step with touch scrolling | `ScrollTrigger.normalizeScroll(true)` on touch devices, only if pins still jitter | not yet |
+| P5 | **Pinned story scenes during native touch scrolling** | `motion.js`, `cards.js` (`pin:true`), the chapters | Pins updated from JavaScript can fall out of step with touch scrolling | `ScrollTrigger.normalizeScroll(true)` on touch devices, only if pins still jitter | **big gain**: average 42.5 → 65.9 fps, no freeze over 200 ms left. Done in CP-13 (phones) |
 | P6 | **Other heavy effects inside chapters** | `.thr .sh` (`filter: blur`), `.bl-ghost` (`mix-blend-mode: screen`), the 3D card scenes, `water.js`, `runner.js` | Together they can push a chapter over budget | Fix what the profile shows | the 3D cards were the big one (CP-1). The rest: not yet |
 | P7 | **Image decoding during scroll** | Card paintings and large WebP files | Decoding mid-scroll drops frames | Only if the trace shows it | **not a cause** (CP-3: about 30 decodes per scroll, about 250 ms in all) |
 

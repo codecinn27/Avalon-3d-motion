@@ -10,7 +10,9 @@ export function initMotion() {
   // phones and tablets (html.lite, spec 013 CP-13, P5): a finger scroll is run from JavaScript, in the same tick as the pinned
   // story, instead of on the browser's own scroll thread. Without it the page moves under the finger at full speed while
   // the story, drawn on the main thread, falls behind and jumps to catch up. (A mouse wheel already goes through Lenis.)
-  if (document.documentElement.classList.contains('lite')) ScrollTrigger.normalizeScroll(true);
+  // momentum: how long a flick glides once the finger lifts, in seconds (the distance grows with it). GSAP's default 2.8 made
+  // the screen move too fast; the owner picked 1 on the phone from 2.8, 2, 1.4 and 1 (CP-14).
+  if (document.documentElement.classList.contains('lite')) ScrollTrigger.normalizeScroll({ momentum: 1 });
   gsap.defaults({ ease: 'power3.out' });
 
   if (Lenis) {
