@@ -1,6 +1,6 @@
 # 013 Mobile performance (scroll lag on real phones)
 
-**Status**: in progress, worked one checkpoint at a time (see "Checkpoints" below). CP-1 and CP-2 measured: fewer layers (351 → 210), steadier frames (p95 108 → 58 ms), but the average is still about 21 to 25 fps because of freezes of up to about 3 s. CP-3 traced them: inside the pinned story the GPU draws 13 to 38 off-screen surfaces per frame (filters, 3D contexts, clip-paths, blends), against 1 after it, and that backs up the main thread. CP-4 hid the undrawn threads: layers 211 → 146, but the surfaces per frame did not fall, so the threads were not drawing them. CP-5 traced switch-offs: **the ten story cards make most of the surfaces and the freezes**, and only removing both their 3D context and their rounded clip cuts them (freezes over 500 ms 11 → 1). CP-6 did that for real: average fps 21.9 → 40.1 (run ranges apart), worst frame 3.2 s → 0.55 s, wall surfaces 41 → 15.5 per frame. CP-7 traced seven suspects in tenth 8 and ruled them all out: the heavy places are two narrow hot spots, 40 to 43% and 70 to 71%, at 18 to 19 surfaces per frame whatever is switched off. CP-8 proved the cause: the chapters' own small cards (`.pc`, the vote, quest and climb cards) stay 3D contexts even at rest. Flattened, both spots go (peaks 19 → 10 and 17 → 13), and freezes over 500 ms fall 4 → 1. CP-9 did that on phones (resting chapter cards flat, 3D only while they turn): fps 39 → 42 against cp6 (run ranges apart), the 70% spot gone, at no visible change. The vote's ten-cards-at-once turn (43 to 44%) is still a hot spot. CP-10 made every chapter card's turn a flat 2D squash on phones (owner's choice C, desktops keep the 3D turn): the vote's peak 19 → 9, worst frame 1371 → 532 ms, no freeze over 500 ms left on the page, average 40.7 fps. CP-11 traced the wall (9 to 17%, peak 20 to 22, about 2.9 s of freezes): it is the cards' box shadows inside the 3D ring. A flat ring alone, or no shadows alone, takes it to 1 to 3. CP-12 made the ring flat on phones from the drum's opening to the deal (owner's choice C), with the 3D's order kept by z-index: the wall's peak 22 → 1, average 41.1 → 42.2 fps against cp10, no visible change. CP-13 ran touch scrolling from JavaScript on phones (`normalizeScroll`, P5): average 42.5 → 65.9 fps, worst frame 1031 → 183 ms, no freeze over 200 ms left. The average now meets the ship rule. CP-14 shortened the flick's glide after the owner's finger test ("the screen moves too fast"): `momentum: 1`, the owner's pick of four, at no measurable cost (67.4 fps). Next: CP-15, tenth 8 (the climb and the blade, the worst tenth) and p95 (41.5 ms). **Not ready to ship**: the goal is the ship rule in "What counts as smooth".
+**Status**: in progress, worked one checkpoint at a time (see "Checkpoints" below). CP-1 and CP-2 measured: fewer layers (351 → 210), steadier frames (p95 108 → 58 ms), but the average is still about 21 to 25 fps because of freezes of up to about 3 s. CP-3 traced them: inside the pinned story the GPU draws 13 to 38 off-screen surfaces per frame (filters, 3D contexts, clip-paths, blends), against 1 after it, and that backs up the main thread. CP-4 hid the undrawn threads: layers 211 → 146, but the surfaces per frame did not fall, so the threads were not drawing them. CP-5 traced switch-offs: **the ten story cards make most of the surfaces and the freezes**, and only removing both their 3D context and their rounded clip cuts them (freezes over 500 ms 11 → 1). CP-6 did that for real: average fps 21.9 → 40.1 (run ranges apart), worst frame 3.2 s → 0.55 s, wall surfaces 41 → 15.5 per frame. CP-7 traced seven suspects in tenth 8 and ruled them all out: the heavy places are two narrow hot spots, 40 to 43% and 70 to 71%, at 18 to 19 surfaces per frame whatever is switched off. CP-8 proved the cause: the chapters' own small cards (`.pc`, the vote, quest and climb cards) stay 3D contexts even at rest. Flattened, both spots go (peaks 19 → 10 and 17 → 13), and freezes over 500 ms fall 4 → 1. CP-9 did that on phones (resting chapter cards flat, 3D only while they turn): fps 39 → 42 against cp6 (run ranges apart), the 70% spot gone, at no visible change. The vote's ten-cards-at-once turn (43 to 44%) is still a hot spot. CP-10 made every chapter card's turn a flat 2D squash on phones (owner's choice C, desktops keep the 3D turn): the vote's peak 19 → 9, worst frame 1371 → 532 ms, no freeze over 500 ms left on the page, average 40.7 fps. CP-11 traced the wall (9 to 17%, peak 20 to 22, about 2.9 s of freezes): it is the cards' box shadows inside the 3D ring. A flat ring alone, or no shadows alone, takes it to 1 to 3. CP-12 made the ring flat on phones from the drum's opening to the deal (owner's choice C), with the 3D's order kept by z-index: the wall's peak 22 → 1, average 41.1 → 42.2 fps against cp10, no visible change. CP-13 ran touch scrolling from JavaScript on phones (`normalizeScroll`, P5): average 42.5 → 65.9 fps, worst frame 1031 → 183 ms, no freeze over 200 ms left. The average now meets the ship rule. CP-14 shortened the flick's glide after the owner's finger test ("the screen moves too fast"): `momentum: 1`, the owner's pick of four, at no measurable cost (67.4 fps). CP-15 traced tenth 8 (68 to 80%) with 20 switch-offs and ruled out the climb's own effects, the blade and every glow and shadow tried: **the passes there (12 to 14) come from the vote's and the crown's layers left in the 3D ring after their chapter**, a few each, and the GPU is rastering tiles 40 to 50% of the time through the whole stretch whatever is off. No change to the site; options A to E went to the owner. CP-16 built the owner's pick (B): hide the faded layers on phones. Layers 110 → 89, p95 41.5 → 33.3 ms, average 66.8 → 68.4 fps, but the passes at 68 to 73% did not move. Next: the crown (option C, a comparison first) or a raster trace at 70% (E). **Not ready to ship**: the goal is the ship rule in "What counts as smooth".
 **Reported by**: owner ([own.md](../own.md) item 6). Scrolling is very laggy on a real phone. Desktop is smooth, and desktop Chrome in mobile view (DevTools device mode) is smooth too. It happens on Cloudflare and on cPanel alike.
 **Test phone**: Honor X9b (ALI-NX1), 1200x2652, 3.25 device pixels per CSS pixel, screen at 60 Hz during the tests, Chrome 157.
 **Code involved**: `src/templates/layout.mjs` (the `lite` class), `src/styles/main.css`, `src/js/shader.js`, `src/js/main.js`, `src/js/cards.js`, the chapter files. Measuring: `scripts/perf-phone.mjs`, `perf/`.
@@ -20,7 +20,7 @@ One change per step, so every change shows its own effect.
 6. If kept, freeze the build so the next step can be compared with it: copy `dist/` to `perf/builds/cp<N>/` (PowerShell: `Copy-Item -Recurse dist perf/builds/cp<N>`).
 7. Tick the checkpoint, **only once its column in the comparison table is filled with measured numbers.**
 
-**The comparison table rule** (owner, 2026-11-18): every checkpoint (`###` heading) ends with this table. It keeps the three target columns, then one column per checkpoint from the baseline to this one, so each checkpoint shows the whole history so far. The newest column is in bold. A checkpoint with no code change (a diagnosis) repeats the column before it, marked "no change".
+**The comparison table rule** (owner, 2026-11-18): every checkpoint (`###` heading) ends with this table. It keeps the three target columns, then one column per checkpoint from the baseline to this one, so each checkpoint shows the whole history so far. The newest column is in bold. A checkpoint with no code change (a diagnosis) repeats the column before it, marked "no change". **From CP-15 on (owner, 2026-11-19) the table is shorter:** after the three target columns it keeps Baseline, then only the checkpoints from CP10 on (CP10, CP11, ... up to this one). CP1 to CP9 are left out (they stay in the Tracker and in the older checkpoints' tables).
 
 - Baseline column: the first measurement (1 run). The other columns: the median of that checkpoint's "after" runs.
 - Worst tenth: the slowest tenth of the page. Freezes: frames over 50 ms in the whole scroll. GPU memory: the Chrome GPU process "Graphics" figure from the script (compare columns, it has no fixed limit).
@@ -61,6 +61,8 @@ The numbers are medians of the runs ("range" = slowest to fastest run). The wors
 | 12 | Phone-only: a flat ring from the drum's opening to the deal, cards ordered by depth with z-index (owner's choice C) | 42.2 (42.2 to 44) | 21.2 fps | 66.4 ms | 18.3% | 105 | 549 ms | 103 | **keep**: the wall's peak 22 → 1, no freeze there, tenth 2 51 → 57 fps. Against cp10 41.1 (40.6 to 42.2) in the same session. No visible change (phone screenshots) |
 | 13 | Phone-only: touch scrolling from JavaScript (`ScrollTrigger.normalizeScroll(true)`, P5) | 65.9 (61.8 to 65.9) | 26.4 fps | 41.6 ms | 11.6% | 44 | 183 ms | 105 | **keep** (pending the owner's finger test): against cp12 + chairs fix 42.5 (41.6 to 45) in the same session, ranges far apart. No freeze over 200 ms left. Average meets the ship rule |
 | 14 | Phone-only: a shorter flick glide, `normalizeScroll({ momentum: 1 })` (owner's choice d of 2.8, 2, 1.4, 1) | 67.4 (66.8 to 67.6) | 34.5 fps | 41.5 ms | 10.4% | 48 | 191 ms | 98 | **keep**: the owner's feel choice, at no measurable cost (against cp13 66.4, 65.2 to 69.6, in the same session) |
+| 15 | No change: tenth 8 (68 to 80%), 20 switch-off traces | same as CP-14 | | | | | | | diagnosis: **the vote's layers (the `.tg` rings and the cards' plane) and the crown, left in the 3D ring after their chapter**, make 12 to 14 passes at 63 to 73%. Every plane switched off takes 1 to 5 passes off, all of them together 14 → 6. The climb's own planes, the lady's, the quest's, the blade and every shadow and glow tried change nothing. The GPU rasters 40 to 50% of the time at 64 to 77% in every variant |
+| 16 | Phone-only: a layer faded with `put(el, 'o')` is also `visibility: hidden` at opacity 0 (option B) | 68.4 (68.2 to 69.7) | 43 fps | 33.3 ms | 10.2% | 46 | 183 ms | 89 | **keep**: against cp14 66.8 (66 to 67.3) in the same session, ranges just apart. Layers 110 → 89, p95 41.5 → 33.3 ms. The passes at 68 to 73% did not move (as at CP-4). Not yet checked with phone screenshots |
 | Ship rule | | 55 or more (45 acceptable) | 45 (30 acceptable) | 20 ms (33) | under 5% (15%) | 0 to 2 (10) | under 100 ms (200) | under 50 (100) | |
 
 ### [x] CP-0 Baseline (2026-11-18)
@@ -741,10 +743,116 @@ By tenth of the page, before: 99.2 / 85.9 / 56.3 / 42.2 / 46.4 / 46.4 / 45.5 / 4
 
 (Against cp13 measured in the same session: average 66.4 → 67.4, worst tenth 42.2 → 34.5, within spread. The CP13 column came from an earlier session; see the first table.)
 
-### [ ] CP-15 and on: tenth 8, the chapters' own effects
+### [x] CP-15 No change: tenth 8, the climb and the blade (2026-11-19)
+
+**The problem:** tenth 8 (70 to 80% of the page) is the worst tenth: 26 to 46 fps depending on the session, the noisiest tenth. The question: which 1% steps carry the passes there, and what is drawn on them.
+
+**What the control shows** (`--plan perf/plans/cp15-control.json --trace --port 4880`, cp14): no freeze over 200 ms and no commit over 100 ms anywhere, and tenth 8 has the fewest passes of the story (2.6 per frame, the GPU drawing them only 7% of the time). The most passes in one frame, by 1%: 63 to 67% 16 16 11 – 13; **68 to 73% 13 12 13 12 7**; 75% 3; **76 to 80% 1**. So the passes are not where the blade is: the blade (about 74 to 80%) draws 1 to 3. The 12 to 13 are at 63 to 73%, on the lady's last steps and the climb.
+
+**Two other things the 1% breakdown showed** (a scratch script over the same traces, not kept):
+- **The GPU rasters tiles for 120 to 220 ms of every 250 ms at 64 to 77%** (about 450 ms a second), against about 10 ms at 61% and 3 ms at 78%. Every variant below has the same figure (410 to 530 ms a second at 68 to 77%), so none of the things switched off is what is being rastered. It is the one cost this checkpoint did not find.
+- **Frames come slowly there**: the gap between drawn frames has a median of 45 to 63 ms at 68 to 77% (10 to 20 fps), against 8 to 9 ms from 79%. Neither the main thread (busy 15 to 35%) nor the passes explain it. The tenth's fps (31 to 54 across variants, the control 39 and 41) swings too much between traces of the same build to rank variants by. The most passes per 1% is the steady measure, as in CP-7 and CP-11.
+
+**Switch-offs** (CSS added on cp14 after the intro; plans `cp15-tenth8.json`, `-2`, `-3`, `-4`; one trace each). The most passes in one frame in each stretch, and tenth 8's frames a second:
+
+| Variant (CSS added) | 63–67% | 68–73% | 74–79% | Tenth 8 fps |
+|---|---|---|---|---|
+| control | 16 | 13 | 7 | 39 |
+| control 2 | 16 | 14 | 7 | 41 |
+| no blade (`.bl-layer,.bl-ui`) | 16 | 14 | 7 | 38 |
+| no thread shadows (`.thr .sh`) | 11 | 13 | 3 | 32 |
+| no thread glow (`.thr .ln` box-shadow) | 16 | 14 | 7 | 36 |
+| no card glow and halo (`.pc-glow,.qh`) | 15 | 13 | 6 | 31 |
+| no card shadows (`.pc-side,.card-side`) | 16 | 14 | 6 | 36 |
+| no seat-card glow (`.ring.is-night .slot` box-shadow) | 16 | 14 | 12 | 44 |
+| no gold light, red light, motes (`.rl,.c-gold,.c-motes`) | 16 | 13 | 12 | 33 |
+| the climb's own planes, gold and motes (`.c-under,.c-flat,.c-gold,.c-motes,.q-fly`) | 16 | 12 | 3 | 39 |
+| the climb's underlay only (`.c-under`) | 16 | 12 | 7 | 18 |
+| every chapter's card planes (`.x-flat`) | 15 | 13 | 6 | 41 |
+| the lady's planes (`.l-wp,.l-lp,.l-fl`) | 11 | 13 | 6 | 30 |
+| the quest's planes | 16 | 14 | 7 | 27 |
+| **the vote's planes** (`.tg` rings, cards, counts) | 16 | 11 | 7 | 51 |
+| **the crown** (`.x-over`) | 11 | 9 | 3 | 19 |
+| **vote and quest planes and the crown** | 11 | **6** | 3 | 32 |
+| every chapter's underlay (`.x-under`) | 7 | **7** | 7 | 49 |
+| every chapter's planes (`.x-under,.x-flat`, twice) | 6 | **6** | 6 | 51 and 54 |
+| every chapter's planes made flat (`transform-style:flat`) | 17 | 10 | 7 | 35 |
+
+**A mistake to note:** the first runs called "no climb" used `.x-under,.x-flat`. Every chapter's planes (vote, quest, lady, climb, seat) carry those two classes, so that variant took all of them away, not the climb's. The table above has the corrected names; the climb's own planes are `.c-under` and `.c-flat`.
+
+**What it shows:**
+- **The climb itself is not the cost.** Its planes, its gold light and motes, its threads' shadows and glows, its cards' glow and shadow, and the blade each change nothing (12 to 14 stays 12 to 14). Of the doc's candidate list, the thread shadows' blur, the box shadows and glows and the blade's effects are ruled out here. `i.seam` `drop-shadow` and the `.gf`/`.cf`/`.eye-in` `clip-path` were not switched off: they are in the night's chapter (27 to 32%) and are not on screen at 68 to 80%. Their hot spots at 27 to 32% (17 to 24) stay the same in every variant.
+- **What costs is the earlier chapters' layers, left standing in the 3D ring** (the same pattern as CP-1's extras and CP-4's threads). The vote's planes and the crown each take 3 to 5 passes off; taken together 14 → 6 at 68 to 73%. No other single plane takes more than 2. Switching all the planes off gives the same 6, so after that nothing in the climb or the blade adds a pass.
+- **A flat plane is not the cure**: `transform-style:flat` on all the planes moves 13 to 10 only, so the cost is not the planes' 3D context alone. What makes the pass is something drawn in them while they sit at rest (the vote's `.tg` rings are 20 elements with big `box-shadow`s at `opacity: 0`, the crown is 3 nested `preserve-3d` boxes with a spinning set of faces).
+- **The crown is in use** at 68 to 73% (the climb moves it from seat to seat), so it cannot be hidden there. The vote's planes are not used after the vote.
+- **Not found:** why the GPU rasters 450 ms a second through 64 to 77% (above). It is the reason the frames come at 45 to 63 ms, and no single switch-off touched it.
+
+**Options for CP-16** (phones only unless noted; the owner chooses). The expected peak is the most passes at 68 to 73%, measured by this checkpoint's variants where one exists:
+
+| | Option | What the visitor sees on a phone | Expected peak, 68–73% | Risk |
+|---|---|---|---|---|
+| A | **Hide the vote's planes (`visibility: hidden`) once the vote is over, back when scrolling up into it** (all devices) | nothing: they are at `opacity: 0` already | 13 → 11 (the vote's planes alone), about 8 with C | low. Same kind of change as CP-4. CP-4 warns that a candidate is not a proof: measure it |
+| B | **Hide every chapter's planes outside its own steps** (vote, quest, lady, climb, seat), the same switch each chapter | nothing | 13 → about 7 (the underlay's figure) | medium: five files, and each chapter must show its plane again when scrolling back up into it |
+| C | **A plainer crown on phones**: a flat 2D crown (one picture that squashes as it turns) instead of the 3 nested 3D boxes | the crown turns as a flat squash like the cards (CP-10), not a spinning solid | 13 → 9 (the crown alone) | look change: needs a comparison first |
+| D | B + C | as C | 13 → about 6 | as B and C |
+| E | Find the 450 ms a second of raster first (a layer or raster trace at 70%, no site change) | nothing | not known | a third diagnosis before a fix, but it is the cost the variants did not move |
+
+**Recommendation:** B first (one change per checkpoint: all five chapters' planes under the same rule, so the measure is clear), then C only if its numbers say so after the owner has tried the comparison. B changes no look. If the owner wants only one chapter in the first step, A (the vote) is the largest single plane. E is worth doing after B whatever it measures: B may not move the raster at all.
+
+**Verdict: diagnosis, no change to the site.** The passes at 68 to 73% are traced to the vote's and the crown's layers at 1% resolution. The frame gap and the raster are not explained. CP-16 builds the owner's pick, measured against cp14.
+
+Results: `perf/results/2026-11-19-13-47-cp15-control-trace.json`, `13-51-cp15-*` (control 2 and 8 variants), `14-08-cp15-*` (4), `14-16-cp15-*` (4), and the last plan's three (`cp15-no-vote-planes`, `cp15-no-crown`, `cp15-no-quest-planes`). 20 traces in all, about 320 MB each. Plans: `perf/plans/cp15-control.json`, `cp15-tenth8.json`, `cp15-tenth8-2.json`, `cp15-tenth8-3.json`, `cp15-tenth8-4.json`. One trace per variant: a gap of 1 or 2 passes is noise (CP-5 measured up to 5 between two traces of the same build), so only the 5 to 8 pass changes above count.
+
+| Measure | Smooth (ship) | Acceptable | Laggy | Baseline | CP10 | CP11 | CP12 | CP13 | CP14 | **CP15** |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Average fps while scrolling | ≥ 55 | 45–55 | < 45 | 15.3 | 40.7 | 40.7 (no change) | 42.2 | 65.9 | 67.4 | **67.4 (no change)** |
+| Worst tenth of the page | ≥ 45 fps | 30–45 | < 30 | 0.4 | 18.2 | 18.2 (no change) | 21.2 | 26.4 | 34.5 | **34.5 (no change)** |
+| p95 frame time | ≤ 20 ms | ≤ 33 ms | > 33 ms | 241 ms | 74.7 ms | 74.7 ms (no change) | 66.4 ms | 41.6 ms | 41.5 ms | **41.5 ms (no change)** |
+| Dropped frames | < 5% | 5–15% | > 15% | 31% | 18.9% | 18.9% (no change) | 18.3% | 11.6% | 10.4% | **10.4% (no change)** |
+| Freezes over 50 ms | 0–2 | ≤ 10 | > 10 | 37 | 110 | 110 (no change) | 105 | 44 | 48 | **48 (no change)** |
+| GPU layers | < 50 | 50–100 | > 200 | 339 | 105 | 105 (no change) | 103 | 105 | 98 | **98 (no change)** |
+| GPU memory | < 50% of max | < 75% | near max | 76 MB | 76 MB | 76 MB (no change) | 79 MB | 89 MB | 91 MB | **91 MB (no change)** |
+
+### [x] CP-16 Hide the faded layers on phones (2026-11-19)
+
+**Owner's choice** (from CP-15's options): **B**, hide the chapters' layers while they are not drawn, phones only.
+
+**Change** (`night.js`, phones only under `html.lite`): `put(el, 'o', v)`, the one writer every chapter uses to fade a layer, now also sets `visibility: hidden` while the opacity is below 0.002 and clears it when the opacity rises, as CP-4 did for the threads. An element that a chapter already hides itself with `put(el, 'v', …)` is left to that chapter (the vote's outlines and cards, the threads, the crown). This reaches the vote's two counts and the crown's shadow, the quest's red light and hands, the climb's and the lady's glows and every other layer faded in the night's frame loop, in one place.
+
+**Why this and not a hide window per chapter** (the first idea): the chapters share layers. The crown and its shadow sit in the vote's planes and are used up to the blade's lights-out, the vote's outline rings serve the quest and the climb, and the lady's standing card is lent to the climb and the blade. A time window per chapter would hide things still in use. Hiding each layer by its own opacity follows the value that fades it in, so it cannot be early.
+
+**Measured** (`--before perf/builds/cp14 --after dist --runs 3 --port 4880`):
+
+| | Avg fps (range) | p95 | Dropped | Hitches | Worst frame | Blocking | Layers | GPU MB | Script s |
+|---|---|---|---|---|---|---|---|---|---|
+| before (cp14) | 66.8 (66 to 67.3) | 41.5 ms | 11.2% | 50 | 175 ms | 63 ms | 110 | 88 | 3.67 |
+| after (cp16) | **68.4 (68.2 to 69.7)** | **33.3 ms** | **10.2%** | **46** | 183 ms | 44 ms | **89** | 87 | 3.71 |
+
+Each run, before / after: 66.8 / 68.2, 67.3 / 68.4, 66 / 69.7 fps.
+By tenth of the page, before: 98.7 / 91.2 / 58.3 / 43.1 / 44.3 / 48.3 / 44.8 / 40.4 / 83.6 / 91.4. After: 99.7 / 90.8 / 59.2 / 47.4 / 49.9 / 58.9 / 45.7 / **43** / 81.4 / 91.7.
+
+**Trace** (`--label cp16 --dir dist --trace`): no freeze over 200 ms, no commit over 100 ms. **The passes at 68 to 73% did not move**: 14 14 12 (cp14: 13 12 13 12), and the other hot spots are the same (3 to 4%, 17 to 18%, 28%, 31 to 32%, 64 to 65%). So, as at CP-4, the layers that were hidden were not the surfaces. What fell is the layer count.
+
+**What it shows:** a small, real gain that is not the one CP-15 aimed at. Layers 110 → 89 (21 fewer, a ship-table measure: 50 to 100 is acceptable, and this is the first build under 90), p95 41.5 → 33.3 ms (now at the "acceptable" line), dropped 11.2 → 10.2%, blocking time 63 → 44 ms, tenth 8 40.4 → 43. The average gain is 1.6 fps, and the two ranges just clear each other (66 to 67.3 against 68.2 to 69.7), so call it a gain but a small one. The passes at 63 to 73% (12 to 14) are still there: **what makes them is still not found** (CP-15: the vote's planes and the crown together, about 8 passes, but not what is hidden here).
+
+**Verdict: keep.** No visible change is expected (a layer at opacity 0 draws nothing), but it has **not been checked with phone screenshots** at the vote, the quest, the climb and the blade: do that before shipping. `npm test`: 33 pass, 0 fail. Frozen as `perf/builds/cp16/`. Results: `perf/results/2026-11-19-15-18-*` (runs), `2026-11-19-15-23-cp16-trace.json`.
+
+| Measure | Smooth (ship) | Acceptable | Laggy | Baseline | CP10 | CP11 | CP12 | CP13 | CP14 | CP15 | **CP16** |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Average fps while scrolling | ≥ 55 | 45–55 | < 45 | 15.3 | 40.7 | 40.7 (no change) | 42.2 | 65.9 | 67.4 | 67.4 (no change) | **68.4** |
+| Worst tenth of the page | ≥ 45 fps | 30–45 | < 30 | 0.4 | 18.2 | 18.2 (no change) | 21.2 | 26.4 | 34.5 | 34.5 (no change) | **43** |
+| p95 frame time | ≤ 20 ms | ≤ 33 ms | > 33 ms | 241 ms | 74.7 ms | 74.7 ms (no change) | 66.4 ms | 41.6 ms | 41.5 ms | 41.5 ms (no change) | **33.3 ms** |
+| Dropped frames | < 5% | 5–15% | > 15% | 31% | 18.9% | 18.9% (no change) | 18.3% | 11.6% | 10.4% | 10.4% (no change) | **10.2%** |
+| Freezes over 50 ms | 0–2 | ≤ 10 | > 10 | 37 | 110 | 110 (no change) | 105 | 44 | 48 | 48 (no change) | **46** |
+| GPU layers | < 50 | 50–100 | > 200 | 339 | 105 | 105 (no change) | 103 | 105 | 98 | 98 (no change) | **89** |
+| GPU memory | < 50% of max | < 75% | near max | 76 MB | 76 MB | 76 MB (no change) | 79 MB | 89 MB | 91 MB | 91 MB (no change) | **87 MB** |
+
+(Against cp14 measured in the same session: average 66.8 → 68.4, worst tenth 40.4 → 43, layers 110 → 89. The older columns came from earlier sessions.)
+
+### [ ] CP-17 and on: p95, the passes at 63 to 73%, the chapters' own effects
 
 Cheapest first:
-- **Tenth 8, the climb and the blade** (the worst tenth: 26 to 46 fps, the noisiest from session to session). Trace it at 1% first, as in CP-8 and CP-11.
+- **The 12 to 14 passes at 63 to 73%** (CP-15: the vote's planes and the crown, about 8 of them, and 450 ms a second of raster there that no switch-off moved). Options left from CP-15: C (a plainer crown on phones, a look change: comparison first) and E (a layer and raster trace at 70%, no site change).
 - **The drum, 2 to 5%** (peak 16): left by option C. The 10 seat cards' shadows in the 3D drum make it (CP-11: 16 → 6 with no shadows). Only if the owner wants it: no shadow while in the drum, with a comparison first.
 - **The chapters' own effects** (tenths 5 and 7, 10 to 15 surfaces with no cards). Prove each by a switch-off trace first, as here: the thread shadows' `blur` while drawn (`.thr .sh`, `main.css:288`, a soft gradient on phones), `i.seam` `drop-shadow`, the `.gf`/`.cf`/`.eye-in` `clip-path` (clear it once the reveal is done). (`img.bl-ghost` `mix-blend-mode` was ruled out in CP-7.)
 - Small main-thread items: cache the scroll position once per tick (`cards.js:161`), no layout reads inside frame loops (`night.js:101`, `seats.js`).

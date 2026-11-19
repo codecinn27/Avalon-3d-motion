@@ -98,14 +98,20 @@ export function createNight(o) {
   let nt = null, nightV = -1;
   let u = 1, zoom = 2.5, tiltW = 28, tiltC = 48, tyW = 0, tyC = 0, hh = 0, fs = 0.1, rs = 217;
   let memo = new WeakMap();
+  const lite = document.documentElement.classList.contains('lite');
+  // phones (spec 013, CP-16): a layer faded with put(el, 'o') is also hidden while its opacity is 0 (the same as CP-4's threads). At
+  // opacity 0 it draws nothing but still costs the GPU a surface inside the 3D ring (CP-15). An element a chapter hides itself with
+  // put(el, 'v') is left to that chapter.
   const put = (el, k, v) => {
     let m = memo.get(el);
     if (!m) memo.set(el, (m = {}));
     if (m[k] === v) return;
     m[k] = v;
     if (k === 't') el.style.transform = v;
-    else if (k === 'o') el.style.opacity = v;
-    else if (k === 'v') el.style.visibility = v;
+    else if (k === 'o') {
+      el.style.opacity = v;
+      if (lite && !('v' in m)) el.style.visibility = +v < 0.002 ? 'hidden' : '';
+    } else if (k === 'v') el.style.visibility = v;
     else if (k === 'face') v ? (el.dataset.face = v) : delete el.dataset.face;
     else el.style.setProperty(k, v);
   };
@@ -116,7 +122,6 @@ export function createNight(o) {
   // CP-10 (owner's choice: option C, plain): on phones the turn is flat too, a 2D squash. scaleX goes 1 → 0 with the face that
   // is down, the face swaps at the edge (e = 0.5), then 0 → 1 with the face that is up. Ten vote cards turning together in 3D made
   // 19 passes per frame and a 2.9 s freeze. Desktops keep the real 3D turn.
-  const lite = document.documentElement.classList.contains('lite');
   api.turn = (el, e) => {
     if (lite) {
       put(el, 'face', e > 0.5 ? 'front' : 'back');

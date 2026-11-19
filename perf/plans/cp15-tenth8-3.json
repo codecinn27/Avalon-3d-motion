@@ -1,0 +1,6 @@
+[
+  { "label": "cp15-no-climb-only", "dir": "perf/builds/cp14", "css": ".c-under,.c-flat,.c-gold,.c-motes,.q-fly{display:none!important}" },
+  { "label": "cp15-no-lady-planes", "dir": "perf/builds/cp14", "css": ".l-wp,.l-lp,.l-fl{display:none!important}" },
+  { "label": "cp15-no-vote-quest-planes", "dir": "perf/builds/cp14", "css": ".x-under:not(.l-wp):not(.l-lp):not(.c-under):not(.st-plane),.x-flat:not(.l-fl):not(.c-flat),.x-over{display:none!important}" },
+  { "label": "cp15-no-climb-under", "dir": "perf/builds/cp14", "css": ".c-under{display:none!important}" }
+]

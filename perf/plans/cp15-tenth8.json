@@ -1,0 +1,11 @@
+[
+  { "label": "cp15-control-2", "dir": "perf/builds/cp14" },
+  { "label": "cp15-no-climb", "dir": "perf/builds/cp14", "css": ".x-under,.x-flat,.c-gold,.c-motes,.q-fly{display:none!important}" },
+  { "label": "cp15-no-blade", "dir": "perf/builds/cp14", "css": ".bl-layer,.bl-ui{display:none!important}" },
+  { "label": "cp15-no-thread-shadow", "dir": "perf/builds/cp14", "css": ".thr .sh{display:none!important}" },
+  { "label": "cp15-no-thread-glow", "dir": "perf/builds/cp14", "css": ".thr .ln{box-shadow:none!important}" },
+  { "label": "cp15-no-card-glow", "dir": "perf/builds/cp14", "css": ".pc-glow,.qh{display:none!important}" },
+  { "label": "cp15-no-card-shadow", "dir": "perf/builds/cp14", "css": ".pc-side,.card-side{box-shadow:none!important}" },
+  { "label": "cp15-no-slot-glow", "dir": "perf/builds/cp14", "css": ".ring.is-night .slot{box-shadow:none!important}" },
+  { "label": "cp15-no-gold-light", "dir": "perf/builds/cp14", "css": ".rl,.c-gold,.c-motes{display:none!important}" }
+]

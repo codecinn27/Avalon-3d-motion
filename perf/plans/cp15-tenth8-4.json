@@ -1,0 +1,5 @@
+[
+  { "label": "cp15-no-vote-planes", "dir": "perf/builds/cp14", "css": ".x-under:has(.tg),.x-flat:has(.vcount){display:none!important}" },
+  { "label": "cp15-no-crown", "dir": "perf/builds/cp14", "css": ".x-over{display:none!important}" },
+  { "label": "cp15-no-quest-planes", "dir": "perf/builds/cp14", "css": ".x-under:not(.l-wp):not(.l-lp):not(.c-under):not(.st-plane):not(:has(.tg)),.x-flat:not(.l-fl):not(.c-flat):not(:has(.vcount)){display:none!important}" }
+]

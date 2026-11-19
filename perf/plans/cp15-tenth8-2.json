@@ -1,0 +1,6 @@
+[
+  { "label": "cp15-no-climb-2", "dir": "perf/builds/cp14", "css": ".x-under,.x-flat,.c-gold,.c-motes,.q-fly{display:none!important}" },
+  { "label": "cp15-no-under", "dir": "perf/builds/cp14", "css": ".x-under{display:none!important}" },
+  { "label": "cp15-no-flat-cards", "dir": "perf/builds/cp14", "css": ".x-flat{display:none!important}" },
+  { "label": "cp15-flat-planes", "dir": "perf/builds/cp14", "css": ".x-under,.x-flat{transform-style:flat!important}" }
+]
