@@ -2,6 +2,7 @@
 // Run: npm run build
 import { readFile, writeFile, mkdir, copyFile, readdir, stat, rm } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
@@ -334,22 +335,55 @@ async function copyDir(from, to) {
   }
 }
 
+// The names the pages point at, filled in by copyStatic (spec 015): every script and style file carries a hash of its content,
+// so a changed file always has a new name and a browser or CDN can never serve an old copy under it.
+const assets = { css: '', js: '', vendor: {} };
+
+// Pages, data and other un-hashed files are re-checked on every visit (a changed file downloads, an unchanged one answers "not modified").
+// Hashed scripts and styles never change under their name, so they are kept for a year. Images, fonts and music keep their names, so 7 days.
+const HTACCESS = `# Written by scripts/build.mjs (spec 015). Do not edit by hand: the next build replaces this file.
+<IfModule mod_headers.c>
+  <FilesMatch "\\.(html|json|xml|txt|map)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+  <FilesMatch "\\.(webp|png|jpe?g|svg|woff2|m4a|ico)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+  <FilesMatch "\\.[0-9A-Za-z]{8}\\.(js|css)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>
+`;
+
 async function copyStatic() {
   await rm(dist('css'), { recursive: true, force: true });
   await rm(dist('js'), { recursive: true, force: true });
+  await rm(dist('vendor'), { recursive: true, force: true });
   // scripts: one bundle, minified, with a source map for devtools. Styles: minified. `npm run build:dev` (--dev) keeps them readable.
   const minify = !process.argv.includes("--dev");
   await mkdir(dist('js'), { recursive: true });
   await mkdir(dist('css'), { recursive: true });
-  await esbuild({ entryPoints: [src('js', 'main.js')], bundle: true, format: 'esm', target: 'es2020', minify, sourcemap: 'linked', legalComments: 'none', outfile: dist('js', 'main.min.js') });
+  const hash = (buf) => createHash('sha256').update(buf).digest('hex').slice(0, 8);
+  const built = await esbuild({ entryPoints: [src('js', 'main.js')], bundle: true, format: 'esm', target: 'es2020', minify, sourcemap: 'linked', legalComments: 'none', outdir: dist('js'), entryNames: '[name].[hash]', metafile: true });
+  const jsFile = path.basename(Object.keys(built.metafile.outputs).find((k) => k.endsWith('.js')));
   const css = await readFile(src('styles', 'main.css'), 'utf8');
-  await writeFile(dist('css', 'main.min.css'), minify ? (await transform(css, { loader: 'css', minify: true })).code : css);
+  const cssCode = minify ? (await transform(css, { loader: 'css', minify: true })).code : css;
+  const cssFile = `main.${hash(cssCode)}.css`;
+  await writeFile(dist('css', cssFile), cssCode);
+  assets.js = `/js/${jsFile}`;
+  assets.css = `/css/${cssFile}`;
   const kb = async (f) => ((await stat(dist(f))).size / 1024).toFixed(0);
-  log(`scripts ${await kb('js/main.min.js')} KB and styles ${await kb('css/main.min.css')} KB${minify ? ' (minified)' : ' (not minified)'}`);
+  log(`scripts ${await kb(`js/${jsFile}`)} KB (${jsFile}) and styles ${await kb(`css/${cssFile}`)} KB (${cssFile})${minify ? ' (minified)' : ' (not minified)'}`);
   await mkdir(dist('vendor'), { recursive: true });
   const nm = (...p) => path.join(root, 'node_modules', ...p);
-  for (const f of ['gsap.min.js', 'ScrollTrigger.min.js', 'SplitText.min.js']) await copyFile(nm('gsap', 'dist', f), dist('vendor', f));
-  await copyFile(nm('lenis', 'dist', 'lenis.min.js'), dist('vendor', 'lenis.min.js'));
+  const vendors = [['gsap.min.js', nm('gsap', 'dist', 'gsap.min.js')], ['ScrollTrigger.min.js', nm('gsap', 'dist', 'ScrollTrigger.min.js')], ['SplitText.min.js', nm('gsap', 'dist', 'SplitText.min.js')], ['lenis.min.js', nm('lenis', 'dist', 'lenis.min.js')]];
+  for (const [f, from] of vendors) {
+    const name = f.replace(/\.js$/, `.${hash(await readFile(from))}.js`);
+    await copyFile(from, dist('vendor', name));
+    assets.vendor[f] = `/vendor/${name}`;
+  }
+  // The caching rules for cPanel and other Apache hosts (Vercel needs none: it re-checks pages on every deploy by itself).
+  await writeFile(dist('.htaccess'), HTACCESS);
   await copyDir(src('assets', 'badges'), dist('assets', 'badges'));
   await mkdir(dist('fonts'), { recursive: true });
   const fonts = [
@@ -374,7 +408,7 @@ async function writePage(route, html) {
 async function buildPages() {
   const urls = [];
   for (const locale of config.locales) {
-    const base = { t: copy[locale.code], config, locale, roles, deck: deck.map((d) => ({ ...d, side: roleBySlug[d.role].side })), night, vote, quest, lady, climb, blade, siteUrl, siteUrlIsReal: Boolean(realSiteUrl) };
+    const base = { t: copy[locale.code], config, locale, roles, deck: deck.map((d) => ({ ...d, side: roleBySlug[d.role].side })), night, vote, quest, lady, climb, blade, assets, siteUrl, siteUrlIsReal: Boolean(realSiteUrl) };
     const home = { ...base, route: '/' };
     await writePage(`${locale.prefix}/`, layout(home, homePage(home)));
     urls.push({ route: '/', locale });

@@ -7,11 +7,12 @@ const BOOT = `(function(){var d=document.documentElement,c=d.classList,q=locatio
 
 /**
  * The shell around every page.
- * ctx: { t, config, locale, route, siteUrl }
+ * ctx: { t, config, locale, route, siteUrl, assets }
  * page: { title, description, ogImage, theme, body, bodyClass, data }
  */
 export function layout(ctx, page) {
   const { config, locale, route, siteUrl } = ctx;
+  const A = ctx.assets; // the hashed script and style names, from the build (spec 015)
   const abs = (p) => siteUrl + p;
   const canonical = abs(locale.prefix + route);
   const alternates = config.locales
@@ -54,7 +55,7 @@ ${seo}
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preload" href="/fonts/fraunces-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/geist-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/main.min.css">
+<link rel="stylesheet" href="${A.css}">
 <script>${BOOT}</script>
 </head>
 <body${page.bodyClass ? ` class="${page.bodyClass}"` : ''}>
@@ -67,11 +68,11 @@ ${page.body}
 </main>
 ${footer(ctx)}
 ${page.data ? `<script type="application/json" id="page-data">${JSON.stringify(page.data).replace(/</g, '\\u003c')}</script>` : ''}
-<script src="/vendor/gsap.min.js" defer></script>
-<script src="/vendor/ScrollTrigger.min.js" defer></script>
-<script src="/vendor/SplitText.min.js" defer></script>
-<script src="/vendor/lenis.min.js" defer></script>
-<script type="module" src="/js/main.min.js"></script>
+<script src="${A.vendor['gsap.min.js']}" defer></script>
+<script src="${A.vendor['ScrollTrigger.min.js']}" defer></script>
+<script src="${A.vendor['SplitText.min.js']}" defer></script>
+<script src="${A.vendor['lenis.min.js']}" defer></script>
+<script type="module" src="${A.js}"></script>
 </body>
 </html>
 `;

@@ -109,3 +109,28 @@ npx serve dist -l 4870
 ```
 
 step 3: open http://localhost:4870 at the phone
+
+
+
+optional:
+```bash
+& "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe" forward tcp:9333 localabstract:chrome_devtools_remote
+```
+
+
+
+# Text files:
+English:
+
+Pop 3: "Select the card you think is Merlin"
+popNote 1: If you don't choose, Good wins by default
+popNote 2: Choose correctly you win the game and make a comeback.
+
+Chinese:
+    "popTitle": "选出你认为是梅林的那张牌。",
+    "popNote": "（如果你不选，系统会让正义一方获胜。）",
+
+Malay:    
+    "popTitle": "Pembunuh sila pilah Merlin untuk bunuh.",
+    "popNote": "(Jika tidak, pasukan Baik akan terus menang.)",
+

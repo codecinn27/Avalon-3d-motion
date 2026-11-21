@@ -9,3 +9,5 @@ perf/results/*
 !.env.example
 .DS_Store
 Thumbs.db
+
+dist.zip 
