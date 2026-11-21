@@ -8,6 +8,10 @@ const PERSP = 1600; // the ring's perspective in the wide view, see .ring in mai
 const PFAR = 5000; // the ring's perspective in a close up: a long lens, so a standing card keeps its 2:3 shape (decision 12)
 const RS0 = 217; // radius of the circle of seats on the prototype (1280 wide). u = table.rs / RS0 scales every design size
 const LIFT = 46; // degrees a woken card stands up
+const ORBIT = 5; // how many times longer than the first build the camera takes to swing to the next seat (spec 005, decision 14)
+const SWING_EASE = 'sine.inOut'; // decision 15: a steadier turn than the cubic ease, whose middle ran 3 times the average speed
+const SWING = 1.3; // the first build's swing to a seat, in the night's own time units
+const EXTRA = SWING * (ORBIT - 1); // what one swing to a seat adds to everything after it
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 const smooth = (t) => t * t * (3 - 2 * t);
 const near = (t, ref) => t + 360 * Math.round((ref - t) / 360); // the same angle, the short way round from ref
@@ -71,11 +75,12 @@ export function createNight(o) {
   const moon = sky.querySelector('.moon');
 
   // ---------- the words: one element per line, faded and slid by the scroll (decision 10) ----------
-  // Twelve lines for eight steps. Times are in the night's own units (see build): the line is on screen from its time.
+  // Twelve lines for eight steps. [time in the night's own units before the swings were slowed, swings before it, the words].
+  // build() adds one swing's extra length (EXTRA) for every swing before the line, so a line still appears with its seat.
   const BEATS = [
-    [0.6, T.fall, T.fallSub], [5.4, T.evil], [13.7, T.traitors], [15.5, T.oberon],
-    [19.3, T.merlin], [23.1, T.merlinSees, T.merlinSub], [26.5, T.percival], [30.3, T.percivalSees, T.percivalSub],
-    [33.3, T.others],
+    [0.6, 0, T.fall, T.fallSub], [5.4, 0, T.evil], [13.7, 3, T.traitors], [15.5, 3, T.oberon],
+    [19.3, 4, T.merlin], [23.1, 5, T.merlinSees, T.merlinSub], [26.5, 5, T.percival], [30.3, 6, T.percivalSees, T.percivalSub],
+    [33.3, 6, T.others],
   ];
   const say = sec.querySelector('.night-say');
 
@@ -321,25 +326,31 @@ export function createNight(o) {
     const [tRed, tLight, tGold] = [idx('red'), idx('light'), idx('gold')];
     const CL = { fr: 1, dz: 1, tl: 1, ty: 1 };
     let cur = 90;
+    let sh = 0; // see below: the extra time the slower swings have added so far
+    // the camera swings to a seat, slowly and steadily (decisions 14 and 15); a swing adds its extra length to everything after it
     const look = (t, d, seat) => {
       const a = near(ANG(seat), cur);
       cur = a;
-      nt.to(S, { a, ...CL, duration: d }, t);
+      nt.to(S, { a, ...CL, duration: d * ORBIT, ease: SWING_EASE }, t + sh);
+      sh += d * (ORBIT - 1);
     };
-    const out = (t, d) => nt.to(S, { fr: 0, dz: 0, tl: 0, ty: 0, duration: d }, t);
+    const out = (t, d) => nt.to(S, { fr: 0, dz: 0, tl: 0, ty: 0, duration: d }, t + sh);
     // the eye opens, the card stands up and turns face up, then a glow. Focus rings only for Merlin and Percival (not the evil step).
     const wake = (seat, t, glow, rings) => {
+      t += sh;
       nt.to(st.eye, { [seat]: 1, duration: 0.5 }, t);
       nt.to(st.lift, { [seat]: 1, duration: 0.8 }, t + 0.4);
       if (glow) nt.to(st[glow], { [seat]: 1, duration: 0.6 }, t + 0.6);
       if (rings) nt.to(st.ring, { [seat]: 1, duration: 0.7 }, t + 1);
     };
     const sleepAgain = (seats, t, groups) => {
+      t += sh;
       nt.to(st.lift, { ...pick(seats, 0), duration: 0.8 }, t);
       nt.to(st.eye, { ...pick(seats, 0), duration: 0.5 }, t + 0.6);
       nt.to(st.ring, { ...pick(seats, 0), duration: 0.5 }, t);
       groups.forEach((g) => nt.to(st[g], { ...pick(seats, 0), duration: 0.6 }, t));
     };
+    // sh: the extra time the slower swings have added so far. Every step is written in the first build's times, then moved by sh.
     // 1 night falls: over half a screen the page turns to night, the table dims, closed eyes appear, moon and stars, a slow push in
     nt.to(st, { night: 1, duration: HALF, ease: 'sine.inOut' }, 0.3);
     nt.to(st, { eyeVis: 1, duration: 1.6 }, 1.6);
@@ -348,45 +359,45 @@ export function createNight(o) {
     // prototype's timing plus 3.5)
     evil.forEach((s, k) => {
       const t = [5.5, 7.9, 10.3][k];
-      look(t, 1.3, s);
+      look(t, SWING, s);
       wake(s, t + 1.1, 'red', false);
     });
     // 3 the traitors find each other
     out(12.9, 1.4);
-    tRed.forEach((k, m) => nt.to(st.thr, { [k]: 1, duration: 0.9, ease: 'power1.out' }, 13.9 + m * 0.3));
+    tRed.forEach((k, m) => nt.to(st.thr, { [k]: 1, duration: 0.9, ease: 'power1.out' }, 13.9 + m * 0.3 + sh));
     // 4 Oberon works alone, then the three traitors close their eyes
-    look(15.5, 1.3, oberon);
+    look(15.5, SWING, oberon);
     out(17.9, 1.2);
-    nt.to(st.thr, { ...pick(tRed, 0), duration: 0.8 }, 17.9);
+    nt.to(st.thr, { ...pick(tRed, 0), duration: 0.8 }, 17.9 + sh);
     sleepAgain(evil, 18, ['red']);
     // 5 Merlin wakes and sees three, not Mordred
-    look(19.5, 1.3, merlin);
+    look(19.5, SWING, merlin);
     wake(merlin, 20.6, null, true);
     out(22.5, 1.3);
-    tLight.forEach((k, m) => nt.to(st.thr, { [k]: 1, duration: 0.9, ease: 'power1.out' }, 23.3 + m * 0.25));
-    nt.to(st.red, { ...pick(data.sees[merlin], 1), duration: 0.6 }, 23.9);
-    nt.to(st.thr, { ...pick(tLight, 0), duration: 0.7 }, 25.7);
-    nt.to(st.red, { ...pick(data.sees[merlin], 0), duration: 0.6 }, 25.7);
+    tLight.forEach((k, m) => nt.to(st.thr, { [k]: 1, duration: 0.9, ease: 'power1.out' }, 23.3 + m * 0.25 + sh));
+    nt.to(st.red, { ...pick(data.sees[merlin], 1), duration: 0.6 }, 23.9 + sh);
+    nt.to(st.thr, { ...pick(tLight, 0), duration: 0.7 }, 25.7 + sh);
+    nt.to(st.red, { ...pick(data.sees[merlin], 0), duration: 0.6 }, 25.7 + sh);
     sleepAgain([merlin], 25.7, []);
     // 6 Percival wakes and sees two Merlins
-    look(26.7, 1.3, percival);
+    look(26.7, SWING, percival);
     wake(percival, 27.8, null, true);
     out(29.7, 1.3);
-    tGold.forEach((k, m) => nt.to(st.thr, { [k]: 1, duration: 0.9, ease: 'power1.out' }, 30.5 + m * 0.3));
-    nt.to(st.gold, { ...pick(data.sees[percival], 1), duration: 0.6 }, 30.9);
-    nt.to(st.thr, { ...pick(tGold, 0), duration: 0.7 }, 32.7);
-    nt.to(st.gold, { ...pick(data.sees[percival], 0), duration: 0.6 }, 32.7);
+    tGold.forEach((k, m) => nt.to(st.thr, { [k]: 1, duration: 0.9, ease: 'power1.out' }, 30.5 + m * 0.3 + sh));
+    nt.to(st.gold, { ...pick(data.sees[percival], 1), duration: 0.6 }, 30.9 + sh);
+    nt.to(st.thr, { ...pick(tGold, 0), duration: 0.7 }, 32.7 + sh);
+    nt.to(st.gold, { ...pick(data.sees[percival], 0), duration: 0.6 }, 32.7 + sh);
     sleepAgain([percival], 32.7, []);
     // 7 everyone else saw nothing (33.3). 8 dawn: every eye opens on the face down cards, the table turns back to its
-    // resting turn, and over half a screen the moon sets and the page goes back to cream
-    const D = 34.8;
-    nt.to(S, { a: near(90, cur), duration: 1.6 }, D);
+    // resting turn (slowly, like every swing), and over half a screen the moon sets and the page goes back to cream
+    const D = 34.8 + sh;
+    nt.to(S, { a: near(90, cur), duration: 1.6 * ORBIT, ease: SWING_EASE }, D);
     nt.to(st.eye, { ...pick([...Array(n).keys()], 1), duration: 0.9 }, D + 0.2);
     nt.to(st, { night: 0, duration: HALF, ease: 'sine.inOut' }, D + 0.4);
-    const end = D + 0.4 + HALF + 0.6;
+    const end = Math.max(D + 0.4 + HALF + 0.6, D + 1.6 * ORBIT + 0.3);
     nt.to(st, { eyeVis: 0, duration: 1 }, end - 1.6);
     // the words: each line slides and fades in, and the one before it out, over the same stretch of scroll
-    const beats = [...BEATS, [D, T.open], [D + 2.6, T.know]];
+    const beats = [...BEATS.map((b) => [b[0] + b[1] * EXTRA, ...b.slice(2)]), [D, T.open], [D + 2.6, T.know]];
     say.innerHTML = beats.map((b) => `<p class="ns"><b>${esc(b[1])}</b>${b[2] ? `<span>${esc(b[2])}</span>` : ''}</p>`).join('');
     const lines = [...say.children];
     gsap.set(lines, { autoAlpha: 0, y: 22 });

@@ -30,6 +30,33 @@
 | 12 | **Close up: the card is about 40% of the screen tall and keeps its 2:3 shape.** The camera also uses a longer lens as it moves in: the ring's perspective grows from 1600 (wide, as before) to 5000 (close), so the same zoom happens from further away. While building it turned out the stretch had another cause, which was the main one (see "As built") | Owner |
 | 13 | **The draw order switch happens while nothing moves**: just after the last card of the deal lands, not at the first frame of the night | Assistant, part of decision 10 |
 
+## Decisions made after the owner's phone review (owner, 2026-11-22): slower swings round the table
+
+**Status: built 2026-11-22 in `src/js/night.js` (`ORBIT = 5`, `SWING_EASE = 'sine.inOut'`, a running shift `sh` that moves every later step and `BEATS` line). Build and the 33 tests pass. Still to do: scroll it on the real phone (the phone was unplugged when this was built), measure the real night length, and move this section to "As built".** The owner scrolled the night on a phone and found the swing round the table to each waking seat too quick to follow.
+
+**Cause.** `look()` in `src/js/night.js` turns the camera to the next seat in 1.3 timeline units, about 0.14 of a screen, which is roughly 100 px of scroll on both desktop and phone. The swings are 36 degrees (Assassin), 72 (Morgana), 108 (Mordred), 72 (Oberon), 72 (Merlin), 144 (Percival), and the dawn swings back 144 in 1.6 units. With the `power2.inOut` ease (cubic) the middle of a swing runs about 3 times faster than its average, so Percival's swing peaks near 420 degrees per 100 px of scroll.
+
+| # | Decision | Why / who |
+|---|---|---|
+| 14 | **Every swing is 5 times slower**, on desktop and phone alike: 1.3 units becomes 6.5, and the dawn swing 1.6 becomes 8. All seven swings (six seats and the dawn) get the same factor, so the night keeps one even rhythm | Owner, after trying 1x to 3x in the comparison page (Night Orbit Speeds, https://claude.ai/artifact/NbJcrauUBVudLpQYxEGki9) and asking for more |
+| 15 | **The swing eases with `sine.inOut`** instead of `power2.inOut`. A gentler start and end, and the middle runs about 1.6 times the average, not 3 times | Owner |
+| 16 | **The night gets longer in scroll, nothing is squeezed.** Each swing's extra length pushes every later step back by the same amount. The night grows from about 4.4 screens to about 8.5 on a desktop, and from about 3.8 to about 7.3 on a phone. The later chapters follow, because they are placed after `NIGHT` | Follows from 14 |
+| 17 | **The words, the wake of each seat and the dawn keep their order and their gaps.** Only the start time moves, so each line still appears with its seat | Assistant, follows from 16 |
+
+Expected result: the fastest moment of the biggest swing (Percival) drops from about 420 degrees per 100 px of scroll to about 44. Every swing is about 510 px of scroll on a desktop (the dawn about 630), where it was about 100.
+
+### Plan (to build)
+
+1. **One setting.** In `night.js` add `ORBIT = 5` (swing length factor) and `const swing = (d) => d * ORBIT`.
+2. **Shift the later times.** `build()` writes its times as plain numbers (5.5, 7.9, 10.3, 12.9, 15.5 ...) and `BEATS` repeats them. Add a running `shift`: after each swing starts at `t`, `shift += swing(d) - d`, and every later tween, wake, thread, glow, `sleepAgain` and line time is written as `t + shift`. Easiest is to build the night as an ordered list of steps with a cursor, instead of fixed numbers, so each step starts where the last one ends. `D` (dawn start) and `end` move with it.
+3. **Ease.** `look()` and the dawn swing tween `S` with `ease: 'sine.inOut'`. The other tweens keep the timeline default.
+4. **Words.** `BEATS` times and the dawn lines use the same shifted times. The fade in and fade out lengths (1.3 and 1) stay as they are, so a line is on screen about as long as before relative to its seat.
+5. **Length.** `build()` already returns `len = end / unitsPerScreen x perScreen`, so the hero pin and every chapter after it lengthen on their own. Check that the scroll budget table below and the pin length in `cards.js` (`window.innerHeight x (5 | 4.4) x duration`) still add up.
+6. **Check on a phone.** Run the real phone through `chrome://inspect` and `scripts/perf-phone.mjs`: scroll the night, confirm no swing is faster than about 45 degrees per 100 px, the card is still about 40% of the screen at close up, and the page colour, words and eyes still follow the scroll both ways.
+7. **Record.** Move this section from "decided" to "As built", with the measured lengths.
+
+Open question for the build: at 8.5 screens the night is the longest chapter. If it feels long on a real phone, the first thing to try is a factor of 3 (about 6.0 screens on a desktop), which is a one number change.
+
 ## What the visitor sees
 
 Still inside the pinned hero stage, after the deal. The table holds still at the end of the deal, then:
