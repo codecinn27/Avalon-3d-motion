@@ -1,0 +1,6 @@
+[
+  { "label": "cp17-control", "dir": "perf/builds/cp16" },
+  { "label": "cp17-no-twinkle", "dir": "perf/builds/cp16", "css": ".star b{animation:none!important}" },
+  { "label": "cp17-no-sky", "dir": "perf/builds/cp16", "css": ".n-sky{display:none!important}" },
+  { "label": "cp17-no-seat-labels", "dir": "perf/builds/cp16", "css": ".sn-layer{display:none!important}" }
+]

@@ -170,18 +170,28 @@ function blade(ctx) {
   const { t } = ctx;
   const b = t.blade;
   // Chapter 7 of the story line: the blade. The visitor points it (blade.js). Without scripts this is a plain section (the opening lines,
-  // ending A as text, how the last strike works). With reduced motion blade.js adds six real buttons and swaps the ending on a choice.
+  // the default ending as text, how the last strike works). With reduced motion blade.js adds six real buttons and swaps the ending on a choice.
+  // No choice strikes a loyal servant, so Good wins by default (spec 014).
+  const auto = ctx.blade.auto;
+  const autoName = t.roles[ctx.deck[auto - 1].role].name;
+  const plainB = b.plainB.replace('{n}', auto).replace('{name}', autoName);
   return `<section class="sec blade" id="blade">
   <div class="blade-static">
     <h2 class="h2">${esc(b.title)}</h2>
     <ol class="night-steps" role="list">${[b.remains, b.evilWin, b.name, b.saw, b.where].map((l) => `<li>${esc(l)}</li>`).join('')}</ol>
     <div class="blade-plain" data-blade-plain></div>
-    <p class="night-results" data-blade-result>${esc(b.plainA)} ${esc(b.lost)}</p>
+    <p class="night-results" data-blade-result>${esc(plainB)} ${esc(b.saved)}</p>
     <p class="vh" aria-live="polite" data-blade-live></p>
     <h3 class="night-h3">${esc(b.howTitle)}</h3>
     <ul class="night-list" role="list">${[1, 2, 3].map((n) => `<li>${esc(b[`how${n}`])}</li>`).join('')}</ul>
   </div>
   <div class="night-live night-say blade-say" aria-hidden="true"></div>
+  <dialog class="bl-pop" data-blade-pop aria-labelledby="bl-pop-t" aria-describedby="bl-pop-n">
+    <p class="bl-pop-t" id="bl-pop-t" aria-live="polite">${esc(b.popTitle)}</p>
+    <p class="bl-pop-n" id="bl-pop-n">${esc(b.popNote)}</p>
+    <p class="bl-pop-n bl-pop-n2" hidden>${esc(b.popNote2)}</p>
+    <button class="bl-pop-ok" type="button" autofocus>${esc(b.popOk)}</button>
+  </dialog>
 </section>`;
 }
 
@@ -191,7 +201,7 @@ function seat(ctx) {
   // table. Without them (or with reduced motion) it is a plain section: the closing question and the friend line, then the plain draw.
   return `<section class="sec seat" id="seat">
   <div class="seat-static">
-    <h2 class="h2" data-seat-q>${esc(t.seat.hidden)}</h2>
+    <h2 class="h2" data-seat-q>${esc(t.seat.found)}</h2>
     <p class="lede">${em(t.seat.friend)}</p>
   </div>
   <div class="night-live night-say seat-say" aria-hidden="true"></div>

@@ -1,0 +1,5 @@
+[
+  { "label": "cp17-control-2", "dir": "perf/builds/cp16" },
+  { "label": "cp17-will-change", "dir": "perf/builds/cp16", "css": ".pcp,.tg,.vcount,.cr-wrap,.cr-sh,.n-g,.thr,.rl,.l-paint,.sn,.x-flat>*,.x-under>*{will-change:transform}" },
+  { "label": "cp17-no-seat-labels-2", "dir": "perf/builds/cp16", "css": ".sn-layer{display:none!important}" }
+]

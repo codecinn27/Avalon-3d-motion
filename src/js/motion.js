@@ -108,6 +108,12 @@ export function lockScroll(on) {
   document.documentElement.style.overflow = on ? 'hidden' : '';
 }
 
+/** Put the page at a position at once, even while Lenis is stopped. Used by the blade's pop-up (spec 014) to hold the choice. */
+export function jumpTo(y) {
+  if (lenis) lenis.scrollTo(y, { immediate: true, force: true });
+  else window.scrollTo(0, y);
+}
+
 /** After pins are in place, land on the hash target (for example /#draw from a role page). */
 export function settleHash() {
   const { ScrollTrigger } = window;

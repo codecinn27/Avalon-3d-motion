@@ -134,7 +134,7 @@ function checkStory(errors) {
   if (!blade.evil.includes(blade.assassin) || deck[blade.assassin - 1]?.role !== 'assassin') errors.push('blade.json: assassin must be the Assassin seat');
   if (!same(blade.arc, loyalSeats)) errors.push('blade.json: arc must list exactly the loyal seats of deck.json');
   if (deck[blade.merlin - 1]?.role !== 'merlin' || !blade.arc.includes(blade.merlin)) errors.push('blade.json: merlin must be the Merlin seat, and in the arc');
-  if (blade.auto !== blade.merlin) errors.push('blade.json: auto (no choice) must be Merlin');
+  if (!blade.arc.includes(blade.auto) || blade.auto === blade.merlin) errors.push('blade.json: auto (no choice, spec 014) must be a loyal seat in the arc, not Merlin');
   const wins = climb.score.filter((r) => r === 'success').length;
   if (climb.score.length !== 5 || wins !== 3) errors.push('climb.json: the score must end 3 : 2 for the loyal');
 }

@@ -659,6 +659,16 @@ html:not(.js) .climb-score{display:none}
 .bl-strike{top:var(--ay,50%);transform:translate(-50%,-100%);min-height:48px;padding:0 24px;border:0;border-radius:99px;background:#b3283a;color:#fff6e8;font-weight:500;font-size:15px;box-shadow:0 10px 24px -10px rgba(179,40,58,.8)}
 .bl-other{left:auto;right:clamp(12px,4vw,56px);transform:none;bottom:max(14px,2svh);min-height:44px;padding:0 14px;border:0;background:none;color:var(--fg-soft);font-size:13px;text-decoration:underline;text-underline-offset:4px}
 .bl-strike[hidden],.bl-other[hidden]{display:none}
+/* the pop-up at the choice (spec 014): stops the scroll once a visit until OK */
+.bl-pop{pointer-events:auto;width:min(420px,calc(100vw - 32px));margin:auto;padding:28px 24px 24px;border:0;border-radius:20px;background:linear-gradient(#171a24,#0f1118) padding-box,linear-gradient(160deg,rgba(217,164,65,.8),rgba(217,164,65,.14) 40%,rgba(217,164,65,.6)) border-box;border:1px solid transparent;color:#EFE6D4;text-align:center;box-shadow:0 30px 80px -20px rgba(0,0,0,.8)}
+.bl-pop:not([open]){display:none}
+.bl-pop[open]{display:grid;gap:10px;justify-items:center}
+.bl-pop::backdrop{background:rgba(6,7,10,.55)}
+.bl-pop-t{font-family:var(--display);font-weight:380;font-size:clamp(22px,5.6vw,28px);line-height:1.12;letter-spacing:-.02em;text-wrap:balance;font-variation-settings:"opsz" 144}
+.bl-pop-n{font-size:14px;line-height:1.45;color:#9A927F;text-wrap:balance}
+.bl-pop-n[hidden]{display:none}
+.bl-pop-ok{margin-top:10px;min-width:120px;min-height:48px;padding:0 28px;border:0;border-radius:99px;background:#D9A441;color:#1B1712;font:inherit;font-weight:600;font-size:15px;cursor:pointer}
+.bl-pop-ok:focus-visible{outline:2px solid #f3dba0;outline-offset:3px}
 .blade.is-tapped .blade-say:not(.blade-a):not(.blade-b) .ns:nth-last-child(-n+2){display:none}
 .blade-btns{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;width:100%}
 .blade-btns .ghost{justify-content:flex-start;text-align:left;font:inherit;cursor:pointer;background:none;border:0}

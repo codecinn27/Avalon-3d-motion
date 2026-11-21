@@ -1,6 +1,7 @@
 # 010 The Blade (scroll story part 10, chapter 7)
 
 **Status**: plan written 2026-11-16 with the owner, from their answers and their picks on The Blade Options page. **Approved by the owner 2026-11-16.** **Built 2026-11-17** (owner's look pending), see [As built](#as-built-2026-11-17).
+**Changed by [014 The default blade](014-default_blade.md) (2026-11-21)**: with no choice the Assassin now strikes seat 6, a Loyal Servant, so **ending B (Good wins) is the default**, not ending A. A pop-up stops the scroll at the choice once per visit until the visitor presses OK. Decision 14, step 8, rule 5, B-9, B-14 and the `auto` data check below are replaced by 014.
 **Build command**: `/develop chp7-the-blade`. Read [Before you build](#before-you-build) first.
 **Story**: [story_line.md](../scope/story_line.md), chapter 7 The Blade. Rule shown: when good wins three quests, evil gets one guess at Merlin, and a right guess steals the whole game. Visitor: **decides where the blade falls** (the third hands on moment, and the one the whole page builds to).
 **Model**: the same pinned stage and round table as [004](004-the-deal.md) to [009](009-the-climb.md).

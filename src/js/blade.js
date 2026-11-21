@@ -6,7 +6,7 @@
 // Like quest.js and lady.js the choice mixes a timed tween (the strike) with the scroll: `K.t`, the scroll position inside the chapter in screens,
 // is read every frame, and everything else follows the scroll both ways. Only transform and opacity change per frame (the `put` cache).
 import { sayLines } from './say.js';
-import { goTo } from './motion.js';
+import { goTo, jumpTo, lockScroll } from './motion.js';
 
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 const smooth = (t) => t * t * (3 - 2 * t);
@@ -34,6 +34,8 @@ const liftFor = (deg) => {
 
 // the screens where the choice lives (from the start of the chapter, 010 "Scroll budget")
 const WIN0 = 2.0, WIN1 = 2.5, AUTO1 = 2.75, END0 = 2.75, END_LEN = 1.25, WIN_LEN = 0.6, LEN = 4.6;
+// where the pop-up stops the scroll (spec 014): a little inside the window, the same place "See the other ending" lands
+const GATE = WIN0 + 0.08;
 
 // what chapter 8 and the invite read (spec 011): which ending, and whether the visitor chose it
 const RESULT = { ending: null, chose: false };
@@ -87,6 +89,8 @@ export function createBlade({ gsap, sec, ring, slots, night, vote, lady, climb, 
   const T = data.text;
   const s0 = (s) => s - 1;
   const EVIL = data.evil.map(s0), ARC = data.arc.map(s0), MERLIN = s0(data.merlin), ASSASSIN = s0(data.assassin), PERCIVAL = s0(data.between[1]);
+  // no choice: the Assassin strikes this loyal seat, so Good wins by default (spec 014)
+  const AUTO = s0(data.auto);
   const { S, X, L, FL, Z, F, HID, table, put } = night;
   const V = vote.V;
   const n = 10;
@@ -278,6 +282,62 @@ export function createBlade({ gsap, sec, ring, slots, night, vote, lady, climb, 
   });
   let winY = () => null;
 
+  // ---------- the pop-up at the choice (spec 014): once a visit, the scroll stops on the choice until OK ----------
+  const pop = sec.querySelector('[data-blade-pop]');
+  const canPop = Boolean(pop && typeof pop.showModal === 'function');
+  let popShown = !canPop, popOpen = false, lockY = null, gateT = null, popStep = 0, swapping = false;
+  // three steps, one dialog: you lose, you are the Assassin, then the choice (its two small lines). Only the text swaps, so the lock never lets go
+  const popT = pop && pop.querySelector('.bl-pop-t'), popN = pop && pop.querySelector('#bl-pop-n'), popN2 = pop && pop.querySelector('.bl-pop-n2');
+  const setStep = (s) => {
+    popStep = s;
+    popT.textContent = s === 1 ? T.popLose : s === 2 ? T.popAssassin : T.popTitle;
+    popN.textContent = T.popNote;
+    popN.hidden = s !== 3;
+    popN2.hidden = s !== 3;
+  };
+  function nextPop() {
+    if (!popOpen || swapping) return;
+    if (popStep >= 3) return closePop();
+    const kids = [...pop.children];
+    if (!pop.animate || reduceMotion()) return setStep(popStep + 1);
+    swapping = true;
+    const out = kids.map((k) => k.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: 'ease-in', fill: 'forwards' }));
+    out[0].onfinish = () => {
+      setStep(popStep + 1);
+      out.forEach((a) => a.cancel());
+      [...pop.children].forEach((k) => k.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out' }));
+      swapping = false;
+    };
+  }
+  function openPop() {
+    popShown = true;
+    popOpen = true;
+    setStep(1);
+    lockY = winY();
+    if (lockY != null) jumpTo(lockY); // a fast flick that passed the choice comes back to it
+    lockScroll(true);
+    pop.showModal();
+    if (pop.animate) pop.animate([{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }], { duration: 250, easing: 'ease-out' });
+  }
+  function closePop() {
+    if (!popOpen) return;
+    popOpen = false;
+    const done = () => {
+      if (pop.open) pop.close();
+      lockScroll(false);
+      lockY = null;
+    };
+    if (pop.animate) pop.animate([{ opacity: 1 }, { opacity: 0, transform: 'translateY(6px)' }], { duration: 200, easing: 'ease-in' }).onfinish = done;
+    else done();
+  }
+  if (canPop) {
+    on(pop.querySelector('.bl-pop-ok'), 'click', nextPop);
+    on(pop, 'cancel', (e) => {
+      e.preventDefault(); // Esc counts as OK for the current step only
+      nextPop();
+    });
+  }
+
   const labelsOn = (on2) => {
     ARC.forEach((i) => {
       const el = slots[i];
@@ -301,6 +361,11 @@ export function createBlade({ gsap, sec, ring, slots, night, vote, lady, climb, 
     lastClock = clock;
     const t = K.t;
     const active = t > 0.001;
+    // the pop-up: the first time the scroll crosses the stop point going down, and the visitor hasn't struck yet
+    if (!popShown && !choice && gateT != null && gateT < GATE && t >= GATE) openPop();
+    gateT = t;
+    // while it is open, hold the page on the choice (a flick's glide may still be running)
+    if (popOpen && lockY != null && Math.abs(window.scrollY - lockY) > 1) jumpTo(lockY);
     night.noAsk = active;
     if (!active) {
       // above the chapter: leave nothing behind
@@ -321,7 +386,7 @@ export function createBlade({ gsap, sec, ring, slots, night, vote, lady, climb, 
     // the choice: scrolling back above the window clears it, the end of the window makes it for the visitor
     if (t < WIN0 - 0.02 && choice) clearChoice();
     if (choice && choice.by === 'scroll' && t < WIN1 - 0.02) choice = null;
-    if (!choice && t >= WIN1) choice = { seat: MERLIN, by: 'scroll' };
+    if (!choice && t >= WIN1 && !popOpen) choice = { seat: AUTO, by: 'scroll' };
     const win = inWindow();
     if (win !== wasWin) {
       wasWin = win;
@@ -581,7 +646,7 @@ export function createBlade({ gsap, sec, ring, slots, night, vote, lady, climb, 
     vis(boxes.b, ending === 'b');
   }
   night.after.push(frame);
-  if (location.search.includes('debug')) window.__bl = { K, get choice() { return choice; }, get aim() { return aim; }, ST };
+  if (location.search.includes('debug')) window.__bl = { K, get choice() { return choice; }, get aim() { return aim; }, ST, get pop() { return { shown: popShown, open: popOpen, lockY, step: popStep }; } };
 
   function hideAll() {
     put(dag, 'v', 'hidden');
@@ -679,6 +744,11 @@ export function createBlade({ gsap, sec, ring, slots, night, vote, lady, climb, 
   function destroy() {
     if (bt) bt.kill();
     if (tw) tw.kill();
+    if (popOpen || (pop && pop.open)) {
+      popOpen = false;
+      if (pop.open) pop.close();
+      lockScroll(false);
+    }
     offs.forEach((fn) => fn());
     offs = [];
     const i = night.after.indexOf(frame);
@@ -708,7 +778,7 @@ export function createBlade({ gsap, sec, ring, slots, night, vote, lady, climb, 
   return { build, destroy, K, result, boxes };
 }
 
-// ---------- reduced motion (?motion=off): six plain buttons, ending A by default, the chosen ending shown with a fade ----------
+// ---------- reduced motion (?motion=off): six plain buttons, ending B by default (spec 014), the chosen ending shown with a fade ----------
 export function initBladePlain() {
   const dataEl = document.getElementById('page-data');
   const pd = dataEl && JSON.parse(dataEl.textContent);
@@ -738,5 +808,6 @@ export function initBladePlain() {
     const q = document.querySelector('[data-seat-q]');
     if (q) q.textContent = isA ? pd.seat.text.hidden : pd.seat.text.found;
   });
-  setResult('a', false);
+  // no choice: the Assassin strikes a loyal servant, Good wins (spec 014). The template already shows that ending
+  setResult('b', false);
 }
