@@ -62,7 +62,7 @@ ${seo}
 <a class="skip" href="#main">${esc(ctx.t.a11y.skip)}</a>
 <div class="backdrop" aria-hidden="true"><div class="silk silk-light"></div><div class="silk silk-dark"></div><div class="silk silk-night"></div><canvas id="silk"></canvas><div class="tint tint-crimson"></div><div class="tint tint-dawn"></div></div>
 <div class="grain" aria-hidden="true"></div>
-${nav(ctx)}
+${page.bodyClass === 'page-home' ? '<div class="progress" aria-hidden="true"><i><b></b></i></div>' : ''}${nav(ctx)}
 <main id="main">
 ${page.body}
 </main>

@@ -186,6 +186,7 @@ Decisions and plans are kept per topic. Read these before changing the topic:
 - [docs/section/012-background-music.md](../section/012-background-music.md): the 60 second music loop, its autoplay rules and the top-right on/off button (built 2026-11-17, real phone check pending)
 - [docs/section/013-performance_mobile.md](../section/013-performance_mobile.md): scroll lag on real phones, the suspected causes, the fixes to try, and how to measure on a phone over USB. Worked one checkpoint at a time (CP-1 measured 2026-11-18: 19.4 → 25.5 fps, not yet smooth)
 - [docs/section/014-default_blade.md](../section/014-default_blade.md): change to chapter 7. No choice strikes seat 6 (Good wins by default), and a once-a-visit pop-up stops the scroll at the choice until OK (planned and built 2026-11-21, owner's check of the EN and BM wording and a real phone pending)
+- [docs/section/016-scroll-progress.md](../section/016-scroll-progress.md): a thin scroll progress bar at the very top edge, plain fill, no chapter ticks, built only from transform so the phone stays smooth (plan written 2026-11-22, pen code received and its costly parts replaced, waiting for the owner's go to build)
 - [docs/images/001-characters.md](../images/001-characters.md): card art, the ten card deck, the repaint decision
 - [docs/images/002-badge.md](../images/002-badge.md): team badges, version 2 plan
 - [docs/images/003-props.md](../images/003-props.md): vote, quest and Lady of the Lake cards

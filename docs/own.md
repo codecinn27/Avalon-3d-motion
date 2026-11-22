@@ -117,6 +117,20 @@ optional:
 & "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe" forward tcp:9333 localabstract:chrome_devtools_remote
 ```
 
+### Version 2: 
+
+```bash
+& "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe" reverse tcp:4870 tcp:4870
+```
+
+```bash
+& "$env:LOCALAPPDATA\Android\Sdk\platform-tools\adb.exe" reverse --list
+```
+
+```bash
+npm run build:dev
+npx serve dist -l 4870
+```
 
 
 # Text files:

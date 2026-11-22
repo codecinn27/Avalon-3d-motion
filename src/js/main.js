@@ -14,6 +14,7 @@ import { initBladePlain } from './blade.js';
 import { drawLink } from './seat.js';
 import { initRunner } from './runner.js';
 import { initMusic } from './music.js';
+import { initProgress } from './progress.js';
 
 const root = document.documentElement;
 const reduced = root.classList.contains('rm');
@@ -51,5 +52,6 @@ safe('runner', () => initRunner({ animate: motionOn }));
 safe('music', () => initMusic({ reduced }));
 // with the pin, the hero's "Draw your card" link goes to the draw on the table; without it the link jumps to the plain draw section
 document.querySelectorAll('a[href="#draw"]').forEach((a) => a.addEventListener('click', (e) => drawLink.go && drawLink.go() && e.preventDefault()));
+safe('progress', () => initProgress({ animate: motionOn }));
 safe('reveal', () => initReveal({ animate: motionOn }));
 root.classList.add('ready');
